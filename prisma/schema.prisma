@@ -1,0 +1,76 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id        Int      @id @default(autoincrement())
+  email     String   @unique
+  password  String
+  name      String
+  role      UserRole @default(CASHIER)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  sales     Sale[]
+
+  @@map("users")
+}
+
+model Category {
+  id        Int      @id @default(autoincrement())
+  name      String   @unique
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  items     Item[]
+
+  @@map("categories")
+}
+
+model Item {
+  id          Int        @id @default(autoincrement())
+  name        String     @unique
+  description String?
+  price       Float
+  stock       Int        @default(0)
+  categoryId  Int
+  emoji       String?
+  createdAt   DateTime   @default(now())
+  updatedAt   DateTime   @updatedAt
+  category    Category   @relation(fields: [categoryId], references: [id])
+  saleItems   SaleItem[]
+
+  @@map("items")
+}
+
+model Sale {
+  id        Int        @id @default(autoincrement())
+  total     Float
+  userId    Int
+  createdAt DateTime   @default(now())
+  updatedAt DateTime   @updatedAt
+  items     SaleItem[]
+  user      User       @relation(fields: [userId], references: [id])
+
+  @@map("sales")
+}
+
+model SaleItem {
+  id       Int   @id @default(autoincrement())
+  quantity Int
+  price    Float
+  saleId   Int
+  itemId   Int
+  item     Item  @relation(fields: [itemId], references: [id])
+  sale     Sale  @relation(fields: [saleId], references: [id])
+
+  @@map("sale_items")
+}
+
+enum UserRole {
+  ADMIN
+  CASHIER
+}
