@@ -13,6 +13,7 @@ import {
   LoadingSpinner 
 } from '@/components/ui'
 import { useRouter } from 'next/navigation'
+import ProductImage from '@/components/ProductImage'
 
 export default function CreateSalePage() {
   const { user } = useAuth()
@@ -238,14 +239,8 @@ export default function CreateSalePage() {
                           item.stock <= 0 ? 'opacity-50 cursor-not-allowed' : 'hover:border-blue-500'
                         }`}
                       >
-                        <div className="aspect-square bg-gray-100 rounded-lg mb-3 flex items-center justify-center">
-                          <div className="text-4xl">
-                            {item.category.name === 'Beverages' ? '🥤' : 
-                             item.category.name === 'Snacks' ? '🍿' :
-                             item.category.name === 'Electronics' ? '📱' :
-                             item.category.name === 'Clothing' ? '👕' :
-                             item.category.name === 'Books' ? '📚' : '📦'}
-                          </div>
+                        <div className="aspect-square bg-gray-100 rounded-lg mb-3 flex items-center justify-center p-2">
+                          <ProductImage item={item} size="xl" className="w-full h-full" />
                         </div>
                         <div className="text-center">
                           <h4 className="font-medium text-sm mb-1 truncate">{item.name}</h4>
@@ -299,9 +294,12 @@ export default function CreateSalePage() {
                         {cart.map((item) => (
                           <div key={item.itemId} className="bg-gray-50 rounded-lg p-3">
                             <div className="flex justify-between items-start mb-2">
-                              <div className="flex-1">
-                                <h4 className="font-medium text-sm">{item.name}</h4>
-                                <p className="text-xs text-gray-500">${item.price.toFixed(2)} each</p>
+                              <div className="flex items-center gap-2 flex-1">
+                                <ProductImage item={item} size="sm" />
+                                <div>
+                                  <h4 className="font-medium text-sm">{item.name}</h4>
+                                  <p className="text-xs text-gray-500">${item.price.toFixed(2)} each</p>
+                                </div>
                               </div>
                               <Button
                                 size="sm"

@@ -3,7 +3,20 @@
 import { useState, useEffect } from 'react'
 import AuthGuard from '@/components/AuthGuard'
 import DashboardLayout from '@/components/DashboardLayout'
-import { Card, CardHeader, CardBody, Table, TableHeader, TableBody, TableRow, TableCell, TableHeaderCell, LoadingSpinner } from '@/components/ui'
+import { Card, CardHeader, CardBody } from '@/components/ui'
+import { LoadingSpinner } from '@/components/ui'
+import { Badge } from '@/components/ui'
+import { Button } from '@/components/ui'
+import { 
+  Table, 
+  TableBody, 
+  TableCell, 
+  TableHead, 
+  TableHeader, 
+  TableRow,
+  TableHeaderCell
+} from '@/components/ui'
+import ProductImage from '@/components/ProductImage'
 
 export default function Dashboard() {
   const [stats, setStats] = useState(null)
@@ -184,7 +197,12 @@ export default function Dashboard() {
                     <TableBody>
                       {stats.topItems.map((item, index) => (
                         <TableRow key={index}>
-                          <TableCell>{item.name}</TableCell>
+                          <TableCell>
+                            <div className="flex items-center gap-3">
+                              <ProductImage item={item} size="sm" />
+                              <span className="font-medium">{item.name}</span>
+                            </div>
+                          </TableCell>
                           <TableCell>{item.totalSold}</TableCell>
                           <TableCell>${item.price.toFixed(2)}</TableCell>
                         </TableRow>

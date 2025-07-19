@@ -21,10 +21,7 @@ import ProductImage from '@/components/ProductImage'
 
 export default function SalesPage() {
   const [sales, setSales] = useState([])
-  const [filteredSales, setFilteredSales] = useState([])
   const [loading, setLoading] = useState(true)
-  const [searchTerm, setSearchTerm] = useState('')
-  const [dateFilter, setDateFilter] = useState('')
   const [stats, setStats] = useState({
     totalSales: 0,
     totalRevenue: 0,
@@ -35,10 +32,6 @@ export default function SalesPage() {
   useEffect(() => {
     fetchSales()
   }, [])
-
-  useEffect(() => {
-    filterSales()
-  }, [sales, searchTerm, dateFilter])
 
   const fetchSales = async () => {
     try {
@@ -53,30 +46,6 @@ export default function SalesPage() {
     } finally {
       setLoading(false)
     }
-  }
-
-  const filterSales = () => {
-    let filtered = sales
-
-    if (searchTerm) {
-      filtered = filtered.filter(sale => 
-        sale.id.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        sale.user.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        sale.items.some(item => 
-          item.item.name.toLowerCase().includes(searchTerm.toLowerCase())
-        )
-      )
-    }
-
-    if (dateFilter) {
-      const filterDate = new Date(dateFilter)
-      filtered = filtered.filter(sale => {
-        const saleDate = new Date(sale.createdAt)
-        return saleDate.toDateString() === filterDate.toDateString()
-      })
-    }
-
-    setFilteredSales(filtered)
   }
 
   const calculateStats = (salesData) => {
@@ -159,69 +128,24 @@ export default function SalesPage() {
             </Card>
           </div>
 
-          {/* Search and Filter */}
-          <Card>
-            <CardBody>
-              <div className="flex flex-col md:flex-row gap-4">
-                <div className="flex-1">
-                  <input
-                    type="text"
-                    placeholder="Search sales by ID, cashier, or item name..."
-                    value={searchTerm}
-                    onChange={(e) => setSearchTerm(e.target.value)}
-                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-                  />
-                </div>
-                <div className="flex gap-2">
-                  <input
-                    type="date"
-                    value={dateFilter}
-                    onChange={(e) => setDateFilter(e.target.value)}
-                    className="px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-                  />
-                  <Button
-                    variant="outline"
-                    onClick={() => {
-                      setSearchTerm('')
-                      setDateFilter('')
-                    }}
-                  >
-                    Clear
-                  </Button>
-                </div>
-              </div>
-            </CardBody>
-          </Card>
-
           <Card>
             <CardHeader>
               <div className="flex justify-between items-center">
                 <h3 className="text-lg font-semibold">Recent Transactions</h3>
                 <div className="text-sm text-gray-500">
-                  {filteredSales.length} of {sales.length} transactions
+                  {sales.length} total transactions
                 </div>
               </div>
             </CardHeader>
             <CardBody>
-              {filteredSales.length === 0 ? (
+              {sales.length === 0 ? (
                 <div className="text-center py-16">
-                  <div className="text-gray-400 text-6xl mb-4">
-                    {searchTerm || dateFilter ? '�' : '�🛒'}
-                  </div>
-                  <h3 className="text-lg font-medium text-gray-900 mb-2">
-                    {searchTerm || dateFilter ? 'No matching sales found' : 'No sales yet'}
-                  </h3>
-                  <p className="text-gray-600 mb-6">
-                    {searchTerm || dateFilter 
-                      ? 'Try adjusting your search or filter criteria' 
-                      : 'Start making sales to see transactions here'
-                    }
-                  </p>
-                  {!searchTerm && !dateFilter && (
-                    <Link href="/dashboard/sales/create">
-                      <Button variant="primary">Create First Sale</Button>
-                    </Link>
-                  )}
+                  <div className="text-gray-400 text-6xl mb-4">🛒</div>
+                  <h3 className="text-lg font-medium text-gray-900 mb-2">No sales yet</h3>
+                  <p className="text-gray-600 mb-6">Start making sales to see transactions here</p>
+                  <Link href="/dashboard/sales/create">
+                    <Button variant="primary">Create First Sale</Button>
+                  </Link>
                 </div>
               ) : (
                 <Table>
@@ -235,7 +159,7 @@ export default function SalesPage() {
                     </TableRow>
                   </TableHeader>
                   <TableBody>
-                    {filteredSales.map((sale) => (
+                    {sales.map((sale) => (
                       <TableRow key={sale.id} className="table-row-hover">
                         <TableCell>
                           <div>

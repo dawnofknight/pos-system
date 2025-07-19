@@ -18,6 +18,7 @@ import {
   LoadingSpinner 
 } from '@/components/ui'
 import Link from 'next/link'
+import ProductImage from '@/components/ProductImage'
 import { generateReceiptHTML, generateSaleCSV } from '@/lib/receipt'
 
 export default function SaleDetailsPage() {
@@ -155,9 +156,7 @@ export default function SaleDetailsPage() {
                         <TableRow key={item.id}>
                           <TableCell>
                             <div className="flex items-center gap-3">
-                              <div className="w-10 h-10 bg-gray-100 rounded-lg flex items-center justify-center text-lg">
-                                {item.item.emoji || '📦'}
-                              </div>
+                              <ProductImage item={item.item} size="md" />
                               <div>
                                 <div className="font-medium">{item.item.name}</div>
                                 <div className="text-sm text-gray-500">{item.item.category?.name}</div>
