@@ -31,7 +31,8 @@ export async function PUT(request, { params }) {
       return NextResponse.json({ error: 'Access denied' }, { status: 403 })
     }
 
-    const userId = parseInt(params.id)
+    const { id } = await params
+    const userId = parseInt(id)
     const { password } = await request.json()
 
     // Validation

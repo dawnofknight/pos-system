@@ -3,6 +3,7 @@
 import { useState, useEffect } from 'react'
 import AuthGuard from '@/components/AuthGuard'
 import DashboardLayout from '@/components/DashboardLayout'
+import { useTheme } from '@/contexts/ThemeContext'
 import { Card, CardHeader, CardBody } from '@/components/ui'
 import { LoadingSpinner } from '@/components/ui'
 import { Badge } from '@/components/ui'
@@ -21,6 +22,8 @@ import ProductImage from '@/components/ProductImage'
 export default function Dashboard() {
   const [stats, setStats] = useState(null)
   const [loading, setLoading] = useState(true)
+  const { theme } = useTheme()
+  const isDark = theme === 'dark'
 
   useEffect(() => {
     fetchDashboardData()
@@ -57,8 +60,18 @@ export default function Dashboard() {
       <DashboardLayout>
         <div className="space-y-6">
           <div>
-            <h1 className="text-2xl font-bold text-gray-900">Dashboard</h1>
-            <p className="text-gray-600">Overview of your POS system</p>
+            <h1 
+              className="text-2xl font-bold transition-colors"
+              style={{ color: isDark ? '#ffffff' : '#111827' }}
+            >
+              Dashboard
+            </h1>
+            <p 
+              className="transition-colors"
+              style={{ color: isDark ? '#d1d5db' : '#4b5563' }}
+            >
+              Overview of your POS system
+            </p>
           </div>
 
           {/* Stats Cards */}
@@ -72,11 +85,22 @@ export default function Dashboard() {
                     </div>
                   </div>
                   <div className="ml-4">
-                    <dt className="text-sm font-medium text-gray-500">Total Sales</dt>
-                    <dd className="text-lg font-semibold text-gray-900">
+                    <dt 
+                      className="text-sm font-medium transition-colors"
+                      style={{ color: isDark ? '#9ca3af' : '#6b7280' }}
+                    >
+                      Total Sales
+                    </dt>
+                    <dd 
+                      className="text-lg font-semibold transition-colors"
+                      style={{ color: isDark ? '#ffffff' : '#111827' }}
+                    >
                       ${stats?.stats?.totalSales?.amount?.toFixed(2) || '0.00'}
                     </dd>
-                    <dd className="text-sm text-gray-500">
+                    <dd 
+                      className="text-sm transition-colors"
+                      style={{ color: isDark ? '#9ca3af' : '#6b7280' }}
+                    >
                       {stats?.stats?.totalSales?.count || 0} transactions
                     </dd>
                   </div>
@@ -93,11 +117,22 @@ export default function Dashboard() {
                     </div>
                   </div>
                   <div className="ml-4">
-                    <dt className="text-sm font-medium text-gray-500">Today's Sales</dt>
-                    <dd className="text-lg font-semibold text-gray-900">
+                    <dt 
+                      className="text-sm font-medium transition-colors"
+                      style={{ color: isDark ? '#9ca3af' : '#6b7280' }}
+                    >
+                      Today's Sales
+                    </dt>
+                    <dd 
+                      className="text-lg font-semibold transition-colors"
+                      style={{ color: isDark ? '#ffffff' : '#111827' }}
+                    >
                       ${stats?.stats?.todaySales?.amount?.toFixed(2) || '0.00'}
                     </dd>
-                    <dd className="text-sm text-gray-500">
+                    <dd 
+                      className="text-sm transition-colors"
+                      style={{ color: isDark ? '#9ca3af' : '#6b7280' }}
+                    >
                       {stats?.stats?.todaySales?.count || 0} transactions
                     </dd>
                   </div>
@@ -114,11 +149,24 @@ export default function Dashboard() {
                     </div>
                   </div>
                   <div className="ml-4">
-                    <dt className="text-sm font-medium text-gray-500">Total Items</dt>
-                    <dd className="text-lg font-semibold text-gray-900">
+                    <dt 
+                      className="text-sm font-medium transition-colors"
+                      style={{ color: isDark ? '#9ca3af' : '#6b7280' }}
+                    >
+                      Total Items
+                    </dt>
+                    <dd 
+                      className="text-lg font-semibold transition-colors"
+                      style={{ color: isDark ? '#ffffff' : '#111827' }}
+                    >
                       {stats?.stats?.totalItems || 0}
                     </dd>
-                    <dd className="text-sm text-gray-500">In inventory</dd>
+                    <dd 
+                      className="text-sm transition-colors"
+                      style={{ color: isDark ? '#9ca3af' : '#6b7280' }}
+                    >
+                      In inventory
+                    </dd>
                   </div>
                 </div>
               </CardBody>
@@ -133,11 +181,24 @@ export default function Dashboard() {
                     </div>
                   </div>
                   <div className="ml-4">
-                    <dt className="text-sm font-medium text-gray-500">Low Stock</dt>
-                    <dd className="text-lg font-semibold text-gray-900">
+                    <dt 
+                      className="text-sm font-medium transition-colors"
+                      style={{ color: isDark ? '#9ca3af' : '#6b7280' }}
+                    >
+                      Low Stock
+                    </dt>
+                    <dd 
+                      className="text-lg font-semibold transition-colors"
+                      style={{ color: isDark ? '#ffffff' : '#111827' }}
+                    >
                       {stats?.stats?.lowStockItems || 0}
                     </dd>
-                    <dd className="text-sm text-gray-500">Items under 10</dd>
+                    <dd 
+                      className="text-sm transition-colors"
+                      style={{ color: isDark ? '#9ca3af' : '#6b7280' }}
+                    >
+                      Items under 10
+                    </dd>
                   </div>
                 </div>
               </CardBody>
@@ -149,7 +210,12 @@ export default function Dashboard() {
             {/* Recent Sales */}
             <Card>
               <CardHeader>
-                <h3 className="text-lg font-semibold">Recent Sales</h3>
+                <h3 
+                  className="text-lg font-semibold transition-colors"
+                  style={{ color: isDark ? '#ffffff' : '#111827' }}
+                >
+                  Recent Sales
+                </h3>
               </CardHeader>
               <CardBody>
                 {stats?.recentSales?.length > 0 ? (
@@ -174,7 +240,12 @@ export default function Dashboard() {
                     </TableBody>
                   </Table>
                 ) : (
-                  <p className="text-gray-500 text-center py-4">No recent sales</p>
+                  <p 
+                    className="text-center py-4 transition-colors"
+                    style={{ color: isDark ? '#9ca3af' : '#6b7280' }}
+                  >
+                    No recent sales
+                  </p>
                 )}
               </CardBody>
             </Card>
@@ -182,7 +253,12 @@ export default function Dashboard() {
             {/* Top Items */}
             <Card>
               <CardHeader>
-                <h3 className="text-lg font-semibold">Top Selling Items</h3>
+                <h3 
+                  className="text-lg font-semibold transition-colors"
+                  style={{ color: isDark ? '#ffffff' : '#111827' }}
+                >
+                  Top Selling Items
+                </h3>
               </CardHeader>
               <CardBody>
                 {stats?.topItems?.length > 0 ? (
@@ -210,7 +286,12 @@ export default function Dashboard() {
                     </TableBody>
                   </Table>
                 ) : (
-                  <p className="text-gray-500 text-center py-4">No sales data</p>
+                  <p 
+                    className="text-center py-4 transition-colors"
+                    style={{ color: isDark ? '#9ca3af' : '#6b7280' }}
+                  >
+                    No sales data
+                  </p>
                 )}
               </CardBody>
             </Card>

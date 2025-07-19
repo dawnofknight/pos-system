@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Manual Theme Test</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            darkMode: 'class'
+        }
+    </script>
+</head>
+<body class="bg-white dark:bg-gray-900 text-black dark:text-white transition-colors duration-300">
+    <div class="container mx-auto p-8">
+        <h1 class="text-4xl font-bold mb-8">Manual Theme Test</h1>
+        
+        <button 
+            onclick="toggleTheme()"
+            class="px-6 py-3 bg-blue-500 hover:bg-blue-600 text-white rounded-lg font-semibold mb-8"
+        >
+            Toggle Theme
+        </button>
+        
+        <div class="p-6 bg-gray-100 dark:bg-gray-800 rounded-lg">
+            <h2 class="text-2xl font-bold mb-4">Test Card</h2>
+            <p class="text-gray-600 dark:text-gray-300">This should change colors</p>
+        </div>
+        
+        <div class="mt-6 p-4 border border-gray-300 dark:border-gray-700 rounded">
+            <h3 class="font-bold mb-2">Debug Info</h3>
+            <p class="text-sm">HTML classes: <span id="classes"></span></p>
+        </div>
+    </div>
+
+    <script>
+        function updateDebug() {
+            document.getElementById('classes').textContent = document.documentElement.classList.toString();
+        }
+        
+        function toggleTheme() {
+            console.log('Toggle clicked');
+            const html = document.documentElement;
+            
+            if (html.classList.contains('dark')) {
+                html.classList.remove('dark');
+                console.log('Removed dark class');
+            } else {
+                html.classList.add('dark');
+                console.log('Added dark class');
+            }
+            
+            updateDebug();
+        }
+        
+        // Initial debug update
+        updateDebug();
+    </script>
+</body>
+</html>

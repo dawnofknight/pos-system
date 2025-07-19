@@ -251,7 +251,7 @@ export default function ItemsPage() {
         <div className="space-y-6">
           <div className="flex justify-between items-center">
             <div>
-              <h1 className="text-2xl font-bold text-gray-900">Items Management</h1>
+              <h1 className="text-2xl font-bold text-gray-900 dark:text-white">Items Management</h1>
               <p className="text-gray-600">Manage your inventory items</p>
             </div>
             <Button 
@@ -295,7 +295,7 @@ export default function ItemsPage() {
                           <div>
                             <div className="font-medium">{item.name}</div>
                             {item.description && (
-                              <div className="text-sm text-gray-500">{item.description}</div>
+                              <div className="text-sm text-gray-500 dark:text-gray-400">{item.description}</div>
                             )}
                           </div>
                         </div>

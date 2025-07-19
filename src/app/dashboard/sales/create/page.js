@@ -4,12 +4,14 @@ import { useState, useEffect } from 'react'
 import AuthGuard from '@/components/AuthGuard'
 import DashboardLayout from '@/components/DashboardLayout'
 import { useAuth } from '@/contexts/AuthContext'
+import { useTheme } from '@/contexts/ThemeContext'
 import { 
   Card, 
   CardHeader, 
   CardBody, 
   Button, 
   Input, 
+  Select,
   LoadingSpinner 
 } from '@/components/ui'
 import { useRouter } from 'next/navigation'
@@ -17,6 +19,8 @@ import ProductImage from '@/components/ProductImage'
 
 export default function CreateSalePage() {
   const { user } = useAuth()
+  const { theme } = useTheme()
+  const isDark = theme === 'dark'
   const router = useRouter()
   const [items, setItems] = useState([])
   const [categories, setCategories] = useState([])
@@ -298,21 +302,46 @@ export default function CreateSalePage() {
 
           <div className="flex justify-between items-center mb-6">
             <div>
-              <h1 className="text-2xl font-bold text-gray-900">Point of Sale</h1>
-              <p className="text-gray-600">Select items to add to cart</p>
+              <h1 
+                className="text-2xl font-bold transition-colors"
+                style={{ color: isDark ? '#ffffff' : '#111827' }}
+              >
+                Point of Sale
+              </h1>
+              <p 
+                className="transition-colors"
+                style={{ color: isDark ? '#d1d5db' : '#6b7280' }}
+              >
+                Select items to add to cart
+              </p>
             </div>
             <div className="flex items-center space-x-4">
               {/* Draft controls */}
               <div className="flex gap-2">
                 {draftSaved && (
-                  <span className="px-2 py-1 bg-blue-100 text-blue-800 text-sm rounded-lg">
+                  <span 
+                    className="px-2 py-1 text-sm rounded-lg transition-colors"
+                    style={{
+                      backgroundColor: isDark ? '#1e3a8a' : '#dbeafe',
+                      color: isDark ? '#93c5fd' : '#1e40af'
+                    }}
+                  >
                     Draft saved
                   </span>
                 )}
                 {hasDraft() && (
                   <button
                     onClick={loadDraft}
-                    className="px-3 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 text-sm"
+                    className="px-3 py-2 text-white rounded-lg text-sm transition-colors duration-200"
+                    style={{
+                      backgroundColor: isDark ? '#1d4ed8' : '#2563eb'
+                    }}
+                    onMouseEnter={(e) => {
+                      e.target.style.backgroundColor = isDark ? '#1e40af' : '#1d4ed8'
+                    }}
+                    onMouseLeave={(e) => {
+                      e.target.style.backgroundColor = isDark ? '#1d4ed8' : '#2563eb'
+                    }}
                   >
                     Load Draft
                   </button>
@@ -321,20 +350,43 @@ export default function CreateSalePage() {
                   <>
                     <button
                       onClick={saveDraft}
-                      className="px-3 py-2 bg-gray-600 text-white rounded-lg hover:bg-gray-700 text-sm"
+                      className="px-3 py-2 text-white rounded-lg text-sm transition-colors duration-200"
+                      style={{
+                        backgroundColor: isDark ? '#4b5563' : '#6b7280'
+                      }}
+                      onMouseEnter={(e) => {
+                        e.target.style.backgroundColor = isDark ? '#374151' : '#4b5563'
+                      }}
+                      onMouseLeave={(e) => {
+                        e.target.style.backgroundColor = isDark ? '#4b5563' : '#6b7280'
+                      }}
                     >
                       Save Draft
                     </button>
                     <button
                       onClick={clearDraft}
-                      className="px-3 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 text-sm"
+                      className="px-3 py-2 text-white rounded-lg text-sm transition-colors duration-200"
+                      style={{
+                        backgroundColor: isDark ? '#dc2626' : '#ef4444'
+                      }}
+                      onMouseEnter={(e) => {
+                        e.target.style.backgroundColor = isDark ? '#b91c1c' : '#dc2626'
+                      }}
+                      onMouseLeave={(e) => {
+                        e.target.style.backgroundColor = isDark ? '#dc2626' : '#ef4444'
+                      }}
                     >
                       Clear Cart
                     </button>
                   </>
                 )}
               </div>
-              <span className="text-sm text-gray-600">Cashier: {user?.name}</span>
+              <span 
+                className="text-sm transition-colors"
+                style={{ color: isDark ? '#d1d5db' : '#6b7280' }}
+              >
+                Cashier: {user?.name}
+              </span>
             </div>
           </div>
 
@@ -344,7 +396,12 @@ export default function CreateSalePage() {
               <Card className="h-full">
                 <CardHeader>
                   <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center space-y-4 sm:space-y-0">
-                    <h3 className="text-lg font-semibold">Items</h3>
+                    <h3 
+                      className="text-lg font-semibold transition-colors"
+                      style={{ color: isDark ? '#ffffff' : '#111827' }}
+                    >
+                      Items
+                    </h3>
                     <div className="flex flex-col sm:flex-row space-y-2 sm:space-y-0 sm:space-x-4 w-full sm:w-auto">
                       <Input
                         placeholder="Search items..."
@@ -352,18 +409,17 @@ export default function CreateSalePage() {
                         onChange={(e) => setSearchTerm(e.target.value)}
                         className="sm:w-64"
                       />
-                      <select
+                      <Select
                         value={selectedCategory}
                         onChange={(e) => setSelectedCategory(e.target.value)}
-                        className="px-3 py-2 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500"
-                      >
-                        <option value="all">All Categories</option>
-                        {categories.map(category => (
-                          <option key={category.id} value={category.id.toString()}>
-                            {category.name}
-                          </option>
-                        ))}
-                      </select>
+                        options={[
+                          { value: 'all', label: 'All Categories' },
+                          ...categories.map(category => ({
+                            value: category.id.toString(),
+                            label: category.name
+                          }))
+                        ]}
+                      />
                     </div>
                   </div>
                 </CardHeader>
@@ -373,18 +429,57 @@ export default function CreateSalePage() {
                       <div
                         key={item.id}
                         onClick={() => addToCart(item)}
-                        className={`bg-white border rounded-lg p-4 cursor-pointer transition-all hover:shadow-md ${
-                          item.stock <= 0 ? 'opacity-50 cursor-not-allowed' : 'hover:border-blue-500'
+                        className={`rounded-lg p-4 cursor-pointer transition-all hover:shadow-md ${
+                          item.stock <= 0 ? 'opacity-50 cursor-not-allowed' : ''
                         }`}
+                        style={{
+                          backgroundColor: isDark ? '#1f2937' : '#ffffff',
+                          borderColor: isDark ? '#374151' : '#e5e7eb',
+                          borderWidth: '1px',
+                          borderStyle: 'solid'
+                        }}
+                        onMouseEnter={(e) => {
+                          if (item.stock > 0) {
+                            e.target.style.borderColor = isDark ? '#3b82f6' : '#2563eb'
+                          }
+                        }}
+                        onMouseLeave={(e) => {
+                          e.target.style.borderColor = isDark ? '#374151' : '#e5e7eb'
+                        }}
                       >
-                        <div className="aspect-square bg-gray-100 rounded-lg mb-3 flex items-center justify-center p-2">
+                        <div 
+                          className="aspect-square rounded-lg mb-3 flex items-center justify-center p-2 transition-colors"
+                          style={{ backgroundColor: isDark ? '#374151' : '#f3f4f6' }}
+                        >
                           <ProductImage item={item} size="xl" className="w-full h-full" />
                         </div>
                         <div className="text-center">
-                          <h4 className="font-medium text-sm mb-1 truncate">{item.name}</h4>
-                          <p className="text-xs text-gray-500 mb-2">{item.category.name}</p>
-                          <p className="text-lg font-bold text-blue-600">{settings.currencySymbol}{item.price.toFixed(2)}</p>
-                          <p className={`text-xs mt-1 ${item.stock <= 5 ? 'text-red-500' : 'text-green-500'}`}>
+                          <h4 
+                            className="font-medium text-sm mb-1 truncate transition-colors"
+                            style={{ color: isDark ? '#ffffff' : '#111827' }}
+                          >
+                            {item.name}
+                          </h4>
+                          <p 
+                            className="text-xs mb-2 transition-colors"
+                            style={{ color: isDark ? '#9ca3af' : '#6b7280' }}
+                          >
+                            {item.category.name}
+                          </p>
+                          <p 
+                            className="text-lg font-bold transition-colors"
+                            style={{ color: isDark ? '#60a5fa' : '#2563eb' }}
+                          >
+                            {settings.currencySymbol}{item.price.toFixed(2)}
+                          </p>
+                          <p 
+                            className="text-xs mt-1 transition-colors"
+                            style={{ 
+                              color: item.stock <= 5 
+                                ? (isDark ? '#f87171' : '#ef4444') 
+                                : (isDark ? '#4ade80' : '#16a34a') 
+                            }}
+                          >
                             Stock: {item.stock}
                           </p>
                         </div>
@@ -392,7 +487,10 @@ export default function CreateSalePage() {
                     ))}
                   </div>
                   {filteredItems.length === 0 && (
-                    <div className="text-center py-8 text-gray-500">
+                    <div 
+                      className="text-center py-8 transition-colors"
+                      style={{ color: isDark ? '#9ca3af' : '#6b7280' }}
+                    >
                       No items found matching your criteria
                     </div>
                   )}
@@ -405,7 +503,12 @@ export default function CreateSalePage() {
               <Card className="h-full">
                 <CardHeader>
                   <div className="flex justify-between items-center">
-                    <h3 className="text-lg font-semibold">Cart ({cart.length})</h3>
+                    <h3 
+                      className="text-lg font-semibold transition-colors"
+                      style={{ color: isDark ? '#ffffff' : '#111827' }}
+                    >
+                      Cart ({cart.length})
+                    </h3>
                     {cart.length > 0 && (
                       <Button
                         size="sm"
@@ -419,7 +522,10 @@ export default function CreateSalePage() {
                 </CardHeader>
                 <CardBody className="p-4 flex flex-col h-full">
                   {cart.length === 0 ? (
-                    <div className="flex-1 flex items-center justify-center text-gray-500">
+                    <div 
+                      className="flex-1 flex items-center justify-center transition-colors"
+                      style={{ color: isDark ? '#9ca3af' : '#6b7280' }}
+                    >
                       <div className="text-center">
                         <div className="text-4xl mb-2">🛒</div>
                         <p>Cart is empty</p>
@@ -430,13 +536,17 @@ export default function CreateSalePage() {
                     <div className="flex flex-col h-full">
                       <div className="flex-1 overflow-y-auto space-y-2 mb-4">
                         {cart.map((item) => (
-                          <div key={item.itemId} className="bg-gray-50 rounded-lg p-3">
+                          <div 
+                            key={item.itemId} 
+                            className="rounded-lg p-3 transition-colors"
+                            style={{ backgroundColor: isDark ? '#374151' : '#f9fafb' }}
+                          >
                             <div className="flex justify-between items-start mb-2">
                               <div className="flex items-center gap-2 flex-1">
                                 <ProductImage item={item} size="sm" />
                                 <div>
-                                  <h4 className="font-medium text-sm">{item.name}</h4>
-                                  <p className="text-xs text-gray-500">{settings.currencySymbol}{item.price.toFixed(2)} each</p>
+                                  <h4 className="font-medium text-sm text-gray-900 dark:text-white">{item.name}</h4>
+                                  <p className="text-xs text-gray-500 dark:text-gray-400">{settings.currencySymbol}{item.price.toFixed(2)} each</p>
                                 </div>
                               </div>
                               <Button
@@ -452,36 +562,36 @@ export default function CreateSalePage() {
                               <div className="flex items-center space-x-2">
                                 <button
                                   onClick={() => updateQuantity(item.itemId, item.quantity - 1)}
-                                  className="w-6 h-6 flex items-center justify-center bg-gray-200 rounded text-sm"
+                                  className="w-6 h-6 flex items-center justify-center bg-gray-200 dark:bg-gray-600 text-gray-900 dark:text-white rounded text-sm hover:bg-gray-300 dark:hover:bg-gray-500 transition-colors duration-200"
                                 >
                                   -
                                 </button>
-                                <span className="text-sm font-medium w-8 text-center">{item.quantity}</span>
+                                <span className="text-sm font-medium w-8 text-center text-gray-900 dark:text-white">{item.quantity}</span>
                                 <button
                                   onClick={() => updateQuantity(item.itemId, item.quantity + 1)}
-                                  className="w-6 h-6 flex items-center justify-center bg-gray-200 rounded text-sm"
+                                  className="w-6 h-6 flex items-center justify-center bg-gray-200 dark:bg-gray-600 text-gray-900 dark:text-white rounded text-sm hover:bg-gray-300 dark:hover:bg-gray-500 transition-colors duration-200"
                                 >
                                   +
                                 </button>
                               </div>
-                              <div className="text-sm font-bold">{settings.currencySymbol}{item.total.toFixed(2)}</div>
+                              <div className="text-sm font-bold text-gray-900 dark:text-white">{settings.currencySymbol}{item.total.toFixed(2)}</div>
                             </div>
                           </div>
                         ))}
                       </div>
 
-                      <div className="border-t pt-4 space-y-2">
-                        <div className="flex justify-between text-sm">
+                      <div className="border-t border-gray-200 dark:border-gray-600 pt-4 space-y-2">
+                        <div className="flex justify-between text-sm text-gray-900 dark:text-gray-100">
                           <span>Subtotal:</span>
                           <span>{settings.currencySymbol}{calculateTotal().toFixed(2)}</span>
                         </div>
                         {settings.taxEnabled && (
-                          <div className="flex justify-between text-sm">
+                          <div className="flex justify-between text-sm text-gray-900 dark:text-gray-100">
                             <span>{settings.taxName} ({settings.taxRate}%):</span>
                             <span>{settings.currencySymbol}{calculateTax().toFixed(2)}</span>
                           </div>
                         )}
-                        <div className="flex justify-between text-lg font-bold border-t pt-2">
+                        <div className="flex justify-between text-lg font-bold border-t border-gray-200 dark:border-gray-600 pt-2 text-gray-900 dark:text-white">
                           <span>Total:</span>
                           <span>{settings.currencySymbol}{calculateGrandTotal().toFixed(2)}</span>
                         </div>

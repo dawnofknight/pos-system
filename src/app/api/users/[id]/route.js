@@ -31,7 +31,8 @@ export async function PUT(request, { params }) {
       return NextResponse.json({ error: 'Access denied' }, { status: 403 })
     }
 
-    const userId = parseInt(params.id)
+    const { id } = await params
+    const userId = parseInt(id)
     const { name, email, password, role } = await request.json()
 
     // Validation
@@ -105,7 +106,8 @@ export async function DELETE(request, { params }) {
       return NextResponse.json({ error: 'Access denied' }, { status: 403 })
     }
 
-    const userId = parseInt(params.id)
+    const { id } = await params
+    const userId = parseInt(id)
 
     // Prevent admin from deleting themselves
     if (userId === user.id) {

@@ -4,6 +4,7 @@ import { useState, useEffect } from 'react'
 import AuthGuard from '@/components/AuthGuard'
 import DashboardLayout from '@/components/DashboardLayout'
 import { useAuth } from '@/contexts/AuthContext'
+import { useTheme } from '@/contexts/ThemeContext'
 import { useRBAC, withPermission } from '@/contexts/RBACContext'
 import { 
   Card, 
@@ -17,6 +18,8 @@ import {
 
 export default function SettingsPage() {
   const { user } = useAuth()
+  const { theme } = useTheme()
+  const isDark = theme === 'dark'
   const { hasPermission } = useRBAC()
   const [loading, setLoading] = useState(true)
   const [saving, setSaving] = useState(false)
@@ -338,22 +341,49 @@ export default function SettingsPage() {
       <DashboardLayout>
         <div className="space-y-6">
           <div>
-            <h1 className="text-2xl font-bold text-gray-900">Settings</h1>
-            <p className="text-gray-600">Manage your POS system configuration</p>
+            <h1 
+              className="text-2xl font-bold transition-colors"
+              style={{ color: isDark ? '#ffffff' : '#111827' }}
+            >
+              Settings
+            </h1>
+            <p 
+              className="transition-colors"
+              style={{ color: isDark ? '#9ca3af' : '#6b7280' }}
+            >
+              Manage your POS system configuration
+            </p>
           </div>
 
           {/* Tab Navigation */}
-          <div className="border-b border-gray-200">
+          <div 
+            className="border-b transition-colors"
+            style={{ borderColor: isDark ? '#374151' : '#e5e7eb' }}
+          >
             <nav className="-mb-px flex space-x-8">
               {tabs.map((tab) => (
                 <button
                   key={tab.id}
                   onClick={() => setActiveTab(tab.id)}
-                  className={`${
-                    activeTab === tab.id
-                      ? 'border-blue-500 text-blue-600'
-                      : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
-                  } whitespace-nowrap py-2 px-1 border-b-2 font-medium text-sm flex items-center gap-2`}
+                  className="whitespace-nowrap py-2 px-1 border-b-2 font-medium text-sm flex items-center gap-2 transition-colors"
+                  style={{
+                    borderBottomColor: activeTab === tab.id ? '#3b82f6' : 'transparent',
+                    color: activeTab === tab.id 
+                      ? '#3b82f6' 
+                      : isDark ? '#9ca3af' : '#6b7280'
+                  }}
+                  onMouseEnter={(e) => {
+                    if (activeTab !== tab.id) {
+                      e.target.style.color = isDark ? '#d1d5db' : '#374151'
+                      e.target.style.borderBottomColor = isDark ? '#4b5563' : '#d1d5db'
+                    }
+                  }}
+                  onMouseLeave={(e) => {
+                    if (activeTab !== tab.id) {
+                      e.target.style.color = isDark ? '#9ca3af' : '#6b7280'
+                      e.target.style.borderBottomColor = 'transparent'
+                    }
+                  }}
                 >
                   <span>{tab.icon}</span>
                   {tab.name}
@@ -366,14 +396,29 @@ export default function SettingsPage() {
           {activeTab === 'general' && (
             <Card>
               <CardHeader>
-                <h2 className="text-lg font-semibold">General Settings</h2>
-                <p className="text-sm text-gray-600">Configure currency and tax settings</p>
+                <h2 
+                  className="text-lg font-semibold transition-colors"
+                  style={{ color: isDark ? '#ffffff' : '#111827' }}
+                >
+                  General Settings
+                </h2>
+                <p 
+                  className="text-sm transition-colors"
+                  style={{ color: isDark ? '#9ca3af' : '#6b7280' }}
+                >
+                  Configure currency and tax settings
+                </p>
               </CardHeader>
               <CardBody>
                 <div className="space-y-6">
                   {/* Currency Settings */}
                   <div>
-                    <h3 className="text-md font-medium text-gray-900 mb-4">Currency</h3>
+                    <h3 
+                      className="text-md font-medium mb-4 transition-colors"
+                      style={{ color: isDark ? '#ffffff' : '#111827' }}
+                    >
+                      Currency
+                    </h3>
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                       <Input
                         label="Currency Code"
@@ -394,8 +439,18 @@ export default function SettingsPage() {
                   <div className="border-t pt-6">
                     <div className="flex items-center justify-between mb-4">
                       <div>
-                        <h3 className="text-md font-medium text-gray-900">Tax Configuration</h3>
-                        <p className="text-sm text-gray-600">Enable and configure tax calculations</p>
+                        <h3 
+                          className="text-md font-medium transition-colors"
+                          style={{ color: isDark ? '#ffffff' : '#111827' }}
+                        >
+                          Tax Configuration
+                        </h3>
+                        <p 
+                          className="text-sm transition-colors"
+                          style={{ color: isDark ? '#9ca3af' : '#6b7280' }}
+                        >
+                          Enable and configure tax calculations
+                        </p>
                       </div>
                       <label className="relative inline-flex items-center cursor-pointer">
                         <input
@@ -449,13 +504,27 @@ export default function SettingsPage() {
           {activeTab === 'payments' && (
             <Card>
               <CardHeader>
-                <h2 className="text-lg font-semibold">Payment Methods</h2>
-                <p className="text-sm text-gray-600">Configure available payment options</p>
+                <h2 
+                  className="text-lg font-semibold transition-colors"
+                  style={{ color: isDark ? '#ffffff' : '#111827' }}
+                >
+                  Payment Methods
+                </h2>
+                <p 
+                  className="text-sm transition-colors"
+                  style={{ color: isDark ? '#9ca3af' : '#6b7280' }}
+                >
+                  Configure available payment options
+                </p>
               </CardHeader>
               <CardBody>
                 <div className="space-y-4">
                   {paymentMethods.map((method) => (
-                    <div key={method.id} className="flex items-center justify-between p-4 bg-gray-50 rounded-lg">
+                    <div 
+                      key={method.id} 
+                      className="flex items-center justify-between p-4 rounded-lg transition-colors"
+                      style={{ backgroundColor: isDark ? '#374151' : '#f9fafb' }}
+                    >
                       <div className="flex items-center gap-3">
                         <span className="text-2xl">
                           {method.name === 'Cash' ? '💵' : 
@@ -463,8 +532,16 @@ export default function SettingsPage() {
                            method.name === 'Debit' ? '💳' : '💰'}
                         </span>
                         <div>
-                          <h4 className="font-medium">{method.name}</h4>
-                          <p className="text-sm text-gray-600">
+                          <h4 
+                            className="font-medium transition-colors"
+                            style={{ color: isDark ? '#ffffff' : '#111827' }}
+                          >
+                            {method.name}
+                          </h4>
+                          <p 
+                            className="text-sm transition-colors"
+                            style={{ color: isDark ? '#9ca3af' : '#6b7280' }}
+                          >
                             {method.enabled ? 'Available for transactions' : 'Disabled'}
                           </p>
                         </div>
@@ -494,8 +571,18 @@ export default function SettingsPage() {
           {activeTab === 'roles' && user?.role === 'ADMIN' && (
             <Card>
               <CardHeader>
-                <h2 className="text-lg font-semibold">Role Management</h2>
-                <p className="text-sm text-gray-600">Configure permissions for different user roles</p>
+                <h2 
+                  className="text-lg font-semibold transition-colors"
+                  style={{ color: isDark ? '#ffffff' : '#111827' }}
+                >
+                  Role Management
+                </h2>
+                <p 
+                  className="text-sm transition-colors"
+                  style={{ color: isDark ? '#9ca3af' : '#6b7280' }}
+                >
+                  Configure permissions for different user roles
+                </p>
               </CardHeader>
               <CardBody>
                 <div className="space-y-6">
@@ -505,29 +592,87 @@ export default function SettingsPage() {
                         <Badge variant={role === 'ADMIN' ? 'primary' : 'secondary'}>
                           {role}
                         </Badge>
-                        <span className="text-lg font-medium">{role} Permissions</span>
+                        <span 
+                          className="text-lg font-medium transition-colors"
+                          style={{ color: isDark ? '#ffffff' : '#111827' }}
+                        >
+                          {role} Permissions
+                        </span>
                       </div>
                       
                       <div className="overflow-x-auto">
-                        <table className="w-full border border-gray-200 rounded-lg">
-                          <thead className="bg-gray-50">
+                        <table 
+                          className="w-full border rounded-lg transition-colors"
+                          style={{ borderColor: isDark ? '#374151' : '#e5e7eb' }}
+                        >
+                          <thead 
+                            className="transition-colors"
+                            style={{ backgroundColor: isDark ? '#374151' : '#f9fafb' }}
+                          >
                             <tr>
-                              <th className="px-4 py-3 text-left text-sm font-medium text-gray-900">Resource</th>
-                              <th className="px-4 py-3 text-center text-sm font-medium text-gray-900">View</th>
-                              <th className="px-4 py-3 text-center text-sm font-medium text-gray-900">Create</th>
-                              <th className="px-4 py-3 text-center text-sm font-medium text-gray-900">Edit</th>
-                              <th className="px-4 py-3 text-center text-sm font-medium text-gray-900">Delete</th>
+                              <th 
+                                className="px-4 py-3 text-left text-sm font-medium transition-colors"
+                                style={{ color: isDark ? '#ffffff' : '#111827' }}
+                              >
+                                Resource
+                              </th>
+                              <th 
+                                className="px-4 py-3 text-center text-sm font-medium transition-colors"
+                                style={{ color: isDark ? '#ffffff' : '#111827' }}
+                              >
+                                View
+                              </th>
+                              <th 
+                                className="px-4 py-3 text-center text-sm font-medium transition-colors"
+                                style={{ color: isDark ? '#ffffff' : '#111827' }}
+                              >
+                                Create
+                              </th>
+                              <th 
+                                className="px-4 py-3 text-center text-sm font-medium transition-colors"
+                                style={{ color: isDark ? '#ffffff' : '#111827' }}
+                              >
+                                Edit
+                              </th>
+                              <th 
+                                className="px-4 py-3 text-center text-sm font-medium transition-colors"
+                                style={{ color: isDark ? '#ffffff' : '#111827' }}
+                              >
+                                Delete
+                              </th>
                             </tr>
                           </thead>
-                          <tbody className="divide-y divide-gray-200">
+                          <tbody 
+                            className="divide-y transition-colors"
+                            style={{ borderColor: isDark ? '#374151' : '#e5e7eb' }}
+                          >
                             {resources.map((resource) => {
                               const permission = rolePermissions.find(p => p.role === role && p.resource === resource.id)
                               return (
-                                <tr key={resource.id} className="hover:bg-gray-50">
+                                <tr 
+                                  key={resource.id} 
+                                  className="transition-colors"
+                                  onMouseEnter={(e) => {
+                                    e.currentTarget.style.backgroundColor = isDark ? '#374151' : '#f9fafb'
+                                  }}
+                                  onMouseLeave={(e) => {
+                                    e.currentTarget.style.backgroundColor = 'transparent'
+                                  }}
+                                >
                                   <td className="px-4 py-3">
                                     <div>
-                                      <div className="font-medium text-gray-900">{resource.name}</div>
-                                      <div className="text-sm text-gray-600">{resource.description}</div>
+                                      <div 
+                                        className="font-medium transition-colors"
+                                        style={{ color: isDark ? '#ffffff' : '#111827' }}
+                                      >
+                                        {resource.name}
+                                      </div>
+                                      <div 
+                                        className="text-sm transition-colors"
+                                        style={{ color: isDark ? '#9ca3af' : '#6b7280' }}
+                                      >
+                                        {resource.description}
+                                      </div>
                                     </div>
                                   </td>
                                   {['canView', 'canCreate', 'canEdit', 'canDelete'].map((permType) => (

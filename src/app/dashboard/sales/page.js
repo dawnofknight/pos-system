@@ -113,7 +113,7 @@ export default function SalesPage() {
         <div className="space-y-6">
           <div className="flex justify-between items-center">
             <div>
-              <h1 className="text-2xl font-bold text-gray-900">Sales History</h1>
+              <h1 className="text-2xl font-bold text-gray-900 dark:text-white">Sales History</h1>
               <p className="text-gray-600">View and manage all sales transactions</p>
             </div>
             <Link href="/dashboard/sales/create">
@@ -197,7 +197,7 @@ export default function SalesPage() {
             <CardHeader>
               <div className="flex justify-between items-center">
                 <h3 className="text-lg font-semibold">Recent Transactions</h3>
-                <div className="text-sm text-gray-500">
+                <div className="text-sm text-gray-500 dark:text-gray-400">
                   {filteredSales.length} of {sales.length} transactions
                 </div>
               </div>
@@ -208,7 +208,7 @@ export default function SalesPage() {
                   <div className="text-gray-400 text-6xl mb-4">
                     {searchTerm || dateFilter ? '�' : '�🛒'}
                   </div>
-                  <h3 className="text-lg font-medium text-gray-900 mb-2">
+                  <h3 className="text-lg font-medium text-gray-900 dark:text-white mb-2">
                     {searchTerm || dateFilter ? 'No matching sales found' : 'No sales yet'}
                   </h3>
                   <p className="text-gray-600 mb-6">
@@ -246,7 +246,7 @@ export default function SalesPage() {
                                 year: 'numeric'
                               })}
                             </div>
-                            <div className="text-sm text-gray-500">
+                            <div className="text-sm text-gray-500 dark:text-gray-400">
                               {new Date(sale.createdAt).toLocaleTimeString('en-US', {
                                 hour: '2-digit',
                                 minute: '2-digit'
@@ -260,11 +260,11 @@ export default function SalesPage() {
                               <div key={index} className="flex items-center gap-2 text-sm">
                                 <ProductImage item={item.item} size="xs" />
                                 <span>{item.item.name}</span>
-                                <span className="text-gray-500">×{item.quantity}</span>
+                                <span className="text-gray-500 dark:text-gray-400">×{item.quantity}</span>
                               </div>
                             ))}
                             {sale.items.length > 2 && (
-                              <div className="text-xs text-gray-500">
+                              <div className="text-xs text-gray-500 dark:text-gray-400">
                                 +{sale.items.length - 2} more items
                               </div>
                             )}
@@ -275,7 +275,7 @@ export default function SalesPage() {
                             <div className="text-lg font-bold text-green-600">
                               ${sale.total.toFixed(2)}
                             </div>
-                            <div className="text-xs text-gray-500">
+                            <div className="text-xs text-gray-500 dark:text-gray-400">
                               {sale.items.reduce((sum, item) => sum + item.quantity, 0)} items
                             </div>
                           </div>
