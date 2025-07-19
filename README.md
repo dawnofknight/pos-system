@@ -1,5 +1,62 @@
 # POS System
 
+A modern Point of Sale (POS) system built with Next.js 15, React 19, and Tailwind CSS v4, featuring a fully themeable UI (dark/light mode), draft cart saving, and category/product management.
+
+## Features
+- **Theme Toggle:** Switch between dark and light mode with full UI consistency.
+- **Product & Category Management:** Browse, search, and filter products by category.
+- **Cart & Drafts:** Add/remove items, auto-save cart as draft, load/clear drafts.
+- **Sales Processing:** Complete sales with tax and subtotal calculations.
+- **Responsive UI:** Works on desktop and mobile.
+- **Modern Stack:** Next.js 15 (App Router), React 19, Tailwind CSS v4 (with inline style theming), Prisma ORM.
+
+## Code Structure
+- `src/components/ui/`: All reusable UI components (Button, Input, Select, Card, Table, Modal, etc.) are theme-aware and use inline styles for dark/light mode.
+- `src/contexts/ThemeContext.js`: Theme context and hook for toggling and persisting theme.
+- `src/app/dashboard/sales/create/page.js`: Main POS sales page, including product grid, cart, and category filter.
+- `prisma/schema.prisma`: Database schema for products, categories, sales, etc.
+- `public/`: Static assets and icons.
+
+## Theming Approach
+- **No Tailwind dark: classes:** All theming is handled via React context and inline styles for maximum compatibility with Tailwind v4 and React 19.
+- **No border conflicts:** All border styles use only longhand properties (`borderWidth`, `borderStyle`, `borderColor`) to avoid React 19 errors.
+
+## Local Development
+1. **Install dependencies:**
+   ```bash
+   npm install
+   ```
+2. **Set up your database:**
+   - Edit `prisma/schema.prisma` as needed.
+   - Run migrations:
+     ```bash
+     npx prisma migrate dev
+     ```
+3. **Start the dev server:**
+   ```bash
+   npm run dev
+   ```
+4. **Access the app:**
+   Open [http://localhost:3000](http://localhost:3000)
+
+## Deploying to Vercel
+1. **Push your code to GitHub.**
+2. **Go to [vercel.com](https://vercel.com) and import your repository.**
+3. **Set environment variables:**
+   - For example, `DATABASE_URL` for your production database.
+4. **Vercel will auto-detect Next.js and deploy.**
+5. **After deployment:**
+   - Run your Prisma migrations on the production database (see Vercel docs for [Next.js + Prisma](https://vercel.com/guides/nextjs-prisma-postgres)).
+
+## Notes
+- **Theme system:** All UI components use the `useTheme` hook and inline styles for color, background, and border.
+- **No border shorthand:** Never use `border` shorthand in style or className; always use longhand properties.
+- **React 19 compatible:** No style property conflicts.
+
+## License
+MIT
+# POS System
+
 A modern Point of Sale (POS) system built with Next.js, Prisma ORM, and PostgreSQL. Features include user authentication, inventory management, sales processing, and comprehensive dashboard analytics.
 
 ## Features
