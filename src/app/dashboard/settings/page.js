@@ -36,11 +36,25 @@ export default function SettingsPage() {
   
   // Role Permissions
   const [rolePermissions, setRolePermissions] = useState([])
+  
+  // User Management
+  const [users, setUsers] = useState([])
+  const [showUserForm, setShowUserForm] = useState(false)
+  const [editingUser, setEditingUser] = useState(null)
+  const [userForm, setUserForm] = useState({
+    name: '',
+    email: '',
+    password: '',
+    role: 'CASHIER'
+  })
 
   const tabs = [
     { id: 'general', name: 'General', icon: '⚙️' },
     { id: 'payments', name: 'Payment Methods', icon: '💳' },
-    ...(hasPermission('settings', 'edit') && user?.role === 'ADMIN' ? [{ id: 'roles', name: 'Role Management', icon: '👥' }] : [])
+    ...(hasPermission('settings', 'edit') && user?.role === 'ADMIN' ? [
+      { id: 'roles', name: 'Role Management', icon: '👥' },
+      { id: 'users', name: 'User Management', icon: '👤' }
+    ] : [])
   ]
 
   const resources = [
@@ -57,6 +71,7 @@ export default function SettingsPage() {
     fetchPaymentMethods()
     if (user?.role === 'ADMIN') {
       fetchRolePermissions()
+      fetchUsers()
     }
   }, [user])
 
@@ -96,6 +111,146 @@ export default function SettingsPage() {
     } catch (error) {
       console.error('Error fetching role permissions:', error)
     }
+  }
+
+  const fetchUsers = async () => {
+    try {
+      const response = await fetch('/api/users')
+      if (response.ok) {
+        const data = await response.json()
+        setUsers(data.users)
+      }
+    } catch (error) {
+      console.error('Error fetching users:', error)
+    }
+  }
+
+  const handleCreateUser = async (e) => {
+    e.preventDefault()
+    setSaving(true)
+
+    try {
+      const response = await fetch('/api/users', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(userForm)
+      })
+
+      if (response.ok) {
+        alert('User created successfully!')
+        setUserForm({ name: '', email: '', password: '', role: 'CASHIER' })
+        setShowUserForm(false)
+        fetchUsers()
+      } else {
+        const error = await response.json()
+        alert(`Error: ${error.error}`)
+      }
+    } catch (error) {
+      console.error('Error creating user:', error)
+      alert('Error creating user')
+    } finally {
+      setSaving(false)
+    }
+  }
+
+  const handleUpdateUser = async (e) => {
+    e.preventDefault()
+    setSaving(true)
+
+    try {
+      const updateData = { ...userForm }
+      if (!updateData.password) {
+        delete updateData.password // Don't update password if empty
+      }
+
+      const response = await fetch(`/api/users/${editingUser.id}`, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(updateData)
+      })
+
+      if (response.ok) {
+        alert('User updated successfully!')
+        setUserForm({ name: '', email: '', password: '', role: 'CASHIER' })
+        setEditingUser(null)
+        setShowUserForm(false)
+        fetchUsers()
+      } else {
+        const error = await response.json()
+        alert(`Error: ${error.error}`)
+      }
+    } catch (error) {
+      console.error('Error updating user:', error)
+      alert('Error updating user')
+    } finally {
+      setSaving(false)
+    }
+  }
+
+  const handleDeleteUser = async (userId) => {
+    if (userId === user.id) {
+      alert("You cannot delete your own account")
+      return
+    }
+
+    if (!confirm('Are you sure you want to delete this user?')) return
+
+    try {
+      const response = await fetch(`/api/users/${userId}`, {
+        method: 'DELETE'
+      })
+
+      if (response.ok) {
+        alert('User deleted successfully!')
+        fetchUsers()
+      } else {
+        const error = await response.json()
+        alert(`Error: ${error.error}`)
+      }
+    } catch (error) {
+      console.error('Error deleting user:', error)
+      alert('Error deleting user')
+    }
+  }
+
+  const handleResetPassword = async (userId) => {
+    const newPassword = prompt('Enter new password:')
+    if (!newPassword) return
+
+    try {
+      const response = await fetch(`/api/users/${userId}/reset-password`, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ password: newPassword })
+      })
+
+      if (response.ok) {
+        alert('Password reset successfully!')
+      } else {
+        const error = await response.json()
+        alert(`Error: ${error.error}`)
+      }
+    } catch (error) {
+      console.error('Error resetting password:', error)
+      alert('Error resetting password')
+    }
+  }
+
+  const startEditUser = (user) => {
+    setEditingUser(user)
+    setUserForm({
+      name: user.name,
+      email: user.email,
+      password: '',
+      role: user.role
+    })
+    setShowUserForm(true)
+  }
+
+  const cancelUserForm = () => {
+    setShowUserForm(false)
+    setEditingUser(null)
+    setUserForm({ name: '', email: '', password: '', role: 'CASHIER' })
   }
 
   const saveGeneralSettings = async () => {
@@ -394,6 +549,190 @@ export default function SettingsPage() {
                       </div>
                     </div>
                   ))}
+                </div>
+              </CardBody>
+            </Card>
+          )}
+
+          {/* User Management Tab (Admin Only) */}
+          {activeTab === 'users' && user?.role === 'ADMIN' && (
+            <Card>
+              <CardHeader>
+                <div className="flex justify-between items-center">
+                  <div>
+                    <h2 className="text-lg font-semibold">User Management</h2>
+                    <p className="text-sm text-gray-600">Create, edit, and manage user accounts</p>
+                  </div>
+                  <Button
+                    onClick={() => setShowUserForm(true)}
+                    variant="primary"
+                  >
+                    Add New User
+                  </Button>
+                </div>
+              </CardHeader>
+              <CardBody>
+                {/* User Form Modal */}
+                {showUserForm && (
+                  <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+                    <div className="bg-white rounded-lg p-6 w-full max-w-md">
+                      <h3 className="text-lg font-semibold mb-4">
+                        {editingUser ? 'Edit User' : 'Create New User'}
+                      </h3>
+                      <form onSubmit={editingUser ? handleUpdateUser : handleCreateUser}>
+                        <div className="space-y-4">
+                          <div>
+                            <label className="block text-sm font-medium text-gray-700 mb-1">
+                              Full Name
+                            </label>
+                            <Input
+                              type="text"
+                              value={userForm.name}
+                              onChange={(e) => setUserForm({ ...userForm, name: e.target.value })}
+                              required
+                              placeholder="Enter full name"
+                            />
+                          </div>
+                          <div>
+                            <label className="block text-sm font-medium text-gray-700 mb-1">
+                              Email
+                            </label>
+                            <Input
+                              type="email"
+                              value={userForm.email}
+                              onChange={(e) => setUserForm({ ...userForm, email: e.target.value })}
+                              required
+                              placeholder="Enter email address"
+                            />
+                          </div>
+                          <div>
+                            <label className="block text-sm font-medium text-gray-700 mb-1">
+                              Password {editingUser && "(leave empty to keep current)"}
+                            </label>
+                            <Input
+                              type="password"
+                              value={userForm.password}
+                              onChange={(e) => setUserForm({ ...userForm, password: e.target.value })}
+                              required={!editingUser}
+                              placeholder={editingUser ? "Enter new password" : "Enter password"}
+                            />
+                          </div>
+                          <div>
+                            <label className="block text-sm font-medium text-gray-700 mb-1">
+                              Role
+                            </label>
+                            <select
+                              value={userForm.role}
+                              onChange={(e) => setUserForm({ ...userForm, role: e.target.value })}
+                              className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500"
+                              required
+                            >
+                              <option value="CASHIER">Cashier</option>
+                              <option value="ADMIN">Admin</option>
+                            </select>
+                          </div>
+                        </div>
+                        <div className="flex gap-2 mt-6">
+                          <Button
+                            type="submit"
+                            variant="primary"
+                            disabled={saving}
+                            className="flex-1"
+                          >
+                            {saving ? (
+                              <div className="flex items-center space-x-2">
+                                <LoadingSpinner size="sm" />
+                                <span>{editingUser ? 'Updating...' : 'Creating...'}</span>
+                              </div>
+                            ) : (
+                              editingUser ? 'Update User' : 'Create User'
+                            )}
+                          </Button>
+                          <Button
+                            type="button"
+                            variant="outline"
+                            onClick={cancelUserForm}
+                            className="flex-1"
+                          >
+                            Cancel
+                          </Button>
+                        </div>
+                      </form>
+                    </div>
+                  </div>
+                )}
+
+                {/* Users List */}
+                <div className="space-y-4">
+                  {users.length === 0 ? (
+                    <div className="text-center py-8 text-gray-500">
+                      <div className="text-4xl mb-2">👥</div>
+                      <p>No users found</p>
+                      <p className="text-sm">Click "Add New User" to create the first user</p>
+                    </div>
+                  ) : (
+                    <div className="overflow-x-auto">
+                      <table className="w-full border border-gray-200 rounded-lg">
+                        <thead className="bg-gray-50">
+                          <tr>
+                            <th className="px-4 py-3 text-left text-sm font-medium text-gray-900">User</th>
+                            <th className="px-4 py-3 text-left text-sm font-medium text-gray-900">Role</th>
+                            <th className="px-4 py-3 text-left text-sm font-medium text-gray-900">Created</th>
+                            <th className="px-4 py-3 text-center text-sm font-medium text-gray-900">Actions</th>
+                          </tr>
+                        </thead>
+                        <tbody className="divide-y divide-gray-200">
+                          {users.map((u) => (
+                            <tr key={u.id} className="hover:bg-gray-50">
+                              <td className="px-4 py-3">
+                                <div>
+                                  <div className="font-medium text-gray-900">{u.name}</div>
+                                  <div className="text-sm text-gray-600">{u.email}</div>
+                                </div>
+                              </td>
+                              <td className="px-4 py-3">
+                                <Badge variant={u.role === 'ADMIN' ? 'primary' : 'secondary'}>
+                                  {u.role}
+                                </Badge>
+                              </td>
+                              <td className="px-4 py-3 text-sm text-gray-600">
+                                {new Date(u.createdAt).toLocaleDateString()}
+                              </td>
+                              <td className="px-4 py-3">
+                                <div className="flex items-center justify-center space-x-2">
+                                  <Button
+                                    size="sm"
+                                    variant="outline"
+                                    onClick={() => startEditUser(u)}
+                                  >
+                                    Edit
+                                  </Button>
+                                  <Button
+                                    size="sm"
+                                    variant="outline"
+                                    onClick={() => handleResetPassword(u.id)}
+                                    className="text-orange-600 hover:text-orange-700"
+                                  >
+                                    Reset Password
+                                  </Button>
+                                  {u.id !== user.id && (
+                                    <Button
+                                      size="sm"
+                                      variant="outline"
+                                      onClick={() => handleDeleteUser(u.id)}
+                                      className="text-red-600 hover:text-red-700"
+                                    >
+                                      Delete
+                                    </Button>
+                                  )}
+                                </div>
+                              </td>
+                            </tr>
+                          ))}
+                        </tbody>
+                      </table>
+                    </div>
+                  )}
                 </div>
               </CardBody>
             </Card>
