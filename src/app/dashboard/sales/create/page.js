@@ -25,10 +25,21 @@ export default function CreateSalePage() {
   const [processing, setProcessing] = useState(false)
   const [selectedCategory, setSelectedCategory] = useState('all')
   const [searchTerm, setSearchTerm] = useState('')
+  const [settings, setSettings] = useState({
+    taxEnabled: false,
+    taxRate: 0,
+    taxName: 'Tax',
+    currencySymbol: '$'
+  })
+  const [draftSaved, setDraftSaved] = useState(false)
+  const [showDraftNotification, setShowDraftNotification] = useState(false)
+
+  const DRAFT_STORAGE_KEY = `pos_draft_cart_${user?.id || 'anonymous'}`
 
   useEffect(() => {
     fetchItems()
     fetchCategories()
+    fetchSettings()
   }, [])
 
   const fetchItems = async () => {
@@ -56,6 +67,89 @@ export default function CreateSalePage() {
       console.error('Error fetching categories:', error)
     }
   }
+
+  const fetchSettings = async () => {
+    try {
+      const response = await fetch('/api/settings')
+      if (response.ok) {
+        const data = await response.json()
+        setSettings(data)
+      }
+    } catch (error) {
+      console.error('Error fetching settings:', error)
+    }
+  }
+
+  // Draft management functions
+  const saveDraft = () => {
+    if (cart.length > 0) {
+      const draftData = {
+        cart: cart,
+        timestamp: new Date().toISOString(),
+        itemCount: cart.reduce((sum, item) => sum + item.quantity, 0)
+      }
+      localStorage.setItem(DRAFT_STORAGE_KEY, JSON.stringify(draftData))
+      setDraftSaved(true)
+      setShowDraftNotification(true)
+      setTimeout(() => setShowDraftNotification(false), 3000)
+    }
+  }
+
+  const loadDraft = () => {
+    try {
+      const draftData = localStorage.getItem(DRAFT_STORAGE_KEY)
+      if (draftData) {
+        const parsed = JSON.parse(draftData)
+        setCart(parsed.cart)
+        setDraftSaved(true)
+        alert(`Draft loaded with ${parsed.itemCount} items from ${new Date(parsed.timestamp).toLocaleString()}`)
+        return true
+      }
+    } catch (error) {
+      console.error('Error loading draft:', error)
+    }
+    return false
+  }
+
+  const clearDraft = () => {
+    localStorage.removeItem(DRAFT_STORAGE_KEY)
+    setCart([])
+    setDraftSaved(false)
+  }
+
+  const hasDraft = () => {
+    try {
+      const draftData = localStorage.getItem(DRAFT_STORAGE_KEY)
+      return draftData && JSON.parse(draftData).cart.length > 0
+    } catch {
+      return false
+    }
+  }
+
+  // Auto-save draft when cart changes
+  useEffect(() => {
+    if (cart.length > 0) {
+      const timeoutId = setTimeout(() => {
+        saveDraft()
+      }, 1000) // Auto-save after 1 second of inactivity
+      
+      return () => clearTimeout(timeoutId)
+    } else if (cart.length === 0 && draftSaved) {
+      // Clear draft if cart is empty
+      localStorage.removeItem(DRAFT_STORAGE_KEY)
+      setDraftSaved(false)
+    }
+  }, [cart, DRAFT_STORAGE_KEY, draftSaved])
+
+  // Load draft on component mount
+  useEffect(() => {
+    if (user && hasDraft()) {
+      const shouldLoad = window.confirm('You have a saved draft cart. Would you like to load it?')
+      if (shouldLoad) {
+        loadDraft()
+      }
+    }
+  }, [user, DRAFT_STORAGE_KEY])
 
   const addToCart = (item) => {
     if (item.stock <= 0) {
@@ -116,7 +210,8 @@ export default function CreateSalePage() {
   }
 
   const calculateTax = () => {
-    return calculateTotal() * 0.1 // 10% tax
+    if (!settings.taxEnabled) return 0
+    return calculateTotal() * (settings.taxRate / 100)
   }
 
   const calculateGrandTotal = () => {
@@ -150,6 +245,7 @@ export default function CreateSalePage() {
 
       if (response.ok) {
         alert('Sale completed successfully!')
+        clearDraft() // Clear the draft after successful sale
         router.push('/dashboard/sales')
       } else {
         alert('Error processing sale')
@@ -164,7 +260,7 @@ export default function CreateSalePage() {
 
   const clearCart = () => {
     if (confirm('Are you sure you want to clear the cart?')) {
-      setCart([])
+      clearDraft()
     }
   }
 
@@ -190,12 +286,54 @@ export default function CreateSalePage() {
     <AuthGuard>
       <DashboardLayout>
         <div className="h-full">
+          {/* Draft notification */}
+          {showDraftNotification && (
+            <div className="mb-4 bg-green-50 border border-green-200 text-green-800 px-4 py-3 rounded-lg flex items-center gap-2">
+              <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
+                <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
+              </svg>
+              Draft saved successfully!
+            </div>
+          )}
+
           <div className="flex justify-between items-center mb-6">
             <div>
               <h1 className="text-2xl font-bold text-gray-900">Point of Sale</h1>
               <p className="text-gray-600">Select items to add to cart</p>
             </div>
-            <div className="flex items-center space-x-2">
+            <div className="flex items-center space-x-4">
+              {/* Draft controls */}
+              <div className="flex gap-2">
+                {draftSaved && (
+                  <span className="px-2 py-1 bg-blue-100 text-blue-800 text-sm rounded-lg">
+                    Draft saved
+                  </span>
+                )}
+                {hasDraft() && (
+                  <button
+                    onClick={loadDraft}
+                    className="px-3 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 text-sm"
+                  >
+                    Load Draft
+                  </button>
+                )}
+                {cart.length > 0 && (
+                  <>
+                    <button
+                      onClick={saveDraft}
+                      className="px-3 py-2 bg-gray-600 text-white rounded-lg hover:bg-gray-700 text-sm"
+                    >
+                      Save Draft
+                    </button>
+                    <button
+                      onClick={clearDraft}
+                      className="px-3 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 text-sm"
+                    >
+                      Clear Cart
+                    </button>
+                  </>
+                )}
+              </div>
               <span className="text-sm text-gray-600">Cashier: {user?.name}</span>
             </div>
           </div>
@@ -245,7 +383,7 @@ export default function CreateSalePage() {
                         <div className="text-center">
                           <h4 className="font-medium text-sm mb-1 truncate">{item.name}</h4>
                           <p className="text-xs text-gray-500 mb-2">{item.category.name}</p>
-                          <p className="text-lg font-bold text-blue-600">${item.price.toFixed(2)}</p>
+                          <p className="text-lg font-bold text-blue-600">{settings.currencySymbol}{item.price.toFixed(2)}</p>
                           <p className={`text-xs mt-1 ${item.stock <= 5 ? 'text-red-500' : 'text-green-500'}`}>
                             Stock: {item.stock}
                           </p>
@@ -298,7 +436,7 @@ export default function CreateSalePage() {
                                 <ProductImage item={item} size="sm" />
                                 <div>
                                   <h4 className="font-medium text-sm">{item.name}</h4>
-                                  <p className="text-xs text-gray-500">${item.price.toFixed(2)} each</p>
+                                  <p className="text-xs text-gray-500">{settings.currencySymbol}{item.price.toFixed(2)} each</p>
                                 </div>
                               </div>
                               <Button
@@ -326,7 +464,7 @@ export default function CreateSalePage() {
                                   +
                                 </button>
                               </div>
-                              <div className="text-sm font-bold">${item.total.toFixed(2)}</div>
+                              <div className="text-sm font-bold">{settings.currencySymbol}{item.total.toFixed(2)}</div>
                             </div>
                           </div>
                         ))}
@@ -335,15 +473,17 @@ export default function CreateSalePage() {
                       <div className="border-t pt-4 space-y-2">
                         <div className="flex justify-between text-sm">
                           <span>Subtotal:</span>
-                          <span>${calculateTotal().toFixed(2)}</span>
+                          <span>{settings.currencySymbol}{calculateTotal().toFixed(2)}</span>
                         </div>
-                        <div className="flex justify-between text-sm">
-                          <span>Tax (10%):</span>
-                          <span>${calculateTax().toFixed(2)}</span>
-                        </div>
+                        {settings.taxEnabled && (
+                          <div className="flex justify-between text-sm">
+                            <span>{settings.taxName} ({settings.taxRate}%):</span>
+                            <span>{settings.currencySymbol}{calculateTax().toFixed(2)}</span>
+                          </div>
+                        )}
                         <div className="flex justify-between text-lg font-bold border-t pt-2">
                           <span>Total:</span>
-                          <span>${calculateGrandTotal().toFixed(2)}</span>
+                          <span>{settings.currencySymbol}{calculateGrandTotal().toFixed(2)}</span>
                         </div>
                         
                         <Button

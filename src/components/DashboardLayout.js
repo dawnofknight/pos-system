@@ -1,22 +1,28 @@
 'use client'
 
 import { useState } from 'react'
+import { usePathname, useRouter } from 'next/navigation'
 import { useAuth } from '@/contexts/AuthContext'
-import { useRouter, usePathname } from 'next/navigation'
+import { useRBAC } from '@/contexts/RBACContext'
 
 export default function DashboardLayout({ children }) {
   const [sidebarOpen, setSidebarOpen] = useState(false)
   const { user, logout } = useAuth()
+  const { canAccess } = useRBAC()
   const router = useRouter()
   const pathname = usePathname()
 
-  const navigation = [
-    { name: 'Dashboard', href: '/dashboard', icon: '📊' },
-    { name: 'Items', href: '/dashboard/items', icon: '📦' },
-    { name: 'Categories', href: '/dashboard/categories', icon: '🏷️' },
-    { name: 'Sales', href: '/dashboard/sales', icon: '💰' },
-    { name: 'Create Sale', href: '/dashboard/sales/create', icon: '🛒' },
+  const allNavigation = [
+    { name: 'Dashboard', href: '/dashboard', icon: '📊', resource: 'dashboard' },
+    { name: 'Items', href: '/dashboard/items', icon: '📦', resource: 'items' },
+    { name: 'Categories', href: '/dashboard/categories', icon: '🏷️', resource: 'categories' },
+    { name: 'Sales', href: '/dashboard/sales', icon: '💰', resource: 'sales' },
+    { name: 'Create Sale', href: '/dashboard/sales/create', icon: '🛒', resource: 'sales' },
+    { name: 'Settings', href: '/dashboard/settings', icon: '⚙️', resource: 'settings' },
   ]
+
+  // Filter navigation based on permissions
+  const navigation = allNavigation.filter(item => canAccess(item.resource))
 
   const handleLogout = async () => {
     await logout()
