@@ -3,6 +3,7 @@
 import { useState, useEffect } from 'react'
 import AuthGuard from '@/components/AuthGuard'
 import DashboardLayout from '@/components/DashboardLayout'
+import ImageUpload from '@/components/ImageUpload'
 import { 
   Card, 
   CardHeader, 
@@ -32,7 +33,9 @@ export default function ItemsPage() {
     price: '',
     stock: '',
     categoryId: '',
-    emoji: ''
+    emoji: '',
+    image: '',
+    imageType: ''
   })
   const [errors, setErrors] = useState({})
   const [isSubmitting, setIsSubmitting] = useState(false)
@@ -129,15 +132,7 @@ export default function ItemsPage() {
         await fetchItems()
         setShowModal(false)
         setEditingItem(null)
-        setFormData({
-          name: '',
-          description: '',
-          price: '',
-          stock: '',
-          categoryId: '',
-          emoji: ''
-        })
-        setErrors({})
+        resetForm()
         alert(editingItem ? 'Item updated successfully!' : 'Item created successfully!')
       } else {
         const errorData = await response.json()
@@ -160,7 +155,9 @@ export default function ItemsPage() {
       price: item.price.toString(),
       stock: item.stock.toString(),
       categoryId: item.categoryId.toString(),
-      emoji: item.emoji || ''
+      emoji: item.emoji || '',
+      image: item.image || '',
+      imageType: item.imageType || ''
     })
     setErrors({})
     setShowModal(true)
@@ -176,7 +173,9 @@ export default function ItemsPage() {
       price: '',
       stock: '',
       categoryId: '',
-      emoji: ''
+      emoji: '',
+      image: '',
+      imageType: ''
     })
     setErrors({})
     setShowModal(true)
@@ -197,6 +196,36 @@ export default function ItemsPage() {
         console.error('Error deleting item:', error)
       }
     }
+  }
+
+  const handleImageUploaded = (filename, type) => {
+    setFormData(prev => ({
+      ...prev,
+      image: filename,
+      imageType: type
+    }))
+  }
+
+  const handleImageRemoved = () => {
+    setFormData(prev => ({
+      ...prev,
+      image: '',
+      imageType: ''
+    }))
+  }
+
+  const resetForm = () => {
+    setFormData({
+      name: '',
+      description: '',
+      price: '',
+      stock: '',
+      categoryId: '',
+      emoji: '',
+      image: '',
+      imageType: ''
+    })
+    setErrors({})
   }
 
   const categoryOptions = categories.map(cat => ({
@@ -250,9 +279,19 @@ export default function ItemsPage() {
                     <TableRow key={item.id}>
                       <TableCell>
                         <div className="flex items-center gap-3">
-                          <div className="w-10 h-10 bg-gray-100 rounded-lg flex items-center justify-center text-lg">
-                            {item.emoji || '📦'}
-                          </div>
+                          {item.image ? (
+                            <div className="w-12 h-12 overflow-hidden rounded-lg border border-gray-200">
+                              <img
+                                src={item.image.startsWith('http') ? item.image : `/uploads/items/${item.image}`}
+                                alt={item.name}
+                                className="w-full h-full object-cover"
+                              />
+                            </div>
+                          ) : (
+                            <div className="w-12 h-12 bg-gray-100 rounded-lg flex items-center justify-center text-lg">
+                              {item.emoji || '📦'}
+                            </div>
+                          )}
                           <div>
                             <div className="font-medium">{item.name}</div>
                             {item.description && (
@@ -300,13 +339,7 @@ export default function ItemsPage() {
             onClose={() => {
               setShowModal(false)
               setEditingItem(null)
-              setFormData({
-                name: '',
-                description: '',
-                price: '',
-                stock: '',
-                categoryId: ''
-              })
+              resetForm()
             }}
             title={editingItem ? 'Edit Item' : 'Add New Item'}
           >
@@ -335,6 +368,12 @@ export default function ItemsPage() {
                 onChange={handleInputChange}
                 placeholder="📦 (optional emoji for visual identification)"
                 maxLength={4}
+              />
+
+              <ImageUpload
+                currentImage={formData.image}
+                onImageUploaded={handleImageUploaded}
+                onImageRemoved={handleImageRemoved}
               />
               
               <Input
@@ -383,15 +422,7 @@ export default function ItemsPage() {
                   onClick={() => {
                     setShowModal(false)
                     setEditingItem(null)
-                    setFormData({
-                      name: '',
-                      description: '',
-                      price: '',
-                      stock: '',
-                      categoryId: '',
-                      emoji: ''
-                    })
-                    setErrors({})
+                    resetForm()
                   }}
                 >
                   Cancel

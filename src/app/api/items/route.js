@@ -40,7 +40,7 @@ export async function POST(request) {
       return NextResponse.json({ error: 'Invalid token' }, { status: 401 })
     }
 
-    const { name, description, price, stock, categoryId, emoji } = await request.json()
+    const { name, description, price, stock, categoryId, emoji, image, imageType } = await request.json()
 
     // Validate required fields
     if (!name || !price || !stock || !categoryId) {
@@ -54,7 +54,9 @@ export async function POST(request) {
         price: parseFloat(price),
         stock: parseInt(stock),
         categoryId: parseInt(categoryId),
-        emoji: emoji || '📦'
+        emoji: emoji || '📦',
+        image: image || null,
+        imageType: imageType || null
       },
       include: {
         category: true

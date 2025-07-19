@@ -1,6 +1,7 @@
 import { NextResponse } from 'next/server'
 import { verifyToken } from '@/lib/auth'
 import { prisma } from '@/lib/prisma'
+import { deleteImage } from '@/lib/imageUtils'
 
 export async function GET(request, { params }) {
   try {
@@ -45,7 +46,7 @@ export async function PUT(request, { params }) {
       return NextResponse.json({ error: 'Invalid token' }, { status: 401 })
     }
 
-    const { name, description, price, stock, categoryId, emoji } = await request.json()
+    const { name, description, price, stock, categoryId, emoji, image, imageType } = await request.json()
 
     // Validate required fields
     if (!name || !price || !stock || !categoryId) {
@@ -61,7 +62,9 @@ export async function PUT(request, { params }) {
         price: parseFloat(price),
         stock: parseInt(stock),
         categoryId: parseInt(categoryId),
-        emoji: emoji || '📦'
+        emoji: emoji || '📦',
+        image: image || null,
+        imageType: imageType || null
       },
       include: {
         category: true
@@ -88,6 +91,17 @@ export async function DELETE(request, { params }) {
     }
 
     const awaitedParams = await params
+    
+    // Get item data before deletion to clean up image
+    const item = await prisma.item.findUnique({
+      where: { id: parseInt(awaitedParams.id) }
+    })
+    
+    if (item && item.image && item.imageType === 'upload') {
+      // Delete the image file for uploaded images
+      await deleteImage(item.image)
+    }
+    
     await prisma.item.delete({
       where: { id: parseInt(awaitedParams.id) }
     })
