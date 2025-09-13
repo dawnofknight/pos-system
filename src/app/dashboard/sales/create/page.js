@@ -4,6 +4,7 @@ import { useState, useEffect } from 'react'
 import AuthGuard from '@/components/AuthGuard'
 import DashboardLayout from '@/components/DashboardLayout'
 import { useAuth } from '@/contexts/AuthContext'
+import Link from 'next/link'
 
 import { 
   Card, 
@@ -55,15 +56,9 @@ export default function CreateSalePage() {
     generateOrderNumber()
   }, [])
   
-  // Table layout - 6 tables in 2 rows
-  const tables = [
-    { id: 'T1', name: 'T1', occupied: false, position: { row: 1, col: 1 } },
-    { id: 'T2', name: 'T2', occupied: false, position: { row: 1, col: 2 } },
-    { id: 'T3', name: 'T3', occupied: false, position: { row: 1, col: 3 } },
-    { id: 'T4', name: 'T4', occupied: false, position: { row: 2, col: 1 } },
-    { id: 'T5', name: 'T5', occupied: false, position: { row: 2, col: 2 } },
-    { id: 'T6', name: 'T6', occupied: false, position: { row: 2, col: 3 } }
-  ]
+  // Tables state
+  const [tables, setTables] = useState([])
+  const [activeSales, setActiveSales] = useState([])
   
   const DRAFT_STORAGE_KEY = `pos_draft_cart_${user?.id || 'anonymous'}`
 
@@ -72,6 +67,8 @@ export default function CreateSalePage() {
     fetchCategories()
     fetchPaymentMethods()
     fetchSettings()
+    fetchTables()
+    fetchActiveSales()
   }, [])
 
   const fetchItems = async () => {
@@ -196,8 +193,40 @@ export default function CreateSalePage() {
     return calculateTotal() + calculateTax()
   }
 
+  const fetchTables = async () => {
+    try {
+      const response = await fetch('/api/tables')
+      if (response.ok) {
+        const data = await response.json()
+        setTables(data)
+      }
+    } catch (error) {
+      console.error('Error fetching tables:', error)
+    }
+  }
+
+  const fetchActiveSales = async () => {
+    try {
+      const response = await fetch('/api/sales/active')
+      if (response.ok) {
+        const data = await response.json()
+        setActiveSales(data)
+      }
+    } catch (error) {
+      console.error('Error fetching active sales:', error)
+    }
+  }
+
   const handleTableSelect = (table) => {
-    if (table.occupied) return
+    // Check if table has an active sale
+    const activeSale = activeSales.find(sale => sale.tableId === table.id)
+    if (activeSale) {
+      // Redirect to edit the existing sale
+      router.push(`/dashboard/sales/edit/${activeSale.id}`)
+      return
+    }
+    
+    if (table.status === 'occupied') return
     setSelectedTable(table)
   }
 
@@ -390,14 +419,42 @@ export default function CreateSalePage() {
                       </div>
                     </div>
                     
+                    <div className="mb-6">
+                      <h3 className="text-lg font-medium text-gray-900 mb-2">Active Table Sessions</h3>
+                      {activeSales.length > 0 ? (
+                        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                          {activeSales.map(sale => (
+                            <Link 
+                              href={`/dashboard/sales/edit/${sale.id}`}
+                              key={sale.id}
+                              className="block p-4 bg-green-50 border border-green-200 rounded-lg hover:bg-green-100 transition-colors"
+                            >
+                              <div className="flex justify-between items-center">
+                                <div>
+                                  <h4 className="font-medium text-gray-900">Table {sale.table?.name || 'Unknown'}</h4>
+                                  <p className="text-sm text-gray-600">Order #{sale.orderNumber}</p>
+                                </div>
+                                <div className="text-right">
+                                  <p className="text-sm font-medium text-gray-900">{settings.currencySymbol} {sale.total.toLocaleString()}</p>
+                                  <p className="text-xs text-gray-500">{sale.items?.length || 0} items</p>
+                                </div>
+                              </div>
+                            </Link>
+                          ))}
+                        </div>
+                      ) : (
+                        <p className="text-gray-500 text-sm">No active table sessions</p>
+                      )}
+                    </div>
+                    
                     <div className="grid grid-cols-3 gap-8 max-w-4xl mx-auto">
                       {tables.map((table) => (
                         <div key={table.id} className="text-center">
                           <button
                             onClick={() => handleTableSelect(table)}
-                            disabled={table.occupied}
+                            disabled={table.status === 'occupied'}
                             className={`w-24 h-24 rounded-full border-4 transition-all relative ${
-                              table.occupied
+                              table.status === 'occupied'
                                 ? 'border-red-300 bg-red-100 cursor-not-allowed'
                                 : selectedTable?.id === table.id
                                 ? 'border-orange-500 bg-orange-100 shadow-lg'

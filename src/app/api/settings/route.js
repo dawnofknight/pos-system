@@ -1,8 +1,6 @@
 import { NextResponse } from 'next/server'
-import { PrismaClient } from '@prisma/client'
 import { verifyToken } from '@/lib/auth'
-
-const prisma = new PrismaClient()
+import { prisma } from '@/lib/prisma'
 
 export async function GET(request) {
   try {
@@ -26,7 +24,8 @@ export async function GET(request) {
           currencySymbol: '$',
           taxEnabled: false,
           taxRate: 0.0,
-          taxName: 'Tax'
+          taxName: 'Tax',
+          tableCount: 6
         }
       })
     }
@@ -62,7 +61,7 @@ export async function PUT(request) {
       return NextResponse.json({ error: 'Access denied. Admin required.' }, { status: 403 })
     }
 
-    const { currency, currencySymbol, taxEnabled, taxRate, taxName } = await request.json()
+    const { currency, currencySymbol, taxEnabled, taxRate, taxName, tableCount } = await request.json()
 
     // Get existing settings or create new
     let settings = await prisma.settings.findFirst()
@@ -75,7 +74,8 @@ export async function PUT(request) {
           currencySymbol: currencySymbol || settings.currencySymbol,
           taxEnabled: taxEnabled !== undefined ? taxEnabled : settings.taxEnabled,
           taxRate: taxRate !== undefined ? taxRate : settings.taxRate,
-          taxName: taxName || settings.taxName
+          taxName: taxName || settings.taxName,
+          tableCount: tableCount !== undefined ? tableCount : settings.tableCount
         }
       })
     } else {
@@ -85,7 +85,8 @@ export async function PUT(request) {
           currencySymbol: currencySymbol || 'Rp',
           taxEnabled: taxEnabled || false,
           taxRate: taxRate || 0.0,
-          taxName: taxName || 'Tax'
+          taxName: taxName || 'Tax',
+          tableCount: tableCount || 6
         }
       })
     }
