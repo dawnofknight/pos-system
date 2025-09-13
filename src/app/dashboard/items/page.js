@@ -436,7 +436,7 @@ export default function ItemsPage() {
               
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <Input
-                  label="Price ($)"
+                  label="Price (Rp)"
                   name="price"
                   type="number"
                   step="0.01"

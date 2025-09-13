@@ -36,7 +36,7 @@ export default function CreateSalePage() {
     taxEnabled: false,
     taxRate: 0,
     taxName: 'Tax',
-    currencySymbol: '$'
+    currencySymbol: 'Rp'
   })
   
   // New states for order type and table system

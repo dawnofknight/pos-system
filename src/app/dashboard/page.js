@@ -95,7 +95,7 @@ export default function Dashboard() {
                       </div>
                     </div>
                     <dd className="text-2xl font-bold bg-gradient-to-r from-orange-600 to-orange-700 bg-clip-text text-transparent mb-1">
-                      ${stats?.stats?.totalSales?.amount?.toFixed(2) || '0.00'}
+                      Rp{stats?.stats?.totalSales?.amount?.toFixed(2) || '0.00'}
                     </dd>
                     <dd className="text-sm font-medium text-orange-600">
                       {stats?.stats?.totalSales?.count || 0} transactions
@@ -123,7 +123,7 @@ export default function Dashboard() {
                       </div>
                     </div>
                     <dd className="text-2xl font-bold bg-gradient-to-r from-primary-600 to-orange-600 bg-clip-text text-transparent mb-1">
-                      ${stats?.stats?.todaySales?.amount?.toFixed(2) || '0.00'}
+                      Rp{stats?.stats?.todaySales?.amount?.toFixed(2) || '0.00'}
                     </dd>
                     <dd className="text-sm font-medium text-gray-600">
                       {stats?.stats?.todaySales?.count || 0} transactions
@@ -228,7 +228,7 @@ export default function Dashboard() {
                           <TableCell>
                             {new Date(sale.createdAt).toLocaleDateString()}
                           </TableCell>
-                          <TableCell>${sale.total.toFixed(2)}</TableCell>
+                          <TableCell>Rp{sale.total.toFixed(2)}</TableCell>
                           <TableCell>{sale.user.name}</TableCell>
                         </TableRow>
                       ))}
@@ -287,7 +287,7 @@ export default function Dashboard() {
                             </div>
                           </TableCell>
                           <TableCell>{item.totalSold}</TableCell>
-                          <TableCell>${item.price.toFixed(2)}</TableCell>
+                          <TableCell>Rp{item.price.toFixed(2)}</TableCell>
                         </TableRow>
                       ))}
                     </TableBody>

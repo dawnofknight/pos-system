@@ -5,15 +5,15 @@
 /**
  * Format a number as currency
  * @param {number} amount - The amount to format
- * @param {string} currency - The currency code (default: 'USD')
+ * @param {string} currency - The currency code (default: 'IDR')
  * @returns {string} Formatted currency string
  */
-export function formatCurrency(amount, currency = 'USD') {
+export function formatCurrency(amount, currency = 'IDR') {
   if (typeof amount !== 'number' || isNaN(amount)) {
-    return '$0.00'
+    return 'Rp0.00'
   }
   
-  return new Intl.NumberFormat('en-US', {
+  return new Intl.NumberFormat('id-ID', {
     style: 'currency',
     currency: currency,
     minimumFractionDigits: 2,

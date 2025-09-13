@@ -22,7 +22,7 @@ export default function ReportsPage() {
   const [loading, setLoading] = useState(true)
   const [reportsData, setReportsData] = useState(null)
   const [paymentMethods, setPaymentMethods] = useState([])
-  const [settings, setSettings] = useState({ currencySymbol: '$' })
+  const [settings, setSettings] = useState({ currencySymbol: 'Rp' })
   
   // Filter states
   const [period, setPeriod] = useState('today')

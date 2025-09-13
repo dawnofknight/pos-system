@@ -15,8 +15,8 @@ ALTER TABLE "sales" ADD COLUMN     "paymentMethodId" INTEGER NOT NULL;
 -- CreateTable
 CREATE TABLE "settings" (
     "id" SERIAL NOT NULL,
-    "currency" TEXT NOT NULL DEFAULT 'USD',
-    "currencySymbol" TEXT NOT NULL DEFAULT '$',
+    "currency" TEXT NOT NULL DEFAULT 'IDR',
+    "currencySymbol" TEXT NOT NULL DEFAULT 'Rp',
     "taxEnabled" BOOLEAN NOT NULL DEFAULT false,
     "taxRate" DOUBLE PRECISION NOT NULL DEFAULT 0.0,
     "taxName" TEXT NOT NULL DEFAULT 'Tax',

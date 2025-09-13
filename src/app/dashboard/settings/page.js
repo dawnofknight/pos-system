@@ -34,8 +34,8 @@ export default function SettingsPage() {
   
   // General Settings
   const [settings, setSettings] = useState({
-    currency: 'USD',
-    currencySymbol: '$',
+    currency: 'IDR',
+    currencySymbol: 'Rp',
     taxEnabled: false,
     taxRate: 0,
     taxName: 'Tax'
