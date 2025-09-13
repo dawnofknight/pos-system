@@ -4,7 +4,7 @@ import { useState, useEffect } from 'react'
 import AuthGuard from '@/components/AuthGuard'
 import DashboardLayout from '@/components/DashboardLayout'
 import { useAuth } from '@/contexts/AuthContext'
-import { useTheme } from '@/contexts/ThemeContext'
+
 import { 
   Card, 
   CardHeader, 
@@ -19,30 +19,58 @@ import ProductImage from '@/components/ProductImage'
 
 export default function CreateSalePage() {
   const { user } = useAuth()
-  const { theme } = useTheme()
-  const isDark = theme === 'dark'
+
   const router = useRouter()
+  
+  // Existing states
   const [items, setItems] = useState([])
   const [categories, setCategories] = useState([])
+  const [paymentMethods, setPaymentMethods] = useState([])
   const [cart, setCart] = useState([])
   const [loading, setLoading] = useState(true)
   const [processing, setProcessing] = useState(false)
   const [selectedCategory, setSelectedCategory] = useState('all')
+  const [selectedPaymentMethod, setSelectedPaymentMethod] = useState('')
   const [searchTerm, setSearchTerm] = useState('')
   const [settings, setSettings] = useState({
     taxEnabled: false,
     taxRate: 0,
     taxName: 'Tax',
-    currencySymbol: '$'
+    currencySymbol: 'Rp'
   })
-  const [draftSaved, setDraftSaved] = useState(false)
-  const [showDraftNotification, setShowDraftNotification] = useState(false)
-
+  
+  // New states for order type and table system
+  const [orderType, setOrderType] = useState('dine-in') // 'dine-in' or 'take-away'
+  const [selectedTable, setSelectedTable] = useState(null)
+  const [currentStep, setCurrentStep] = useState('table') // 'table' or 'menu'
+  const [orderNumber, setOrderNumber] = useState('')
+  const [guestCount, setGuestCount] = useState(2)
+  
+  // Generate order number
+  useEffect(() => {
+    const generateOrderNumber = () => {
+      const timestamp = Date.now().toString().slice(-6)
+      setOrderNumber(`${timestamp}`)
+    }
+    generateOrderNumber()
+  }, [])
+  
+  // Table layout - 6 tables in 2 rows
+  const tables = [
+    { id: 'T1', name: 'T1', occupied: false, position: { row: 1, col: 1 } },
+    { id: 'T2', name: 'T2', occupied: false, position: { row: 1, col: 2 } },
+    { id: 'T3', name: 'T3', occupied: false, position: { row: 1, col: 3 } },
+    { id: 'T4', name: 'T4', occupied: false, position: { row: 2, col: 1 } },
+    { id: 'T5', name: 'T5', occupied: false, position: { row: 2, col: 2 } },
+    { id: 'T6', name: 'T6', occupied: false, position: { row: 2, col: 3 } }
+  ]
+  
   const DRAFT_STORAGE_KEY = `pos_draft_cart_${user?.id || 'anonymous'}`
 
   useEffect(() => {
     fetchItems()
     fetchCategories()
+    fetchPaymentMethods()
     fetchSettings()
   }, [])
 
@@ -72,6 +100,23 @@ export default function CreateSalePage() {
     }
   }
 
+  const fetchPaymentMethods = async () => {
+    try {
+      const response = await fetch('/api/payment-methods')
+      if (response.ok) {
+        const data = await response.json()
+        setPaymentMethods(data)
+        // Set the first enabled payment method as default
+        const enabledMethods = data.filter(pm => pm.enabled)
+        if (enabledMethods.length > 0) {
+          setSelectedPaymentMethod(enabledMethods[0].id.toString())
+        }
+      }
+    } catch (error) {
+      console.error('Error fetching payment methods:', error)
+    }
+  }
+
   const fetchSettings = async () => {
     try {
       const response = await fetch('/api/settings')
@@ -83,77 +128,6 @@ export default function CreateSalePage() {
       console.error('Error fetching settings:', error)
     }
   }
-
-  // Draft management functions
-  const saveDraft = () => {
-    if (cart.length > 0) {
-      const draftData = {
-        cart: cart,
-        timestamp: new Date().toISOString(),
-        itemCount: cart.reduce((sum, item) => sum + item.quantity, 0)
-      }
-      localStorage.setItem(DRAFT_STORAGE_KEY, JSON.stringify(draftData))
-      setDraftSaved(true)
-      setShowDraftNotification(true)
-      setTimeout(() => setShowDraftNotification(false), 3000)
-    }
-  }
-
-  const loadDraft = () => {
-    try {
-      const draftData = localStorage.getItem(DRAFT_STORAGE_KEY)
-      if (draftData) {
-        const parsed = JSON.parse(draftData)
-        setCart(parsed.cart)
-        setDraftSaved(true)
-        alert(`Draft loaded with ${parsed.itemCount} items from ${new Date(parsed.timestamp).toLocaleString()}`)
-        return true
-      }
-    } catch (error) {
-      console.error('Error loading draft:', error)
-    }
-    return false
-  }
-
-  const clearDraft = () => {
-    localStorage.removeItem(DRAFT_STORAGE_KEY)
-    setCart([])
-    setDraftSaved(false)
-  }
-
-  const hasDraft = () => {
-    try {
-      const draftData = localStorage.getItem(DRAFT_STORAGE_KEY)
-      return draftData && JSON.parse(draftData).cart.length > 0
-    } catch {
-      return false
-    }
-  }
-
-  // Auto-save draft when cart changes
-  useEffect(() => {
-    if (cart.length > 0) {
-      const timeoutId = setTimeout(() => {
-        saveDraft()
-      }, 1000) // Auto-save after 1 second of inactivity
-      
-      return () => clearTimeout(timeoutId)
-    } else if (cart.length === 0 && draftSaved) {
-      // Clear draft if cart is empty
-      localStorage.removeItem(DRAFT_STORAGE_KEY)
-      setDraftSaved(false)
-    }
-  }, [cart, DRAFT_STORAGE_KEY, draftSaved])
-
-  // Load draft on component mount
-  useEffect(() => {
-    if (user && hasDraft()) {
-      const shouldLoad = window.confirm('You have a saved draft cart. Would you like to load it?')
-      if (shouldLoad) {
-        loadDraft()
-      }
-    }
-  }, [user, DRAFT_STORAGE_KEY])
 
   const addToCart = (item) => {
     if (item.stock <= 0) {
@@ -222,9 +196,38 @@ export default function CreateSalePage() {
     return calculateTotal() + calculateTax()
   }
 
+  const handleTableSelect = (table) => {
+    if (table.occupied) return
+    setSelectedTable(table)
+  }
+
+  const handleOrderTypeChange = (type) => {
+    setOrderType(type)
+    if (type === 'take-away') {
+      setSelectedTable(null)
+    }
+  }
+
+  const proceedToMenu = () => {
+    if (orderType === 'dine-in' && !selectedTable) {
+      alert('Please select a table for dine-in orders')
+      return
+    }
+    setCurrentStep('menu')
+  }
+
+  const goBackToTable = () => {
+    setCurrentStep('table')
+  }
+
   const processSale = async () => {
     if (cart.length === 0) {
       alert('Please add items to cart')
+      return
+    }
+
+    if (!selectedPaymentMethod) {
+      alert('Please select a payment method')
       return
     }
 
@@ -238,7 +241,11 @@ export default function CreateSalePage() {
           price: item.price
         })),
         total: calculateGrandTotal(),
-        userId: user.id
+        userId: user.id,
+        paymentMethodId: parseInt(selectedPaymentMethod),
+        orderType: orderType,
+        tableId: selectedTable?.id || null,
+        guestCount: orderType === 'dine-in' ? guestCount : 1
       }
 
       const response = await fetch('/api/sales', {
@@ -249,7 +256,7 @@ export default function CreateSalePage() {
 
       if (response.ok) {
         alert('Sale completed successfully!')
-        clearDraft() // Clear the draft after successful sale
+        setCart([])
         router.push('/dashboard/sales')
       } else {
         alert('Error processing sale')
@@ -259,12 +266,6 @@ export default function CreateSalePage() {
       alert('Error processing sale')
     } finally {
       setProcessing(false)
-    }
-  }
-
-  const clearCart = () => {
-    if (confirm('Are you sure you want to clear the cart?')) {
-      clearDraft()
     }
   }
 
@@ -289,335 +290,468 @@ export default function CreateSalePage() {
   return (
     <AuthGuard>
       <DashboardLayout>
-        <div className="h-full">
-          {/* Draft notification */}
-          {showDraftNotification && (
-            <div className="mb-4 bg-green-50 border border-green-200 text-green-800 px-4 py-3 rounded-lg flex items-center gap-2">
-              <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
-                <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
-              </svg>
-              Draft saved successfully!
-            </div>
-          )}
-
-          <div className="flex justify-between items-center mb-6">
-            <div>
-              <h1 
-                className="text-2xl font-bold transition-colors"
-                style={{ color: isDark ? '#ffffff' : '#111827' }}
-              >
-                Point of Sale
-              </h1>
-              <p 
-                className="transition-colors"
-                style={{ color: isDark ? '#d1d5db' : '#6b7280' }}
-              >
-                Select items to add to cart
-              </p>
-            </div>
-            <div className="flex items-center space-x-4">
-              {/* Draft controls */}
-              <div className="flex gap-2">
-                {draftSaved && (
-                  <span 
-                    className="px-2 py-1 text-sm rounded-lg transition-colors"
-                    style={{
-                      backgroundColor: isDark ? '#1e3a8a' : '#dbeafe',
-                      color: isDark ? '#93c5fd' : '#1e40af'
-                    }}
-                  >
-                    Draft saved
-                  </span>
-                )}
-                {hasDraft() && (
-                  <button
-                    onClick={loadDraft}
-                    className="px-3 py-2 text-white rounded-lg text-sm transition-colors duration-200"
-                    style={{
-                      backgroundColor: isDark ? '#1d4ed8' : '#2563eb'
-                    }}
-                    onMouseEnter={(e) => {
-                      e.target.style.backgroundColor = isDark ? '#1e40af' : '#1d4ed8'
-                    }}
-                    onMouseLeave={(e) => {
-                      e.target.style.backgroundColor = isDark ? '#1d4ed8' : '#2563eb'
-                    }}
-                  >
-                    Load Draft
-                  </button>
-                )}
-                {cart.length > 0 && (
-                  <>
-                    <button
-                      onClick={saveDraft}
-                      className="px-3 py-2 text-white rounded-lg text-sm transition-colors duration-200"
-                      style={{
-                        backgroundColor: isDark ? '#4b5563' : '#6b7280'
-                      }}
-                      onMouseEnter={(e) => {
-                        e.target.style.backgroundColor = isDark ? '#374151' : '#4b5563'
-                      }}
-                      onMouseLeave={(e) => {
-                        e.target.style.backgroundColor = isDark ? '#4b5563' : '#6b7280'
-                      }}
-                    >
-                      Save Draft
-                    </button>
-                    <button
-                      onClick={clearDraft}
-                      className="px-3 py-2 text-white rounded-lg text-sm transition-colors duration-200"
-                      style={{
-                        backgroundColor: isDark ? '#dc2626' : '#ef4444'
-                      }}
-                      onMouseEnter={(e) => {
-                        e.target.style.backgroundColor = isDark ? '#b91c1c' : '#dc2626'
-                      }}
-                      onMouseLeave={(e) => {
-                        e.target.style.backgroundColor = isDark ? '#dc2626' : '#ef4444'
-                      }}
-                    >
-                      Clear Cart
-                    </button>
-                  </>
-                )}
+        <div className="h-full bg-gray-50">
+          {/* Header */}
+          <div className="bg-white border-b border-gray-200 px-6 py-4">
+            <div className="flex items-center justify-between">
+              <div className="flex items-center gap-4">
+                <div className="flex items-center gap-3">
+                  <div className="w-12 h-12 bg-orange-100 rounded-xl flex items-center justify-center">
+                    <span className="text-2xl">🍽️</span>
+                  </div>
+                  <div>
+                    <h1 className="text-2xl font-bold text-gray-900">POS</h1>
+                    <p className="text-sm text-gray-500">Point of Sale System</p>
+                  </div>
+                </div>
+                
+                <div className="flex items-center gap-2 text-sm text-gray-600">
+                  <span>📅 {new Date().toLocaleDateString()}</span>
+                  <span>•</span>
+                  <span>🕐 {new Date().toLocaleTimeString()}</span>
+                </div>
               </div>
-              <span 
-                className="text-sm transition-colors"
-                style={{ color: isDark ? '#d1d5db' : '#6b7280' }}
-              >
-                Cashier: {user?.name}
-              </span>
+              
+              <div className="flex items-center gap-4">
+                <Button
+                  onClick={() => router.push('/dashboard/sales')}
+                  variant="outline"
+                  size="sm"
+                >
+                  ← Back to Sales
+                </Button>
+              </div>
             </div>
           </div>
 
-          <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 h-full">
-            {/* Items Grid */}
-            <div className="lg:col-span-2">
-              <Card className="h-full">
-                <CardHeader>
-                  <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center space-y-4 sm:space-y-0">
-                    <h3 
-                      className="text-lg font-semibold transition-colors"
-                      style={{ color: isDark ? '#ffffff' : '#111827' }}
+          {currentStep === 'table' ? (
+            // Table Selection Step
+            <div className="p-6">
+              <div className="max-w-6xl mx-auto">
+                {/* Order Type Selection */}
+                <div className="bg-white rounded-2xl shadow-sm border border-gray-200 p-6 mb-6">
+                  <h2 className="text-xl font-semibold text-gray-900 mb-4">Order Type</h2>
+                  <div className="flex gap-4">
+                    <button
+                      onClick={() => handleOrderTypeChange('dine-in')}
+                      className={`flex-1 p-6 rounded-xl border-2 transition-all ${
+                        orderType === 'dine-in'
+                          ? 'border-orange-500 bg-orange-50'
+                          : 'border-gray-200 hover:border-orange-300'
+                      }`}
                     >
-                      Items
-                    </h3>
-                    <div className="flex flex-col sm:flex-row space-y-2 sm:space-y-0 sm:space-x-4 w-full sm:w-auto">
-                      <Input
-                        placeholder="Search items..."
-                        value={searchTerm}
-                        onChange={(e) => setSearchTerm(e.target.value)}
-                        className="sm:w-64"
-                      />
+                      <div className="text-center">
+                        <div className="text-4xl mb-2">🍽️</div>
+                        <h3 className="font-semibold text-gray-900">Dine In</h3>
+                        <p className="text-sm text-gray-500">Table service</p>
+                      </div>
+                    </button>
+                    
+                    <button
+                      onClick={() => handleOrderTypeChange('take-away')}
+                      className={`flex-1 p-6 rounded-xl border-2 transition-all ${
+                        orderType === 'take-away'
+                          ? 'border-orange-500 bg-orange-50'
+                          : 'border-gray-200 hover:border-orange-300'
+                      }`}
+                    >
+                      <div className="text-center">
+                        <div className="text-4xl mb-2">🥡</div>
+                        <h3 className="font-semibold text-gray-900">Take Away</h3>
+                        <p className="text-sm text-gray-500">To go</p>
+                      </div>
+                    </button>
+                  </div>
+                </div>
+
+                {orderType === 'dine-in' && (
+                  <div className="bg-white rounded-2xl shadow-sm border border-gray-200 p-6 mb-6">
+                    <div className="flex items-center justify-between mb-6">
+                      <h2 className="text-xl font-semibold text-gray-900">Table Selection</h2>
+                      <div className="flex items-center gap-4">
+                        <div className="flex items-center gap-2">
+                          <span className="text-sm text-gray-600">Guests:</span>
+                          <div className="flex items-center bg-gray-100 rounded-lg">
+                            <button
+                              onClick={() => setGuestCount(Math.max(1, guestCount - 1))}
+                              className="w-8 h-8 flex items-center justify-center text-gray-600 hover:bg-gray-200 rounded-l-lg"
+                            >
+                              -
+                            </button>
+                            <span className="w-12 text-center text-sm font-medium text-gray-900 py-2">{guestCount}</span>
+                            <button
+                              onClick={() => setGuestCount(guestCount + 1)}
+                              className="w-8 h-8 flex items-center justify-center text-gray-600 hover:bg-gray-200 rounded-r-lg"
+                            >
+                              +
+                            </button>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                    
+                    <div className="grid grid-cols-3 gap-8 max-w-4xl mx-auto">
+                      {tables.map((table) => (
+                        <div key={table.id} className="text-center">
+                          <button
+                            onClick={() => handleTableSelect(table)}
+                            disabled={table.occupied}
+                            className={`w-24 h-24 rounded-full border-4 transition-all relative ${
+                              table.occupied
+                                ? 'border-red-300 bg-red-100 cursor-not-allowed'
+                                : selectedTable?.id === table.id
+                                ? 'border-orange-500 bg-orange-100 shadow-lg'
+                                : 'border-gray-300 bg-white hover:border-orange-300 hover:shadow-md'
+                            }`}
+                          >
+                            <div className="absolute inset-0 flex items-center justify-center">
+                              <span className={`text-lg font-semibold ${
+                                table.occupied
+                                  ? 'text-red-600'
+                                  : selectedTable?.id === table.id
+                                  ? 'text-orange-600'
+                                  : 'text-gray-700'
+                              }`}>
+                                {table.name}
+                              </span>
+                            </div>
+                            
+                            {/* Table chairs representation */}
+                            <div className="absolute -top-2 left-1/2 transform -translate-x-1/2 w-4 h-4 bg-gray-300 rounded"></div>
+                            <div className="absolute -bottom-2 left-1/2 transform -translate-x-1/2 w-4 h-4 bg-gray-300 rounded"></div>
+                            <div className="absolute -left-2 top-1/2 transform -translate-y-1/2 w-4 h-4 bg-gray-300 rounded"></div>
+                            <div className="absolute -right-2 top-1/2 transform -translate-y-1/2 w-4 h-4 bg-gray-300 rounded"></div>
+                          </button>
+                          
+                          <div className="mt-2">
+                            <p className={`text-sm font-medium ${
+                              table.occupied
+                                ? 'text-red-600'
+                                : selectedTable?.id === table.id
+                                ? 'text-orange-600'
+                                : 'text-gray-700'
+                            }`}>
+                              {table.occupied ? 'Occupied' : 'Available'}
+                            </p>
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                )}
+
+                {/* Order Info */}
+                <div className="bg-white rounded-2xl shadow-sm border border-gray-200 p-6">
+                  <div className="flex items-center justify-between">
+                    <div className="flex items-center gap-6">
+                      <div>
+                        <p className="text-sm text-gray-500">Order #</p>
+                        <p className="text-lg font-semibold text-gray-900">{orderNumber}</p>
+                      </div>
+                      
+                      {orderType === 'dine-in' && selectedTable && (
+                        <div>
+                          <p className="text-sm text-gray-500">Table</p>
+                          <p className="text-lg font-semibold text-orange-600">{selectedTable.name}</p>
+                        </div>
+                      )}
+                      
+                      <div>
+                        <p className="text-sm text-gray-500">Guests</p>
+                        <p className="text-lg font-semibold text-gray-900">{guestCount}</p>
+                      </div>
+                    </div>
+                    
+                    <Button
+                      onClick={proceedToMenu}
+                      variant="primary"
+                      className="bg-orange-500 hover:bg-orange-600"
+                      disabled={orderType === 'dine-in' && !selectedTable}
+                    >
+                      Select Menu →
+                    </Button>
+                  </div>
+                </div>
+              </div>
+            </div>
+          ) : (
+            // Menu Selection Step
+            <div className="flex h-[calc(100vh-120px)]">
+              {/* Left Side - Menu */}
+              <div className="flex-1 p-6">
+                <div className="bg-white rounded-2xl shadow-sm border border-gray-200 h-full flex flex-col">
+                  {/* Menu Header */}
+                  <div className="p-6 border-b border-gray-200">
+                    <div className="flex items-center justify-between mb-4">
+                      <div className="flex items-center gap-3">
+                        <Button
+                          onClick={goBackToTable}
+                          variant="outline"
+                          size="sm"
+                        >
+                          ← Back
+                        </Button>
+                        <h2 className="text-xl font-semibold text-gray-900">Menu</h2>
+                      </div>
+                      
+                      <div className="flex items-center gap-4 text-sm">
+                        <span className="text-gray-500">Order #{orderNumber}</span>
+                        {orderType === 'dine-in' && selectedTable && (
+                          <span className="text-orange-600 font-medium">Table {selectedTable.name}</span>
+                        )}
+                        {orderType === 'take-away' && (
+                          <span className="text-green-600 font-medium">Take Away</span>
+                        )}
+                      </div>
+                    </div>
+                    
+                    {/* Search and Filter */}
+                    <div className="flex gap-4">
+                      <div className="flex-1 relative">
+                        <Input
+                          placeholder="🔍 Search menu items..."
+                          value={searchTerm}
+                          onChange={(e) => setSearchTerm(e.target.value)}
+                          className="pl-10"
+                        />
+                        <div className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400">
+                          <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+                          </svg>
+                        </div>
+                      </div>
+                      
                       <Select
                         value={selectedCategory}
                         onChange={(e) => setSelectedCategory(e.target.value)}
-                        options={[
-                          { value: 'all', label: 'All Categories' },
-                          ...categories.map(category => ({
-                            value: category.id.toString(),
-                            label: category.name
-                          }))
-                        ]}
-                      />
+                        className="min-w-[160px]"
+                      >
+                        <option value="all">All Categories</option>
+                        {categories.map(category => (
+                          <option key={category.id} value={category.id.toString()}>
+                            {category.name}
+                          </option>
+                        ))}
+                      </Select>
                     </div>
                   </div>
-                </CardHeader>
-                <CardBody className="p-4">
-                  <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-4 max-h-96 overflow-y-auto">
-                    {filteredItems.map((item) => (
-                      <div
-                        key={item.id}
-                        onClick={() => addToCart(item)}
-                        className={`rounded-lg p-4 cursor-pointer transition-all hover:shadow-md ${
-                          item.stock <= 0 ? 'opacity-50 cursor-not-allowed' : ''
-                        }`}
-                        style={{
-                          backgroundColor: isDark ? '#1f2937' : '#ffffff',
-                          borderColor: isDark ? '#374151' : '#e5e7eb',
-                          borderWidth: '1px',
-                          borderStyle: 'solid'
-                        }}
-                        onMouseEnter={(e) => {
-                          if (item.stock > 0) {
-                            e.target.style.borderColor = isDark ? '#3b82f6' : '#2563eb'
-                          }
-                        }}
-                        onMouseLeave={(e) => {
-                          e.target.style.borderColor = isDark ? '#374151' : '#e5e7eb'
-                        }}
-                      >
-                        <div 
-                          className="aspect-square rounded-lg mb-3 flex items-center justify-center p-2 transition-colors"
-                          style={{ backgroundColor: isDark ? '#374151' : '#f3f4f6' }}
+                  
+                  {/* Menu Items Grid */}
+                  <div className="flex-1 p-6 overflow-y-auto">
+                    <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-4">
+                      {filteredItems.map((item) => (
+                        <div
+                          key={item.id}
+                          onClick={() => addToCart(item)}
+                          className={`group bg-gray-50 rounded-xl p-4 cursor-pointer transition-all duration-200 hover:shadow-lg hover:-translate-y-1 border relative ${
+                            item.stock <= 0 ? 'opacity-50 cursor-not-allowed grayscale' : 'hover:border-orange-300'
+                          }`}
                         >
-                          <ProductImage item={item} size="xl" className="w-full h-full" />
+                          {/* Stock badge */}
+                          <div className="flex justify-between items-start mb-3">
+                            <span className={`px-2 py-1 text-xs font-medium rounded-full ${
+                              item.stock <= 0 ? 'bg-red-100 text-red-700' :
+                              item.stock <= 5 ? 'bg-yellow-100 text-yellow-700' :
+                              'bg-green-100 text-green-700'
+                            }`}>
+                              {item.stock <= 0 ? 'Out' : item.stock}
+                            </span>
+                          </div>
+                          
+                          {/* Product image */}
+                          <div className="aspect-square rounded-lg mb-3 bg-white flex items-center justify-center p-2">
+                            <ProductImage item={item} size="lg" className="w-full h-full object-cover rounded-md" />
+                          </div>
+                          
+                          {/* Product info */}
+                          <div className="text-center space-y-1">
+                            <h4 className="font-semibold text-sm text-gray-900 truncate">
+                              {item.name}
+                            </h4>
+                            <p className="text-xs text-gray-500 truncate">
+                              {item.category?.name}
+                            </p>
+                            <div className="text-lg font-bold text-orange-600">
+                              {settings.currencySymbol}{item.price.toFixed(2)}
+                            </div>
+                          </div>
+                          
+                          {/* Hover overlay */}
+                          {item.stock > 0 && (
+                            <div className="absolute inset-0 bg-orange-500/10 rounded-xl opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
+                              <div className="bg-orange-500 text-white px-3 py-1.5 rounded-lg text-sm font-medium shadow-lg transform translate-y-2 group-hover:translate-y-0 transition-transform">
+                                + Add to Cart
+                              </div>
+                            </div>
+                          )}
                         </div>
-                        <div className="text-center">
-                          <h4 
-                            className="font-medium text-sm mb-1 truncate transition-colors"
-                            style={{ color: isDark ? '#ffffff' : '#111827' }}
-                          >
-                            {item.name}
-                          </h4>
-                          <p 
-                            className="text-xs mb-2 transition-colors"
-                            style={{ color: isDark ? '#9ca3af' : '#6b7280' }}
-                          >
-                            {item.category.name}
-                          </p>
-                          <p 
-                            className="text-lg font-bold transition-colors"
-                            style={{ color: isDark ? '#60a5fa' : '#2563eb' }}
-                          >
-                            {settings.currencySymbol}{item.price.toFixed(2)}
-                          </p>
-                          <p 
-                            className="text-xs mt-1 transition-colors"
-                            style={{ 
-                              color: item.stock <= 5 
-                                ? (isDark ? '#f87171' : '#ef4444') 
-                                : (isDark ? '#4ade80' : '#16a34a') 
-                            }}
-                          >
-                            Stock: {item.stock}
-                          </p>
-                        </div>
-                      </div>
-                    ))}
-                  </div>
-                  {filteredItems.length === 0 && (
-                    <div 
-                      className="text-center py-8 transition-colors"
-                      style={{ color: isDark ? '#9ca3af' : '#6b7280' }}
-                    >
-                      No items found matching your criteria
+                      ))}
                     </div>
-                  )}
-                </CardBody>
-              </Card>
-            </div>
-
-            {/* Cart */}
-            <div className="lg:col-span-1">
-              <Card className="h-full">
-                <CardHeader>
-                  <div className="flex justify-between items-center">
-                    <h3 
-                      className="text-lg font-semibold transition-colors"
-                      style={{ color: isDark ? '#ffffff' : '#111827' }}
-                    >
-                      Cart ({cart.length})
-                    </h3>
-                    {cart.length > 0 && (
-                      <Button
-                        size="sm"
-                        variant="outline"
-                        onClick={clearCart}
-                      >
-                        Clear
-                      </Button>
+                    
+                    {filteredItems.length === 0 && (
+                      <div className="text-center py-12 text-gray-500">
+                        <div className="text-4xl mb-4">🔍</div>
+                        <p>No items found matching your criteria</p>
+                      </div>
                     )}
                   </div>
-                </CardHeader>
-                <CardBody className="p-4 flex flex-col h-full">
-                  {cart.length === 0 ? (
-                    <div 
-                      className="flex-1 flex items-center justify-center transition-colors"
-                      style={{ color: isDark ? '#9ca3af' : '#6b7280' }}
-                    >
-                      <div className="text-center">
-                        <div className="text-4xl mb-2">🛒</div>
-                        <p>Cart is empty</p>
-                        <p className="text-sm">Click on items to add them</p>
+                </div>
+              </div>
+              
+              {/* Right Side - Cart */}
+              <div className="w-96 p-6 pl-0">
+                <div className="bg-white rounded-2xl shadow-sm border border-gray-200 h-full flex flex-col">
+                  {/* Cart Header */}
+                  <div className="p-6 border-b border-gray-200">
+                    <div className="flex items-center justify-between">
+                      <div>
+                        <h3 className="text-lg font-semibold text-gray-900">Order Summary</h3>
+                        <p className="text-sm text-gray-500">
+                          {cart.length} {cart.length === 1 ? 'item' : 'items'}
+                        </p>
                       </div>
+                      
+                      {cart.length > 0 && (
+                        <Button
+                          onClick={() => setCart([])}
+                          variant="outline"
+                          size="sm"
+                        >
+                          Clear
+                        </Button>
+                      )}
                     </div>
-                  ) : (
-                    <div className="flex flex-col h-full">
-                      <div className="flex-1 overflow-y-auto space-y-2 mb-4">
+                  </div>
+                  
+                  {/* Cart Items */}
+                  <div className="flex-1 overflow-y-auto p-6">
+                    {cart.length === 0 ? (
+                      <div className="flex flex-col items-center justify-center h-full text-gray-500">
+                        <div className="text-4xl mb-4">🛒</div>
+                        <p className="text-center">No items in cart</p>
+                        <p className="text-sm text-center mt-1">Add items from the menu</p>
+                      </div>
+                    ) : (
+                      <div className="space-y-4">
                         {cart.map((item) => (
-                          <div 
-                            key={item.itemId} 
-                            className="rounded-lg p-3 transition-colors"
-                            style={{ backgroundColor: isDark ? '#374151' : '#f9fafb' }}
-                          >
-                            <div className="flex justify-between items-start mb-2">
-                              <div className="flex items-center gap-2 flex-1">
-                                <ProductImage item={item} size="sm" />
-                                <div>
-                                  <h4 className="font-medium text-sm text-gray-900 dark:text-white">{item.name}</h4>
-                                  <p className="text-xs text-gray-500 dark:text-gray-400">{settings.currencySymbol}{item.price.toFixed(2)} each</p>
-                                </div>
+                          <div key={item.itemId} className="bg-gray-50 rounded-lg p-4">
+                            <div className="flex items-start justify-between mb-3">
+                              <div className="flex-1">
+                                <h4 className="font-medium text-gray-900 text-sm">{item.name}</h4>
+                                <p className="text-xs text-gray-500">{settings.currencySymbol}{item.price.toFixed(2)} each</p>
                               </div>
-                              <Button
-                                size="sm"
-                                variant="outline"
+                              <button
                                 onClick={() => removeFromCart(item.itemId)}
-                                className="ml-2 p-1 h-6 w-6"
+                                className="text-gray-400 hover:text-red-500 transition-colors"
                               >
-                                ×
-                              </Button>
+                                <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                                </svg>
+                              </button>
                             </div>
+                            
                             <div className="flex items-center justify-between">
-                              <div className="flex items-center space-x-2">
+                              <div className="flex items-center bg-white rounded-lg border border-gray-200">
                                 <button
                                   onClick={() => updateQuantity(item.itemId, item.quantity - 1)}
-                                  className="w-6 h-6 flex items-center justify-center bg-gray-200 dark:bg-gray-600 text-gray-900 dark:text-white rounded text-sm hover:bg-gray-300 dark:hover:bg-gray-500 transition-colors duration-200"
+                                  className="w-8 h-8 flex items-center justify-center text-gray-600 hover:bg-gray-100 rounded-l-lg transition-colors"
                                 >
                                   -
                                 </button>
-                                <span className="text-sm font-medium w-8 text-center text-gray-900 dark:text-white">{item.quantity}</span>
+                                <span className="w-12 text-center text-sm font-medium text-gray-900 py-2">{item.quantity}</span>
                                 <button
                                   onClick={() => updateQuantity(item.itemId, item.quantity + 1)}
-                                  className="w-6 h-6 flex items-center justify-center bg-gray-200 dark:bg-gray-600 text-gray-900 dark:text-white rounded text-sm hover:bg-gray-300 dark:hover:bg-gray-500 transition-colors duration-200"
+                                  className="w-8 h-8 flex items-center justify-center text-gray-600 hover:bg-gray-100 rounded-r-lg transition-colors"
                                 >
                                   +
                                 </button>
                               </div>
-                              <div className="text-sm font-bold text-gray-900 dark:text-white">{settings.currencySymbol}{item.total.toFixed(2)}</div>
+                              
+                              <div className="text-right">
+                                <div className="text-lg font-bold text-orange-600">
+                                  {settings.currencySymbol}{item.total.toFixed(2)}
+                                </div>
+                              </div>
                             </div>
                           </div>
                         ))}
                       </div>
-
-                      <div className="border-t border-gray-200 dark:border-gray-600 pt-4 space-y-2">
-                        <div className="flex justify-between text-sm text-gray-900 dark:text-gray-100">
-                          <span>Subtotal:</span>
-                          <span>{settings.currencySymbol}{calculateTotal().toFixed(2)}</span>
+                    )}
+                  </div>
+                  
+                  {/* Cart Footer */}
+                  {cart.length > 0 && (
+                    <div className="p-6 border-t border-gray-200 dark:border-gray-700">
+                      {/* Totals */}
+                      <div className="space-y-2 mb-4">
+                        <div className="flex justify-between text-sm">
+                          <span className="text-gray-600 dark:text-gray-400">Subtotal:</span>
+                          <span className="font-medium text-gray-900 dark:text-white">{settings.currencySymbol}{calculateTotal().toFixed(2)}</span>
                         </div>
                         {settings.taxEnabled && (
-                          <div className="flex justify-between text-sm text-gray-900 dark:text-gray-100">
-                            <span>{settings.taxName} ({settings.taxRate}%):</span>
-                            <span>{settings.currencySymbol}{calculateTax().toFixed(2)}</span>
+                          <div className="flex justify-between text-sm">
+                            <span className="text-gray-600">{settings.taxName} ({settings.taxRate}%):</span>
+                            <span className="font-medium text-gray-900">{settings.currencySymbol}{calculateTax().toFixed(2)}</span>
                           </div>
                         )}
-                        <div className="flex justify-between text-lg font-bold border-t border-gray-200 dark:border-gray-600 pt-2 text-gray-900 dark:text-white">
-                          <span>Total:</span>
-                          <span>{settings.currencySymbol}{calculateGrandTotal().toFixed(2)}</span>
+                        <div className="border-t border-gray-200 pt-2">
+                          <div className="flex justify-between">
+                            <span className="text-lg font-bold text-gray-900">Total:</span>
+                            <span className="text-xl font-bold text-orange-600">{settings.currencySymbol}{calculateGrandTotal().toFixed(2)}</span>
+                          </div>
                         </div>
-                        
-                        <Button
-                          onClick={processSale}
-                          variant="success"
-                          className="w-full mt-4"
-                          disabled={processing}
-                        >
-                          {processing ? (
-                            <div className="flex items-center space-x-2">
-                              <LoadingSpinner size="sm" />
-                              <span>Processing...</span>
-                            </div>
-                          ) : (
-                            'Complete Sale'
-                          )}
-                        </Button>
                       </div>
+                      
+                      {/* Payment Method */}
+                      <div className="mb-4">
+                        <label className="block text-sm font-medium text-gray-700 mb-2">
+                          Payment Method
+                        </label>
+                        <div className="grid grid-cols-2 gap-2">
+                          {paymentMethods
+                            .filter(pm => pm.enabled)
+                            .map(method => (
+                              <button
+                                key={method.id}
+                                type="button"
+                                onClick={() => setSelectedPaymentMethod(method.id)}
+                                className={`flex items-center justify-center p-3 rounded-lg border ${selectedPaymentMethod === method.id ? 'bg-orange-50 border-orange-500' : 'border-gray-300 hover:bg-gray-50'}`}
+                              >
+                                <div className="flex flex-col items-center">
+                                  <span className="text-xl mb-1">{method.name === 'Cash' ? '💵' : method.name === 'Credit Card' ? '💳' : method.name === 'Debit Card' ? '💳' : '📱'}</span>
+                                  <span className="font-medium">{method.name}</span>
+                                </div>
+                              </button>
+                            ))
+                          }
+                        </div>
+                      </div>
+                      
+                      {/* Complete Order Button */}
+                      <Button
+                        onClick={processSale}
+                        variant="primary"
+                        className="w-full bg-orange-500 hover:bg-orange-600 text-white font-semibold py-3 rounded-xl"
+                        disabled={processing || !selectedPaymentMethod}
+                      >
+                        {processing ? (
+                          <div className="flex items-center justify-center space-x-2">
+                            <LoadingSpinner size="sm" />
+                            <span>Processing...</span>
+                          </div>
+                        ) : (
+                          <div className="flex items-center justify-center space-x-2">
+                            <span>💰</span>
+                            <span>Complete Order</span>
+                          </div>
+                        )}
+                      </Button>
                     </div>
                   )}
-                </CardBody>
-              </Card>
+                </div>
+              </div>
             </div>
-          </div>
+          )}
         </div>
       </DashboardLayout>
     </AuthGuard>

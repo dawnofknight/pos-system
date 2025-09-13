@@ -81,8 +81,8 @@ export async function PUT(request) {
     } else {
       settings = await prisma.settings.create({
         data: {
-          currency: currency || 'USD',
-          currencySymbol: currencySymbol || '$',
+          currency: currency || 'IDR',
+          currencySymbol: currencySymbol || 'Rp',
           taxEnabled: taxEnabled || false,
           taxRate: taxRate || 0.0,
           taxName: taxName || 'Tax'

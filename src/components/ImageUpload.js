@@ -152,7 +152,7 @@ export default function ImageUpload({
               accept="image/jpeg,image/jpg,image/png,image/webp"
               onChange={handleFileUpload}
               disabled={uploading}
-              className="block w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-md file:border-0 file:text-sm file:font-semibold file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100"
+              className="block w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-md file:border-0 file:text-sm file:font-semibold file:bg-primary-50 file:text-primary-700 hover:file:bg-primary-100"
             />
             <p className="text-xs text-gray-500 mt-1">
               Max file size: 5MB. Supported formats: JPEG, PNG, WebP
@@ -169,7 +169,7 @@ export default function ImageUpload({
               value={imageUrl}
               onChange={(e) => setImageUrl(e.target.value)}
               disabled={uploading}
-              className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500"
+              className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-primary-500 focus:border-primary-500"
             />
             <Button
               type="button"
@@ -191,8 +191,8 @@ export default function ImageUpload({
         {/* Loading State */}
         {uploading && (
           <div className="flex items-center justify-center py-4">
-            <div className="animate-spin rounded-full h-6 w-6 border-b-2 border-blue-600"></div>
-            <span className="ml-2 text-sm text-gray-600">Processing image...</span>
+            <div className="animate-spin rounded-full h-6 w-6 border-b-2 border-primary-600"></div>
+            <span className="ml-2 text-sm text-foreground">Processing image...</span>
           </div>
         )}
       </div>

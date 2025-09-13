@@ -32,7 +32,7 @@ export async function GET(request) {
     
     if (rolePermissions.length === 0) {
       // Create default permissions
-      const resources = ['dashboard', 'items', 'sales', 'categories', 'users', 'settings']
+      const resources = ['dashboard', 'items', 'sales', 'categories', 'users', 'settings', 'reports']
       const defaultPermissions = []
 
       // Admin permissions - full access to everything
@@ -54,7 +54,8 @@ export async function GET(request) {
         { role: 'CASHIER', resource: 'sales', canView: true, canCreate: true, canEdit: false, canDelete: false },
         { role: 'CASHIER', resource: 'categories', canView: true, canCreate: false, canEdit: false, canDelete: false },
         { role: 'CASHIER', resource: 'users', canView: false, canCreate: false, canEdit: false, canDelete: false },
-        { role: 'CASHIER', resource: 'settings', canView: false, canCreate: false, canEdit: false, canDelete: false }
+        { role: 'CASHIER', resource: 'settings', canView: false, canCreate: false, canEdit: false, canDelete: false },
+        { role: 'CASHIER', resource: 'reports', canView: true, canCreate: false, canEdit: false, canDelete: false }
       )
 
       await prisma.rolePermission.createMany({

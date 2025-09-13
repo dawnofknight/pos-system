@@ -10,8 +10,8 @@ export async function getSettings() {
       // Create default settings if none exist
       settings = await prisma.settings.create({
         data: {
-          currency: 'USD',
-          currencySymbol: '$',
+          currency: 'IDR',
+          currencySymbol: 'Rp',
           taxEnabled: false,
           taxRate: 0.0,
           taxName: 'Tax'
@@ -23,8 +23,8 @@ export async function getSettings() {
   } catch (error) {
     console.error('Error fetching settings:', error)
     return {
-      currency: 'USD',
-      currencySymbol: '$',
+      currency: 'IDR',
+      currencySymbol: 'Rp',
       taxEnabled: false,
       taxRate: 0.0,
       taxName: 'Tax'
@@ -54,6 +54,6 @@ export async function calculateTotalWithTax(subtotal, settings = null) {
 }
 
 export function formatCurrency(amount, settings = null) {
-  const symbol = settings?.currencySymbol || '$'
+  const symbol = settings?.currencySymbol || 'Rp'
   return `${symbol}${amount.toFixed(2)}`
 }

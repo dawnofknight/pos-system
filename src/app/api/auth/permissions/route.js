@@ -34,7 +34,8 @@ export async function GET(request) {
         { resource: 'sales', canView: true, canCreate: true, canEdit: true, canDelete: true },
         { resource: 'categories', canView: true, canCreate: true, canEdit: true, canDelete: true },
         { resource: 'users', canView: true, canCreate: true, canEdit: true, canDelete: true },
-        { resource: 'settings', canView: true, canCreate: true, canEdit: true, canDelete: true }
+        { resource: 'settings', canView: true, canCreate: true, canEdit: true, canDelete: true },
+        { resource: 'reports', canView: true, canCreate: true, canEdit: true, canDelete: true }
       ]
       return NextResponse.json(allPermissions)
     }

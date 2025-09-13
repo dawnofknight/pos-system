@@ -5,25 +5,23 @@ import { usePathname, useRouter } from 'next/navigation'
 import { useAuth } from '@/contexts/AuthContext'
 import { useRBAC } from '@/contexts/RBACContext'
 import { useTheme } from '@/contexts/ThemeContext'
-import ThemeToggle from '@/components/ThemeToggle'
 
 export default function DashboardLayout({ children }) {
   const [sidebarOpen, setSidebarOpen] = useState(false)
   const { user, logout } = useAuth()
   const { canAccess } = useRBAC()
-  const { theme } = useTheme()
+
   const router = useRouter()
   const pathname = usePathname()
 
-  const isDark = theme === 'dark'
-
   const allNavigation = [
-    { name: 'Dashboard', href: '/dashboard', icon: '📊', resource: 'dashboard' },
-    { name: 'Items', href: '/dashboard/items', icon: '📦', resource: 'items' },
-    { name: 'Categories', href: '/dashboard/categories', icon: '🏷️', resource: 'categories' },
-    { name: 'Sales', href: '/dashboard/sales', icon: '💰', resource: 'sales' },
-    { name: 'Create Sale', href: '/dashboard/sales/create', icon: '🛒', resource: 'sales' },
-    { name: 'Settings', href: '/dashboard/settings', icon: '⚙️', resource: 'settings' },
+    { name: 'Dashboard', href: '/dashboard', icon: '📊', resource: 'dashboard', description: 'Overview & Analytics' },
+    { name: 'Items', href: '/dashboard/items', icon: '📦', resource: 'items', description: 'Menu Items' },
+    { name: 'Categories', href: '/dashboard/categories', icon: '🏷️', resource: 'categories', description: 'Product Groups' },
+    { name: 'Sales', href: '/dashboard/sales', icon: '💰', resource: 'sales', description: 'POS & Orders' },
+    { name: 'Create Sale', href: '/dashboard/sales/create', icon: '🛒', resource: 'sales', description: 'New Transaction' },
+    { name: 'Reports', href: '/dashboard/reports', icon: '📈', resource: 'reports', description: 'Analytics & Reports' },
+    { name: 'Settings', href: '/dashboard/settings', icon: '⚙️', resource: 'settings', description: 'System Config' },
   ]
 
   // Filter navigation based on permissions
@@ -34,230 +32,179 @@ export default function DashboardLayout({ children }) {
   }
 
   return (
-    <div 
-      className="min-h-screen transition-colors duration-300"
-      style={{ 
-        backgroundColor: isDark ? '#111827' : '#f3f4f6' 
-      }}
-    >
+    <div className="min-h-screen bg-gray-50">
       {/* Mobile sidebar */}
       <div className={`fixed inset-0 z-50 lg:hidden ${sidebarOpen ? 'block' : 'hidden'}`}>
-        <div 
-          className="fixed inset-0 bg-opacity-75 transition-opacity"
-          style={{ 
-            backgroundColor: isDark ? 'rgba(17, 24, 39, 0.8)' : 'rgba(75, 85, 99, 0.75)' 
-          }}
-          onClick={() => setSidebarOpen(false)} 
-        />
-        <div 
-          className="relative flex w-full max-w-xs flex-1 flex-col transition-colors"
-          style={{ 
-            backgroundColor: isDark ? '#1f2937' : '#ffffff' 
-          }}
-        >
+        <div className="fixed inset-0 bg-black/50 backdrop-blur-sm" onClick={() => setSidebarOpen(false)} />
+        <div className="relative flex w-full max-w-xs flex-1 flex-col modern-card border-0 rounded-none">
           <div className="absolute top-0 right-0 -mr-12 pt-2">
             <button
               type="button"
-              className="ml-1 flex h-10 w-10 items-center justify-center rounded-full focus:outline-none focus:ring-2 focus:ring-inset focus:ring-white"
+              className="ml-1 flex h-10 w-10 items-center justify-center rounded-full bg-white/10 backdrop-blur-sm hover:bg-white/20 transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-primary/50"
               onClick={() => setSidebarOpen(false)}
             >
               <span className="sr-only">Close sidebar</span>
               <span className="text-white text-xl">×</span>
             </button>
           </div>
-          <div className="flex-1 h-0 pt-5 pb-4 overflow-y-auto">
-            <div className="flex-shrink-0 px-4">
-              <h1 
-                className="text-xl font-bold transition-colors"
-                style={{ 
-                  color: isDark ? '#ffffff' : '#111827' 
-                }}
-              >
-                POS System
-              </h1>
+          <div className="flex-1 h-0 overflow-y-auto">
+            {/* Mobile Header */}
+            <div className="flex-shrink-0 px-6 py-6 border-b border-gray-200">
+              <div className="flex items-center space-x-3">
+                <div className="w-10 h-10 bg-gradient-to-br from-primary to-primary-dark rounded-xl flex items-center justify-center">
+                  <span className="text-white font-bold text-lg">P</span>
+                </div>
+                <div>
+                  <h1 className="text-xl font-bold text-gradient">POS System</h1>
+                  <p className="text-xs text-gray-500">Restaurant Management</p>
+                </div>
+              </div>
             </div>
-            <nav className="mt-5 space-y-1 px-2">
+            
+            {/* Mobile Navigation */}
+            <nav className="px-4 py-6 space-y-2">
               {navigation.map((item) => {
                 const isActive = pathname === item.href
                 return (
                   <a
                     key={item.name}
                     href={item.href}
-                    className="group flex items-center px-2 py-2 text-base font-medium rounded-md transition-colors duration-200"
-                    style={{
-                      backgroundColor: isActive 
-                        ? (isDark ? '#374151' : '#f3f4f6')
-                        : 'transparent',
-                      color: isActive
-                        ? (isDark ? '#ffffff' : '#111827')
-                        : (isDark ? '#d1d5db' : '#4b5563')
-                    }}
-                    onMouseEnter={(e) => {
-                      if (!isActive) {
-                        e.target.style.backgroundColor = isDark ? '#374151' : '#f9fafb'
-                        e.target.style.color = isDark ? '#ffffff' : '#111827'
-                      }
-                    }}
-                    onMouseLeave={(e) => {
-                      if (!isActive) {
-                        e.target.style.backgroundColor = 'transparent'
-                        e.target.style.color = isDark ? '#d1d5db' : '#4b5563'
-                      }
-                    }}
+                    className={`group flex items-center px-4 py-3 text-sm font-medium rounded-xl transition-all duration-200 ${
+                      isActive 
+                        ? 'bg-orange-100 text-orange-900 shadow-lg shadow-orange-100/25' 
+                        : 'text-gray-900 hover:bg-gray-100'
+                    }`}
                   >
-                    <span className="mr-3">{item.icon}</span>
-                    {item.name}
+                    <span className="mr-4 text-lg">{item.icon}</span>
+                    <div className="flex-1">
+                      <div className="font-medium">{item.name}</div>
+                      <div className={`text-xs ${
+                         isActive ? 'text-black-900' : 'text-gray-500'
+                       }`}>
+                        {item.description}
+                      </div>
+                    </div>
                   </a>
                 )
               })}
             </nav>
             
-            {/* Theme toggle at bottom of sidebar */}
-            <div 
-              className="px-4 py-4 border-t transition-colors"
-              style={{ 
-                borderColor: isDark ? '#374151' : '#e5e7eb' 
-              }}
-            >
-              <ThemeToggle />
+            {/* Mobile Footer */}
+            <div className="px-4 py-4 border-t border-gray-200">
             </div>
           </div>
         </div>
       </div>
 
       {/* Desktop sidebar */}
-      <div className="hidden lg:fixed lg:inset-y-0 lg:flex lg:w-64 lg:flex-col">
-        <div 
-          className="flex min-h-0 flex-1 flex-col border-r transition-colors"
-          style={{ 
-            backgroundColor: isDark ? '#1f2937' : '#ffffff',
-            borderColor: isDark ? '#374151' : '#e5e7eb'
-          }}
-        >
-          <div className="flex-1 flex flex-col pt-5 pb-4 overflow-y-auto">
-            <div className="flex items-center flex-shrink-0 px-4">
-              <h1 
-                className="text-xl font-bold transition-colors"
-                style={{ 
-                  color: isDark ? '#ffffff' : '#111827' 
-                }}
-              >
-                POS System
-              </h1>
+      <div className="hidden lg:fixed lg:inset-y-0 lg:flex lg:w-72 lg:flex-col">
+        <div className="flex min-h-0 flex-1 flex-col modern-card border-0 rounded-none border-r border-gray-200">
+          <div className="flex-1 flex flex-col overflow-y-auto">
+            {/* Desktop Header */}
+            <div className="flex-shrink-0 px-6 py-8 border-b border-gray-200">
+              <div className="flex items-center space-x-4">
+                <div className="w-12 h-12 bg-gradient-to-br from-primary to-primary-dark rounded-2xl flex items-center justify-center shadow-lg">
+                  <span className="text-white font-bold text-xl">P</span>
+                </div>
+                <div>
+                  <h1 className="text-2xl font-bold text-gradient">POS System</h1>
+                  <p className="text-sm text-gray-500">Restaurant Management</p>
+                </div>
+              </div>
             </div>
-            <nav className="mt-5 flex-1 space-y-1 px-2">
+            
+            {/* Desktop Navigation */}
+            <nav className="flex-1 px-4 py-6 space-y-2">
               {navigation.map((item) => {
                 const isActive = pathname === item.href
                 return (
                   <a
                     key={item.name}
                     href={item.href}
-                    className="group flex items-center px-2 py-2 text-sm font-medium rounded-md transition-colors duration-200"
-                    style={{
-                      backgroundColor: isActive 
-                        ? (isDark ? '#374151' : '#f3f4f6')
-                        : 'transparent',
-                      color: isActive
-                        ? (isDark ? '#ffffff' : '#111827')
-                        : (isDark ? '#d1d5db' : '#4b5563')
-                    }}
-                    onMouseEnter={(e) => {
-                      if (!isActive) {
-                        e.target.style.backgroundColor = isDark ? '#374151' : '#f9fafb'
-                        e.target.style.color = isDark ? '#ffffff' : '#111827'
-                      }
-                    }}
-                    onMouseLeave={(e) => {
-                      if (!isActive) {
-                        e.target.style.backgroundColor = 'transparent'
-                        e.target.style.color = isDark ? '#d1d5db' : '#4b5563'
-                      }
-                    }}
+                    className={`group flex items-center px-4 py-4 text-sm font-medium rounded-xl transition-all duration-200 ${
+                      isActive 
+                        ? 'bg-orange-100 text-orange-900 shadow-lg shadow-orange-100/25' 
+                        : 'text-gray-900 hover:bg-gray-100'
+                    }`}
                   >
-                    <span className="mr-3">{item.icon}</span>
-                    {item.name}
+                    <span className="mr-4 text-xl">{item.icon}</span>
+                    <div className="flex-1">
+                      <div className="font-semibold">{item.name}</div>
+                      <div className={`text-xs mt-0.5 ${
+                        isActive ? 'font-semibold' : 'text-gray-500'
+                      }`}>
+                        {item.description}
+                      </div>
+                    </div>
+                    {isActive && (
+                      <div className="w-2 h-2 bg-orange-600 rounded-full opacity-80"></div>
+                    )}
                   </a>
                 )
               })}
             </nav>
             
-            {/* Theme toggle at bottom of desktop sidebar */}
-            <div 
-              className="px-4 py-4 border-t transition-colors"
-              style={{ 
-                borderColor: isDark ? '#374151' : '#e5e7eb' 
-              }}
-            >
-              <ThemeToggle />
+            {/* Desktop Footer */}
+            <div className="px-4 py-6 border-t border-gray-200">
             </div>
           </div>
         </div>
       </div>
 
-      <div className="lg:pl-64">
+      <div className="lg:pl-72">
         {/* Top navigation */}
-        <div 
-          className="sticky top-0 z-40 flex h-16 shadow transition-colors"
-          style={{ 
-            backgroundColor: isDark ? '#1f2937' : '#ffffff',
-            shadowColor: isDark ? '#111827' : '#00000010'
-          }}
-        >
+        <div className="sticky top-0 z-40 flex h-20 modern-card border-0 rounded-none border-b border-gray-200 backdrop-blur-xl bg-white/80">
           <button
             type="button"
-            className="border-r px-4 focus:outline-none focus:ring-2 focus:ring-inset focus:ring-indigo-500 lg:hidden transition-colors"
-            style={{ 
-              borderColor: isDark ? '#374151' : '#e5e7eb',
-              color: isDark ? '#6b7280' : '#9ca3af'
-            }}
+            className="border-r border-gray-200 px-6 focus:outline-none focus:ring-2 focus:ring-primary/50 lg:hidden transition-all duration-200 hover:bg-gray-100"
             onClick={() => setSidebarOpen(true)}
           >
             <span className="sr-only">Open sidebar</span>
-            <span className="text-xl">☰</span>
+            <span className="text-2xl text-gray-900">☰</span>
           </button>
-          <div className="flex flex-1 justify-between px-4">
-            <div className="flex flex-1">
-              <div className="flex w-full md:ml-0">
-                <div 
-                  className="relative w-full transition-colors"
-                  style={{ 
-                    color: isDark ? '#6b7280' : '#9ca3af'
-                  }}
-                >
-                  <div className="absolute inset-y-0 left-0 flex items-center pointer-events-none">
-                  </div>
+          
+          <div className="flex flex-1 justify-between px-6">
+            {/* Search and breadcrumb area */}
+            <div className="flex flex-1 items-center">
+              <div className="flex items-center space-x-4">
+                <div className="hidden md:flex items-center space-x-2 text-sm text-gray-500">
+                  <span>🏠</span>
+                  <span>/</span>
+                  <span className="text-gray-900 font-medium capitalize">
+                    {pathname.split('/').pop() || 'Dashboard'}
+                  </span>
                 </div>
               </div>
             </div>
-            <div className="ml-4 flex items-center md:ml-6">
-              <div className="relative ml-3">
-                <div className="flex items-center space-x-4">
-                  <span 
-                    className="text-sm font-medium transition-colors"
-                    style={{ 
-                      color: isDark ? '#d1d5db' : '#374151'
-                    }}
-                  >
-                    {user?.name} ({user?.role})
+            
+            {/* User menu */}
+            <div className="flex items-center space-x-4">
+              {/* User info */}
+              <div className="hidden md:flex items-center space-x-3">
+                <div className="text-right">
+                  <div className="text-sm font-semibold text-gray-900">{user?.name}</div>
+                  <div className="text-xs text-gray-500 capitalize">{user?.role}</div>
+                </div>
+                <div className="w-10 h-10 bg-gradient-to-br from-primary to-primary-dark rounded-xl flex items-center justify-center">
+                  <span className="text-white font-semibold text-sm">
+                    {user?.name?.charAt(0)?.toUpperCase()}
                   </span>
-                  <button
-                    onClick={handleLogout}
-                    className="bg-red-600 text-white px-3 py-1 rounded-md text-sm font-medium hover:bg-red-700 transition-colors duration-200"
-                  >
-                    Logout
-                  </button>
                 </div>
               </div>
+              
+              {/* Logout button */}
+              <button
+                onClick={handleLogout}
+                className="bg-gradient-to-r from-orange-500 to-orange-600 text-white px-4 py-2 rounded-xl text-sm font-semibold hover:from-orange-600 hover:to-orange-700 transition-all duration-200 shadow-lg hover:shadow-xl"
+              >
+                <span className="hidden md:inline">Logout</span>
+                <span className="md:hidden">🚪</span>
+              </button>
             </div>
           </div>
         </div>
 
-        <main 
-          className="p-6 min-h-screen transition-colors duration-300"
-          style={{ 
-            backgroundColor: isDark ? '#111827' : '#f9fafb'
-          }}
-        >
+        <main className="p-6 min-h-screen bg-gray-50">
           {children}
         </main>
       </div>

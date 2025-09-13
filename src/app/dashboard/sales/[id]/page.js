@@ -167,7 +167,7 @@ export default function SaleDetailsPage() {
                             <span className="font-medium">${item.price.toFixed(2)}</span>
                           </TableCell>
                           <TableCell>
-                            <span className="bg-blue-100 text-blue-800 px-2 py-1 rounded-full text-sm font-medium">
+                            <span className="bg-primary-100 text-primary-800 px-2 py-1 rounded-full text-sm font-medium">
                               {item.quantity}
                             </span>
                           </TableCell>
@@ -232,8 +232,8 @@ export default function SaleDetailsPage() {
                     <div>
                       <label className="block text-sm font-medium text-gray-700 mb-1">Cashier</label>
                       <div className="flex items-center gap-2">
-                        <div className="w-8 h-8 bg-blue-100 rounded-full flex items-center justify-center">
-                          <span className="text-blue-600 font-medium text-sm">
+                        <div className="w-8 h-8 bg-primary-100 rounded-full flex items-center justify-center">
+                          <span className="text-primary-600 font-medium text-sm">
                             {sale.user.name.charAt(0).toUpperCase()}
                           </span>
                         </div>
@@ -256,7 +256,7 @@ export default function SaleDetailsPage() {
                 <CardBody>
                   <div className="grid grid-cols-2 gap-4">
                     <div className="text-center">
-                      <div className="text-2xl font-bold text-blue-600">
+                      <div className="text-2xl font-bold text-primary-600">
                         {sale.items.length}
                       </div>
                       <div className="text-sm text-gray-600">Items</div>

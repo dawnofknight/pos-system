@@ -49,13 +49,15 @@ model Item {
 }
 
 model Sale {
-  id        Int        @id @default(autoincrement())
-  total     Float
-  userId    Int
-  createdAt DateTime   @default(now())
-  updatedAt DateTime   @updatedAt
-  items     SaleItem[]
-  user      User       @relation(fields: [userId], references: [id])
+  id              Int           @id @default(autoincrement())
+  total           Float
+  userId          Int
+  paymentMethodId Int
+  createdAt       DateTime      @default(now())
+  updatedAt       DateTime      @updatedAt
+  items           SaleItem[]
+  user            User          @relation(fields: [userId], references: [id])
+  paymentMethod   PaymentMethod @relation(fields: [paymentMethodId], references: [id])
 
   @@map("sales")
 }
@@ -79,8 +81,8 @@ enum UserRole {
 
 model Settings {
   id               Int      @id @default(autoincrement())
-  currency         String   @default("USD")
-  currencySymbol   String   @default("$")
+  currency         String   @default("IDR")
+  currencySymbol   String   @default("Rp")
   taxEnabled       Boolean  @default(false)
   taxRate          Float    @default(0.0)
   taxName          String   @default("Tax")
@@ -96,6 +98,7 @@ model PaymentMethod {
   enabled   Boolean  @default(true)
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
+  sales     Sale[]
 
   @@map("payment_methods")
 }
