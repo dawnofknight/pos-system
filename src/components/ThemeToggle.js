@@ -25,16 +25,12 @@ export default function ThemeToggle({ className = '' }) {
       
       <button
         onClick={toggleTheme}
-        className="relative inline-flex items-center w-11 h-6 rounded-full transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2"
-        style={{
-          backgroundColor: isDark ? '#2563eb' : '#d1d5db'
-        }}
+        className="relative inline-flex items-center w-11 h-6 rounded-full transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-orange-500 focus:ring-offset-2 bg-gray-300 dark:bg-orange-100"
       >
         <span
-          className="inline-block w-5 h-5 bg-white rounded-full shadow-lg transform transition-transform duration-200"
-          style={{
-            transform: isDark ? 'translateX(20px)' : 'translateX(2px)'
-          }}
+          className={`inline-block w-5 h-5 bg-white rounded-full shadow-lg transform transition-transform duration-200 ${
+            isDark ? 'translate-x-5' : 'translate-x-0.5'
+          }`}
         />
         <span className="sr-only">Toggle theme ({theme})</span>
       </button>

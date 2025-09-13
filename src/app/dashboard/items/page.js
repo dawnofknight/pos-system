@@ -248,21 +248,53 @@ export default function ItemsPage() {
   return (
     <AuthGuard>
       <DashboardLayout>
-        <div className="space-y-6">
-          <div className="flex justify-between items-center">
-            <div>
-              <h1 className="text-2xl font-bold text-gray-900 dark:text-white">Items Management</h1>
-              <p className="text-gray-600">Manage your inventory items</p>
+        <div className="space-y-8">
+          {/* Header Section */}
+          <div className="relative overflow-hidden rounded-3xl bg-gradient-to-br from-primary-50 via-orange-50 to-red-50 dark:from-primary-900/20 dark:via-orange-900/20 dark:to-red-900/20 p-8">
+            <div className="relative z-10 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
+              <div className="flex items-center gap-4">
+                <div className="w-16 h-16 rounded-2xl bg-gradient-to-br from-orange-500 to-red-600 flex items-center justify-center shadow-xl">
+                  <span className="text-2xl">📦</span>
+                </div>
+                <div>
+                  <h1 className="text-3xl font-bold text-black dark:bg-gradient-to-r dark:from-orange-600 dark:to-red-600 dark:bg-clip-text dark:text-transparent">
+                    Items Management
+                  </h1>
+                  <p className="text-black dark:text-orange-900 mt-1">
+                    Manage your inventory items and stock levels
+                  </p>
+                </div>
+              </div>
+              <Button 
+                onClick={handleAddNew}
+                variant="primary"
+                icon="+"
+                className="shadow-lg hover:shadow-xl transition-all duration-300 bg-orange-600 hover:bg-orange-700"
+              >
+                Add New Item
+              </Button>
             </div>
-            <Button 
-              onClick={handleAddNew}
-              variant="primary"
-            >
-              Add New Item
-            </Button>
+            <div className="absolute top-0 right-0 w-64 h-64 bg-gradient-to-br from-primary-400/10 to-red-400/10 rounded-full blur-3xl"></div>
           </div>
 
-          <Card>
+          <Card variant="glass" hover={true} className="backdrop-blur-xl border border-white/20 shadow-2xl">
+           <CardHeader variant="glass" className="card-header-orange">
+              <div className="flex items-center justify-between">
+                <div className="flex items-center gap-3">
+                  <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-orange-500 to-orange-600 flex items-center justify-center shadow-lg">
+                    <span className="text-lg">📋</span>
+                  </div>
+                  <div>
+                    <h3 className="text-xl font-bold bg-gradient-to-r from-orange-600 to-orange-700 bg-clip-text text-transparent">
+                      Inventory Items
+                    </h3>
+                    <p className="text-sm text-orange-600 dark:text-orange-400">
+                      {items.length} items in stock
+                    </p>
+                  </div>
+                </div>
+              </div>
+            </CardHeader>
             <CardBody>
               <Table>
                 <TableHeader>
@@ -278,9 +310,9 @@ export default function ItemsPage() {
                   {items.map((item) => (
                     <TableRow key={item.id}>
                       <TableCell>
-                        <div className="flex items-center gap-3">
+                        <div className="flex items-center gap-4">
                           {item.image ? (
-                            <div className="w-12 h-12 overflow-hidden rounded-lg border border-gray-200">
+                            <div className="w-14 h-14 overflow-hidden rounded-xl border-2 border-white/20 shadow-lg">
                               <img
                                 src={item.image.startsWith('http') ? item.image : `/uploads/items/${item.image}`}
                                 alt={item.name}
@@ -288,25 +320,31 @@ export default function ItemsPage() {
                               />
                             </div>
                           ) : (
-                            <div className="w-12 h-12 bg-gray-100 rounded-lg flex items-center justify-center text-lg">
+                            <div className="w-14 h-14 bg-gradient-to-br from-gray-100 to-gray-200 dark:from-gray-700 dark:to-gray-600 rounded-xl flex items-center justify-center text-xl shadow-lg">
                               {item.emoji || '📦'}
                             </div>
                           )}
                           <div>
-                            <div className="font-medium">{item.name}</div>
+                            <div className="font-semibold text-foreground">{item.name}</div>
                             {item.description && (
-                              <div className="text-sm text-gray-500 dark:text-gray-400">{item.description}</div>
+                              <div className="text-sm text-gray-500 dark:text-gray-400 mt-1">{item.description}</div>
                             )}
                           </div>
                         </div>
                       </TableCell>
                       <TableCell>{item.category.name}</TableCell>
-                      <TableCell>${item.price.toFixed(2)}</TableCell>
                       <TableCell>
-                        <span className={`px-2 py-1 rounded-full text-xs ${
-                          item.stock < 10 ? 'bg-red-100 text-red-800' : 'bg-green-100 text-green-800'
+                        <div className="font-semibold text-emerald-600 dark:text-emerald-400">
+                          ${item.price.toFixed(2)}
+                        </div>
+                      </TableCell>
+                      <TableCell>
+                        <span className={`px-3 py-1.5 rounded-xl text-xs font-semibold shadow-sm ${
+                          item.stock < 10 
+                            ? 'bg-gradient-to-r from-red-100 to-orange-100 text-red-700 border border-red-200' 
+                            : 'bg-gradient-to-r from-green-100 to-emerald-100 text-green-700 border border-green-200'
                         }`}>
-                          {item.stock}
+                          {item.stock} units
                         </span>
                       </TableCell>
                       <TableCell>
@@ -315,6 +353,8 @@ export default function ItemsPage() {
                             size="sm"
                             variant="outline"
                             onClick={() => handleEdit(item)}
+                            icon="✏️"
+                            className="hover:bg-primary-50 hover:border-primary-300 transition-all duration-200"
                           >
                             Edit
                           </Button>
@@ -322,6 +362,8 @@ export default function ItemsPage() {
                             size="sm"
                             variant="danger"
                             onClick={() => handleDelete(item.id)}
+                            icon="🗑️"
+                            className="hover:shadow-lg transition-all duration-200"
                           >
                             Delete
                           </Button>
@@ -341,16 +383,28 @@ export default function ItemsPage() {
               setEditingItem(null)
               resetForm()
             }}
-            title={editingItem ? 'Edit Item' : 'Add New Item'}
+            title={
+              <div className="flex items-center gap-3">
+                <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-primary-500 to-orange-600 flex items-center justify-center shadow-lg">
+                  <span className="text-lg">{editingItem ? '✏️' : '➕'}</span>
+                </div>
+                <span className="text-xl font-bold bg-gradient-to-r from-primary-600 to-orange-600 bg-clip-text text-transparent">
+                  {editingItem ? 'Edit Item' : 'Add New Item'}
+                </span>
+              </div>
+            }
           >
-            <form onSubmit={handleSubmit} className="space-y-4">
+            <form onSubmit={handleSubmit} className="space-y-6">
               <Input
-                label="Name"
+                label="Item Name"
                 name="name"
                 value={formData.name}
                 onChange={handleInputChange}
                 required
                 error={errors.name}
+                icon="🏷️"
+                variant="glass"
+                placeholder="Enter item name"
               />
               
               <Input
@@ -359,15 +413,19 @@ export default function ItemsPage() {
                 value={formData.description}
                 onChange={handleInputChange}
                 placeholder="Optional description"
+                icon="📝"
+                variant="glass"
               />
 
               <Input
-                label="Emoji"
+                label="Emoji Icon"
                 name="emoji"
                 value={formData.emoji}
                 onChange={handleInputChange}
                 placeholder="📦 (optional emoji for visual identification)"
                 maxLength={4}
+                icon="😊"
+                variant="glass"
               />
 
               <ImageUpload
@@ -376,28 +434,36 @@ export default function ItemsPage() {
                 onImageRemoved={handleImageRemoved}
               />
               
-              <Input
-                label="Price"
-                name="price"
-                type="number"
-                step="0.01"
-                min="0"
-                value={formData.price}
-                onChange={handleInputChange}
-                required
-                error={errors.price}
-              />
-              
-              <Input
-                label="Stock"
-                name="stock"
-                type="number"
-                min="0"
-                value={formData.stock}
-                onChange={handleInputChange}
-                required
-                error={errors.stock}
-              />
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <Input
+                  label="Price ($)"
+                  name="price"
+                  type="number"
+                  step="0.01"
+                  min="0"
+                  value={formData.price}
+                  onChange={handleInputChange}
+                  required
+                  error={errors.price}
+                  icon="💰"
+                  variant="glass"
+                  placeholder="0.00"
+                />
+                
+                <Input
+                  label="Stock Quantity"
+                  name="stock"
+                  type="number"
+                  min="0"
+                  value={formData.stock}
+                  onChange={handleInputChange}
+                  required
+                  error={errors.stock}
+                  icon="📊"
+                  variant="glass"
+                  placeholder="0"
+                />
+              </div>
               
               <Select
                 label="Category"
@@ -410,10 +476,18 @@ export default function ItemsPage() {
                 ]}
                 required
                 error={errors.categoryId}
+                icon="📂"
+                variant="glass"
               />
               
-              <div className="flex space-x-2 pt-4">
-                <Button type="submit" variant="primary" disabled={isSubmitting}>
+              <div className="flex flex-col sm:flex-row gap-3 pt-6 border-t border-gray-200 dark:border-gray-700">
+                <Button 
+                  type="submit" 
+                  variant="primary" 
+                  disabled={isSubmitting}
+                  icon={isSubmitting ? "⏳" : (editingItem ? "✅" : "➕")}
+                  className="flex-1 shadow-lg hover:shadow-xl transition-all duration-300"
+                >
                   {isSubmitting ? 'Saving...' : (editingItem ? 'Update Item' : 'Add Item')}
                 </Button>
                 <Button 
@@ -424,6 +498,8 @@ export default function ItemsPage() {
                     setEditingItem(null)
                     resetForm()
                   }}
+                  icon="❌"
+                  className="flex-1 hover:bg-gray-50 dark:hover:bg-gray-800 transition-all duration-200"
                 >
                   Cancel
                 </Button>

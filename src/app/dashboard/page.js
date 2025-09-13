@@ -59,146 +59,135 @@ export default function Dashboard() {
     <AuthGuard>
       <DashboardLayout>
         <div className="space-y-6">
-          <div>
-            <h1 
-              className="text-2xl font-bold transition-colors"
-              style={{ color: isDark ? '#ffffff' : '#111827' }}
-            >
-              Dashboard
-            </h1>
-            <p 
-              className="transition-colors"
-              style={{ color: isDark ? '#d1d5db' : '#4b5563' }}
-            >
-              Overview of your POS system
-            </p>
+          <div className="mb-8">
+            <div className="flex items-center gap-4 mb-2">
+              <div className="w-12 h-12 rounded-2xl bg-gradient-to-br from-primary-500 to-orange-600 flex items-center justify-center shadow-lg">
+                <span className="text-2xl">📊</span>
+              </div>
+              <div>
+                <h1 
+                  className="text-3xl font-bold text-foreground"
+                >
+                  Dashboard
+                </h1>
+                <p 
+                  className="text-lg transition-colors text-gray-600 dark:text-gray-300"
+                >
+                  Real-time insights into your business performance
+                </p>
+              </div>
+            </div>
           </div>
 
           {/* Stats Cards */}
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-            <Card>
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+            <Card variant="glass" hover={true}>
               <CardBody>
-                <div className="flex items-center">
-                  <div className="flex-shrink-0">
-                    <div className="w-8 h-8 bg-blue-500 rounded-lg flex items-center justify-center">
-                      <span className="text-white font-bold">💰</span>
+                <div className="flex items-center justify-between">
+                  <div className="flex-1">
+                    <div className="flex items-center gap-3 mb-3">
+                      <div className="w-12 h-12 rounded-2xl bg-gradient-to-br from-orange-500 to-orange-600 flex items-center justify-center shadow-lg transition-all duration-300">
+                        <span className="text-xl">💰</span>
+                      </div>
+                      <div>
+                        <dt className="text-sm font-semibold text-orange-600 dark:text-orange-400 uppercase tracking-wide">
+                          Total Sales
+                        </dt>
+                      </div>
                     </div>
-                  </div>
-                  <div className="ml-4">
-                    <dt 
-                      className="text-sm font-medium transition-colors"
-                      style={{ color: isDark ? '#9ca3af' : '#6b7280' }}
-                    >
-                      Total Sales
-                    </dt>
-                    <dd 
-                      className="text-lg font-semibold transition-colors"
-                      style={{ color: isDark ? '#ffffff' : '#111827' }}
-                    >
+                    <dd className="text-2xl font-bold bg-gradient-to-r from-orange-600 to-orange-700 bg-clip-text text-transparent mb-1">
                       ${stats?.stats?.totalSales?.amount?.toFixed(2) || '0.00'}
                     </dd>
-                    <dd 
-                      className="text-sm transition-colors"
-                      style={{ color: isDark ? '#9ca3af' : '#6b7280' }}
-                    >
+                    <dd className="text-sm font-medium text-orange-600 dark:text-orange-400">
                       {stats?.stats?.totalSales?.count || 0} transactions
                     </dd>
                   </div>
+                  <div className="w-16 h-16 rounded-2xl bg-gradient-to-br from-orange-100 to-orange-200 dark:from-orange-900/30 dark:to-orange-800/30 flex items-center justify-center">
+                    <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-orange-500 to-orange-600 opacity-20"></div>
+                  </div>
                 </div>
               </CardBody>
             </Card>
 
-            <Card>
+            <Card variant="glass" hover={true}>
               <CardBody>
-                <div className="flex items-center">
-                  <div className="flex-shrink-0">
-                    <div className="w-8 h-8 bg-green-500 rounded-lg flex items-center justify-center">
-                      <span className="text-white font-bold">📊</span>
+                <div className="flex items-center justify-between">
+                  <div className="flex-1">
+                    <div className="flex items-center gap-3 mb-3">
+                      <div className="w-12 h-12 rounded-2xl bg-gradient-to-br from-primary-500 to-orange-600 flex items-center justify-center shadow-lg transition-all duration-300">
+                        <span className="text-xl">📈</span>
+                      </div>
+                      <div>
+                        <dt className="text-sm font-semibold text-primary-600 dark:text-primary-400 uppercase tracking-wide">
+                          Today's Sales
+                        </dt>
+                      </div>
                     </div>
-                  </div>
-                  <div className="ml-4">
-                    <dt 
-                      className="text-sm font-medium transition-colors"
-                      style={{ color: isDark ? '#9ca3af' : '#6b7280' }}
-                    >
-                      Today's Sales
-                    </dt>
-                    <dd 
-                      className="text-lg font-semibold transition-colors"
-                      style={{ color: isDark ? '#ffffff' : '#111827' }}
-                    >
+                    <dd className="text-2xl font-bold bg-gradient-to-r from-primary-600 to-orange-600 bg-clip-text text-transparent mb-1">
                       ${stats?.stats?.todaySales?.amount?.toFixed(2) || '0.00'}
                     </dd>
-                    <dd 
-                      className="text-sm transition-colors"
-                      style={{ color: isDark ? '#9ca3af' : '#6b7280' }}
-                    >
+                    <dd className="text-sm font-medium text-gray-600 dark:text-gray-400">
                       {stats?.stats?.todaySales?.count || 0} transactions
                     </dd>
                   </div>
+                  <div className="w-16 h-16 rounded-2xl bg-gradient-to-br from-primary-100 to-orange-100 dark:from-primary-900/30 dark:to-orange-900/30 flex items-center justify-center">
+                    <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-primary-500 to-orange-600 opacity-20"></div>
+                  </div>
                 </div>
               </CardBody>
             </Card>
 
-            <Card>
+            <Card variant="glass" hover={true}>
               <CardBody>
-                <div className="flex items-center">
-                  <div className="flex-shrink-0">
-                    <div className="w-8 h-8 bg-purple-500 rounded-lg flex items-center justify-center">
-                      <span className="text-white font-bold">📦</span>
+                <div className="flex items-center justify-between">
+                  <div className="flex-1">
+                    <div className="flex items-center gap-3 mb-3">
+                      <div className="w-12 h-12 rounded-2xl bg-gradient-to-br from-orange-500 to-orange-600 flex items-center justify-center shadow-lg transition-all duration-300">
+                        <span className="text-xl">📦</span>
+                      </div>
+                      <div>
+                        <dt className="text-sm font-semibold text-orange-600 dark:text-orange-400 uppercase tracking-wide">
+                          Total Items
+                        </dt>
+                      </div>
                     </div>
-                  </div>
-                  <div className="ml-4">
-                    <dt 
-                      className="text-sm font-medium transition-colors"
-                      style={{ color: isDark ? '#9ca3af' : '#6b7280' }}
-                    >
-                      Total Items
-                    </dt>
-                    <dd 
-                      className="text-lg font-semibold transition-colors"
-                      style={{ color: isDark ? '#ffffff' : '#111827' }}
-                    >
+                    <dd className="text-2xl font-bold bg-gradient-to-r from-orange-600 to-orange-700 bg-clip-text text-transparent mb-1">
                       {stats?.stats?.totalItems || 0}
                     </dd>
-                    <dd 
-                      className="text-sm transition-colors"
-                      style={{ color: isDark ? '#9ca3af' : '#6b7280' }}
-                    >
+                    <dd className="text-sm font-medium text-orange-600 dark:text-orange-400">
                       In inventory
                     </dd>
                   </div>
+                  <div className="w-16 h-16 rounded-2xl bg-gradient-to-br from-orange-100 to-orange-200 dark:from-orange-900/30 dark:to-orange-800/30 flex items-center justify-center">
+                    <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-orange-500 to-orange-600 opacity-20"></div>
+                  </div>
                 </div>
               </CardBody>
             </Card>
 
-            <Card>
+            <Card variant="glass" hover={true}>
               <CardBody>
-                <div className="flex items-center">
-                  <div className="flex-shrink-0">
-                    <div className="w-8 h-8 bg-red-500 rounded-lg flex items-center justify-center">
-                      <span className="text-white font-bold">⚠️</span>
+                <div className="flex items-center justify-between">
+                  <div className="flex-1">
+                    <div className="flex items-center gap-3 mb-3">
+                      <div className="w-12 h-12 rounded-2xl bg-gradient-to-br from-orange-500 to-red-600 flex items-center justify-center shadow-lg transition-all duration-300">
+                        <span className="text-xl">⚠️</span>
+                      </div>
+                      <div>
+                        <dt className="text-sm font-semibold text-orange-600 dark:text-orange-400 uppercase tracking-wide">
+                          Low Stock
+                        </dt>
+                      </div>
                     </div>
-                  </div>
-                  <div className="ml-4">
-                    <dt 
-                      className="text-sm font-medium transition-colors"
-                      style={{ color: isDark ? '#9ca3af' : '#6b7280' }}
-                    >
-                      Low Stock
-                    </dt>
-                    <dd 
-                      className="text-lg font-semibold transition-colors"
-                      style={{ color: isDark ? '#ffffff' : '#111827' }}
-                    >
+                    <dd className="text-2xl font-bold bg-gradient-to-r from-orange-600 to-red-600 bg-clip-text text-transparent mb-1">
                       {stats?.stats?.lowStockItems || 0}
                     </dd>
-                    <dd 
-                      className="text-sm transition-colors"
-                      style={{ color: isDark ? '#9ca3af' : '#6b7280' }}
-                    >
+                    <dd className="text-sm font-medium text-gray-600 dark:text-gray-400">
                       Items under 10
                     </dd>
+                  </div>
+                  <div className="w-16 h-16 rounded-2xl bg-gradient-to-br from-orange-100 to-red-100 dark:from-orange-900/30 dark:to-red-900/30 flex items-center justify-center">
+                    <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-orange-500 to-red-600 opacity-20"></div>
                   </div>
                 </div>
               </CardBody>
@@ -206,16 +195,23 @@ export default function Dashboard() {
           </div>
 
           {/* Recent Sales and Top Items */}
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
             {/* Recent Sales */}
-            <Card>
-              <CardHeader>
-                <h3 
-                  className="text-lg font-semibold transition-colors"
-                  style={{ color: isDark ? '#ffffff' : '#111827' }}
-                >
-                  Recent Sales
-                </h3>
+            <Card variant="glass" hover={true}>
+              <CardHeader variant="glass" className="card-header-orange">
+                <div className="flex items-center gap-3">
+                  <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-orange-500 to-orange-600 flex items-center justify-center shadow-lg">
+                    <span className="text-lg">🧾</span>
+                  </div>
+                  <div>
+                    <h3 className="text-xl font-bold text-foreground">
+                      Recent Sales
+                    </h3>
+                    <p className="text-sm text-gray-600 dark:text-gray-400">
+                      Latest transactions
+                    </p>
+                  </div>
+                </div>
               </CardHeader>
               <CardBody>
                 {stats?.recentSales?.length > 0 ? (
@@ -240,25 +236,37 @@ export default function Dashboard() {
                     </TableBody>
                   </Table>
                 ) : (
-                  <p 
-                    className="text-center py-4 transition-colors"
-                    style={{ color: isDark ? '#9ca3af' : '#6b7280' }}
-                  >
-                    No recent sales
-                  </p>
+                  <div className="text-center py-12">
+                    <div className="w-16 h-16 mx-auto mb-4 rounded-2xl bg-gradient-to-br from-gray-100 to-gray-200 dark:from-gray-800 dark:to-gray-700 flex items-center justify-center">
+                      <span className="text-2xl opacity-50">📊</span>
+                    </div>
+                    <p className="text-lg font-medium text-gray-600 dark:text-gray-400">
+                      No recent sales
+                    </p>
+                    <p className="text-sm text-gray-500 dark:text-gray-500">
+                      Sales will appear here once you start making transactions
+                    </p>
+                  </div>
                 )}
               </CardBody>
             </Card>
 
             {/* Top Items */}
-            <Card>
-              <CardHeader>
-                <h3 
-                  className="text-lg font-semibold transition-colors"
-                  style={{ color: isDark ? '#ffffff' : '#111827' }}
-                >
-                  Top Selling Items
-                </h3>
+            <Card variant="glass" hover={true}>
+              <CardHeader variant="glass" className="card-header-orange">
+                <div className="flex items-center gap-3">
+                  <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-orange-500 to-orange-600 flex items-center justify-center shadow-lg">
+                    <span className="text-lg">🏆</span>
+                  </div>
+                  <div>
+                    <h3 className="text-xl font-bold text-foreground">
+                      Top Selling Items
+                    </h3>
+                    <p className="text-sm text-gray-600 dark:text-gray-400">
+                      Best performers
+                    </p>
+                  </div>
+                </div>
               </CardHeader>
               <CardBody>
                 {stats?.topItems?.length > 0 ? (
@@ -276,7 +284,7 @@ export default function Dashboard() {
                           <TableCell>
                             <div className="flex items-center gap-3">
                               <ProductImage item={item} size="sm" />
-                              <span className="font-medium">{item.name}</span>
+                              <span className="font-medium text-foreground">{item.name}</span>
                             </div>
                           </TableCell>
                           <TableCell>{item.totalSold}</TableCell>
@@ -286,12 +294,17 @@ export default function Dashboard() {
                     </TableBody>
                   </Table>
                 ) : (
-                  <p 
-                    className="text-center py-4 transition-colors"
-                    style={{ color: isDark ? '#9ca3af' : '#6b7280' }}
-                  >
-                    No sales data
-                  </p>
+                  <div className="text-center py-12">
+                    <div className="w-16 h-16 mx-auto mb-4 rounded-2xl bg-gradient-to-br from-gray-100 to-gray-200 dark:from-gray-800 dark:to-gray-700 flex items-center justify-center">
+                      <span className="text-2xl opacity-50">🏆</span>
+                    </div>
+                    <p className="text-lg font-medium text-gray-600 dark:text-gray-400">
+                      No sales data
+                    </p>
+                    <p className="text-sm text-gray-500 dark:text-gray-500">
+                      Top selling items will appear here after sales are made
+                    </p>
+                  </div>
                 )}
               </CardBody>
             </Card>

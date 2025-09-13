@@ -47,14 +47,15 @@ export async function POST(request) {
       return NextResponse.json({ error: 'Invalid token' }, { status: 401 })
     }
 
-    const { items, total, userId } = await request.json()
+    const { items, total, userId, paymentMethodId } = await request.json()
 
     const sale = await prisma.$transaction(async (prisma) => {
       // Create the sale
       const newSale = await prisma.sale.create({
         data: {
           total: parseFloat(total),
-          userId: parseInt(userId || decoded.userId)
+          userId: parseInt(userId || decoded.userId),
+          paymentMethodId: parseInt(paymentMethodId || 1) // Default to first payment method if not provided
         }
       })
 

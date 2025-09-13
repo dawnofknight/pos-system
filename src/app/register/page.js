@@ -44,7 +44,7 @@ export default function Register() {
   }
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gray-100">
+    <div className="min-h-screen flex items-center justify-center bg-background">
       <div className="max-w-md w-full space-y-8 p-8">
         <div>
           <h2 className="mt-6 text-center text-3xl font-bold text-gray-900">
@@ -52,7 +52,7 @@ export default function Register() {
           </h2>
           <p className="mt-2 text-center text-sm text-gray-600">
             Or{' '}
-            <Link href="/login" className="font-medium text-blue-600 hover:text-blue-500">
+            <Link href="/login" className="font-medium text-primary-600 hover:text-primary-500">
               sign in to your existing account
             </Link>
           </p>

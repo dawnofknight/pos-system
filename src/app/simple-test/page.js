@@ -35,7 +35,7 @@ export default function SimpleThemeTest() {
   return (
     <div className="min-h-screen bg-white dark:bg-gray-900 transition-colors duration-300">
       <div className="container mx-auto p-8">
-        <h1 className="text-4xl font-bold text-black dark:text-white mb-8">
+        <h1 className="text-4xl font-bold text-foreground mb-8">
           Simple Theme Test
         </h1>
         
@@ -46,13 +46,13 @@ export default function SimpleThemeTest() {
           
           <button
             onClick={toggleTheme}
-            className="px-6 py-3 bg-blue-500 hover:bg-blue-600 text-white rounded-lg font-semibold transition-colors"
+            className="px-6 py-3 bg-primary-500 hover:bg-primary-600 text-white rounded-lg font-semibold transition-colors"
           >
             Toggle to {isDark ? 'Light' : 'Dark'} Mode
           </button>
           
           <div className="mt-8 p-6 bg-gray-100 dark:bg-gray-800 rounded-lg transition-colors">
-            <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-4">
+            <h2 className="text-2xl font-bold text-foreground mb-4">
               Test Card
             </h2>
             <p className="text-gray-600 dark:text-gray-300">
@@ -70,7 +70,7 @@ export default function SimpleThemeTest() {
           </div>
           
           <div className="mt-6 p-4 border border-gray-300 dark:border-gray-700 rounded">
-            <h3 className="font-bold text-gray-900 dark:text-white mb-2">Debug Info</h3>
+            <h3 className="font-bold text-foreground mb-2">Debug Info</h3>
             <p className="text-sm text-gray-600 dark:text-gray-400">
               React state: {isDark ? 'dark' : 'light'}
             </p>

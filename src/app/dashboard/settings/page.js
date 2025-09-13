@@ -13,7 +13,14 @@ import {
   Button, 
   Input, 
   LoadingSpinner,
-  Badge
+  Badge,
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+  TableHeaderCell
 } from '@/components/ui'
 
 export default function SettingsPage() {
@@ -341,49 +348,26 @@ export default function SettingsPage() {
       <DashboardLayout>
         <div className="space-y-6">
           <div>
-            <h1 
-              className="text-2xl font-bold transition-colors"
-              style={{ color: isDark ? '#ffffff' : '#111827' }}
-            >
+            <h1 className="text-2xl font-bold transition-colors text-foreground">
               Settings
             </h1>
-            <p 
-              className="transition-colors"
-              style={{ color: isDark ? '#9ca3af' : '#6b7280' }}
-            >
+            <p className="transition-colors text-gray-600 dark:text-gray-400">
               Manage your POS system configuration
             </p>
           </div>
 
           {/* Tab Navigation */}
-          <div 
-            className="border-b transition-colors"
-            style={{ borderColor: isDark ? '#374151' : '#e5e7eb' }}
-          >
+          <div className="border-b transition-colors border-gray-200 dark:border-gray-700">
             <nav className="-mb-px flex space-x-8">
               {tabs.map((tab) => (
                 <button
                   key={tab.id}
                   onClick={() => setActiveTab(tab.id)}
-                  className="whitespace-nowrap py-2 px-1 border-b-2 font-medium text-sm flex items-center gap-2 transition-colors"
-                  style={{
-                    borderBottomColor: activeTab === tab.id ? '#3b82f6' : 'transparent',
-                    color: activeTab === tab.id 
-                      ? '#3b82f6' 
-                      : isDark ? '#9ca3af' : '#6b7280'
-                  }}
-                  onMouseEnter={(e) => {
-                    if (activeTab !== tab.id) {
-                      e.target.style.color = isDark ? '#d1d5db' : '#374151'
-                      e.target.style.borderBottomColor = isDark ? '#4b5563' : '#d1d5db'
-                    }
-                  }}
-                  onMouseLeave={(e) => {
-                    if (activeTab !== tab.id) {
-                      e.target.style.color = isDark ? '#9ca3af' : '#6b7280'
-                      e.target.style.borderBottomColor = 'transparent'
-                    }
-                  }}
+                  className={`whitespace-nowrap py-2 px-1 border-b-2 font-medium text-sm flex items-center gap-2 transition-colors ${
+                    activeTab === tab.id
+                      ? 'border-primary-500 text-primary-600 dark:text-primary-400'
+                      : 'border-transparent text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-300 hover:border-gray-300 dark:hover:border-gray-600'
+                  }`}
                 >
                   <span>{tab.icon}</span>
                   {tab.name}
@@ -396,16 +380,10 @@ export default function SettingsPage() {
           {activeTab === 'general' && (
             <Card>
               <CardHeader>
-                <h2 
-                  className="text-lg font-semibold transition-colors"
-                  style={{ color: isDark ? '#ffffff' : '#111827' }}
-                >
+                <h2 className="text-lg font-semibold transition-colors text-foreground">
                   General Settings
                 </h2>
-                <p 
-                  className="text-sm transition-colors"
-                  style={{ color: isDark ? '#9ca3af' : '#6b7280' }}
-                >
+                <p className="text-sm transition-colors text-gray-600 dark:text-gray-400">
                   Configure currency and tax settings
                 </p>
               </CardHeader>
@@ -413,10 +391,7 @@ export default function SettingsPage() {
                 <div className="space-y-6">
                   {/* Currency Settings */}
                   <div>
-                    <h3 
-                      className="text-md font-medium mb-4 transition-colors"
-                      style={{ color: isDark ? '#ffffff' : '#111827' }}
-                    >
+                    <h3 className="text-md font-medium mb-4 transition-colors text-foreground">
                       Currency
                     </h3>
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -439,16 +414,10 @@ export default function SettingsPage() {
                   <div className="border-t pt-6">
                     <div className="flex items-center justify-between mb-4">
                       <div>
-                        <h3 
-                          className="text-md font-medium transition-colors"
-                          style={{ color: isDark ? '#ffffff' : '#111827' }}
-                        >
+                        <h3 className="text-md font-medium transition-colors text-foreground">
                           Tax Configuration
                         </h3>
-                        <p 
-                          className="text-sm transition-colors"
-                          style={{ color: isDark ? '#9ca3af' : '#6b7280' }}
-                        >
+                        <p className="text-sm transition-colors text-gray-600 dark:text-gray-400">
                           Enable and configure tax calculations
                         </p>
                       </div>
@@ -459,7 +428,7 @@ export default function SettingsPage() {
                           onChange={(e) => setSettings(s => ({ ...s, taxEnabled: e.target.checked }))}
                           className="sr-only peer"
                         />
-                        <div className="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-blue-300 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-blue-600"></div>
+                        <div className="w-11 h-6 bg-gray-200 dark:bg-gray-600 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-orange-300 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-orange-100"></div>
                       </label>
                     </div>
                     
@@ -504,16 +473,10 @@ export default function SettingsPage() {
           {activeTab === 'payments' && (
             <Card>
               <CardHeader>
-                <h2 
-                  className="text-lg font-semibold transition-colors"
-                  style={{ color: isDark ? '#ffffff' : '#111827' }}
-                >
+                <h2 className="text-lg font-semibold transition-colors text-foreground">
                   Payment Methods
                 </h2>
-                <p 
-                  className="text-sm transition-colors"
-                  style={{ color: isDark ? '#9ca3af' : '#6b7280' }}
-                >
+                <p className="text-sm transition-colors text-gray-600 dark:text-gray-400">
                   Configure available payment options
                 </p>
               </CardHeader>
@@ -522,32 +485,25 @@ export default function SettingsPage() {
                   {paymentMethods.map((method) => (
                     <div 
                       key={method.id} 
-                      className="flex items-center justify-between p-4 rounded-lg transition-colors"
-                      style={{ backgroundColor: isDark ? '#374151' : '#f9fafb' }}
+                      className="flex items-center justify-between p-4 rounded-lg transition-colors  dark:border-gray-600"
                     >
                       <div className="flex items-center gap-3">
-                        <span className="text-2xl">
+                        <span className="text-2xl text-gray-700 dark:text-gray-300">
                           {method.name === 'Cash' ? '💵' : 
                            method.name === 'Transfer' ? '🏦' : 
                            method.name === 'Debit' ? '💳' : '💰'}
                         </span>
                         <div>
-                          <h4 
-                            className="font-medium transition-colors"
-                            style={{ color: isDark ? '#ffffff' : '#111827' }}
-                          >
+                          <h4 className="font-medium transition-colors" style={{ color: 'var(--foreground)' }}>
                             {method.name}
                           </h4>
-                          <p 
-                            className="text-sm transition-colors"
-                            style={{ color: isDark ? '#9ca3af' : '#6b7280' }}
-                          >
+                          <p className="text-sm transition-colors" style={{ color: 'var(--muted-foreground)' }}>
                             {method.enabled ? 'Available for transactions' : 'Disabled'}
                           </p>
                         </div>
                       </div>
                       <div className="flex items-center gap-2">
-                        <Badge variant={method.enabled ? 'success' : 'secondary'}>
+                        <Badge variant={method.enabled ? 'warning' : 'secondary'}>
                           {method.enabled ? 'Enabled' : 'Disabled'}
                         </Badge>
                         <label className="relative inline-flex items-center cursor-pointer">
@@ -557,7 +513,7 @@ export default function SettingsPage() {
                             onChange={(e) => togglePaymentMethod(method.id, e.target.checked)}
                             className="sr-only peer"
                           />
-                          <div className="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-blue-300 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-blue-600"></div>
+                          <div className="w-11 h-6 bg-gray-200 dark:bg-gray-600 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-orange-300 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-orange-100"></div>
                         </label>
                       </div>
                     </div>
@@ -571,16 +527,10 @@ export default function SettingsPage() {
           {activeTab === 'roles' && user?.role === 'ADMIN' && (
             <Card>
               <CardHeader>
-                <h2 
-                  className="text-lg font-semibold transition-colors"
-                  style={{ color: isDark ? '#ffffff' : '#111827' }}
-                >
+                <h2 className="text-lg font-semibold transition-colors text-foreground">
                   Role Management
                 </h2>
-                <p 
-                  className="text-sm transition-colors"
-                  style={{ color: isDark ? '#9ca3af' : '#6b7280' }}
-                >
+                <p className="text-sm transition-colors text-gray-600 dark:text-gray-400">
                   Configure permissions for different user roles
                 </p>
               </CardHeader>
@@ -592,105 +542,53 @@ export default function SettingsPage() {
                         <Badge variant={role === 'ADMIN' ? 'primary' : 'secondary'}>
                           {role}
                         </Badge>
-                        <span 
-                          className="text-lg font-medium transition-colors"
-                          style={{ color: isDark ? '#ffffff' : '#111827' }}
-                        >
+                        <span className="text-lg font-medium transition-colors text-foreground">
                           {role} Permissions
                         </span>
                       </div>
                       
                       <div className="overflow-x-auto">
-                        <table 
-                          className="w-full border rounded-lg transition-colors"
-                          style={{ borderColor: isDark ? '#374151' : '#e5e7eb' }}
-                        >
-                          <thead 
-                            className="transition-colors"
-                            style={{ backgroundColor: isDark ? '#374151' : '#f9fafb' }}
-                          >
-                            <tr>
-                              <th 
-                                className="px-4 py-3 text-left text-sm font-medium transition-colors"
-                                style={{ color: isDark ? '#ffffff' : '#111827' }}
-                              >
-                                Resource
-                              </th>
-                              <th 
-                                className="px-4 py-3 text-center text-sm font-medium transition-colors"
-                                style={{ color: isDark ? '#ffffff' : '#111827' }}
-                              >
-                                View
-                              </th>
-                              <th 
-                                className="px-4 py-3 text-center text-sm font-medium transition-colors"
-                                style={{ color: isDark ? '#ffffff' : '#111827' }}
-                              >
-                                Create
-                              </th>
-                              <th 
-                                className="px-4 py-3 text-center text-sm font-medium transition-colors"
-                                style={{ color: isDark ? '#ffffff' : '#111827' }}
-                              >
-                                Edit
-                              </th>
-                              <th 
-                                className="px-4 py-3 text-center text-sm font-medium transition-colors"
-                                style={{ color: isDark ? '#ffffff' : '#111827' }}
-                              >
-                                Delete
-                              </th>
-                            </tr>
-                          </thead>
-                          <tbody 
-                            className="divide-y transition-colors"
-                            style={{ borderColor: isDark ? '#374151' : '#e5e7eb' }}
-                          >
+                        <Table>
+                          <TableHeader>
+                            <TableRow>
+                              <TableHeaderCell>Resource</TableHeaderCell>
+                              <TableHeaderCell>View</TableHeaderCell>
+                              <TableHeaderCell>Create</TableHeaderCell>
+                              <TableHeaderCell>Edit</TableHeaderCell>
+                              <TableHeaderCell>Delete</TableHeaderCell>
+                            </TableRow>
+                          </TableHeader>
+                          <TableBody>
                             {resources.map((resource) => {
                               const permission = rolePermissions.find(p => p.role === role && p.resource === resource.id)
                               return (
-                                <tr 
-                                  key={resource.id} 
-                                  className="transition-colors"
-                                  onMouseEnter={(e) => {
-                                    e.currentTarget.style.backgroundColor = isDark ? '#374151' : '#f9fafb'
-                                  }}
-                                  onMouseLeave={(e) => {
-                                    e.currentTarget.style.backgroundColor = 'transparent'
-                                  }}
-                                >
-                                  <td className="px-4 py-3">
+                                <TableRow key={resource.id}>
+                                  <TableCell>
                                     <div>
-                                      <div 
-                                        className="font-medium transition-colors"
-                                        style={{ color: isDark ? '#ffffff' : '#111827' }}
-                                      >
+                                      <div className="font-medium transition-colors text-foreground">
                                         {resource.name}
                                       </div>
-                                      <div 
-                                        className="text-sm transition-colors"
-                                        style={{ color: isDark ? '#9ca3af' : '#6b7280' }}
-                                      >
+                                      <div className="text-sm transition-colors text-gray-600 dark:text-gray-400">
                                         {resource.description}
                                       </div>
                                     </div>
-                                  </td>
+                                  </TableCell>
                                   {['canView', 'canCreate', 'canEdit', 'canDelete'].map((permType) => (
-                                    <td key={permType} className="px-4 py-3 text-center">
+                                    <TableCell key={permType}>
                                       <input
                                         type="checkbox"
                                         checked={permission?.[permType] || false}
                                         onChange={(e) => updateRolePermission(role, resource.id, permType, e.target.checked)}
-                                        className="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded"
+                                        className="h-4 w-4 text-primary-600 focus:ring-primary-500 border-gray-300 rounded"
                                         disabled={role === 'ADMIN' && resource.id === 'settings'} // Admin always has settings access
                                       />
-                                    </td>
+                                    </TableCell>
                                   ))}
-                                </tr>
+                                </TableRow>
                               )
                             })}
-                          </tbody>
-                        </table>
+                          </TableBody>
+                        </Table>
                       </div>
                     </div>
                   ))}
@@ -706,7 +604,7 @@ export default function SettingsPage() {
                 <div className="flex justify-between items-center">
                   <div>
                     <h2 className="text-lg font-semibold">User Management</h2>
-                    <p className="text-sm text-gray-600">Create, edit, and manage user accounts</p>
+                    <p className="text-sm text-gray-600 dark:text-gray-400">Create, edit, and manage user accounts</p>
                   </div>
                   <Button
                     onClick={() => setShowUserForm(true)}
@@ -720,14 +618,14 @@ export default function SettingsPage() {
                 {/* User Form Modal */}
                 {showUserForm && (
                   <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-                    <div className="bg-white rounded-lg p-6 w-full max-w-md">
-                      <h3 className="text-lg font-semibold mb-4">
+                    <div className="bg-white dark:bg-gray-800 rounded-lg p-6 w-full max-w-md transition-colors">
+                      <h3 className="text-lg font-semibold mb-4 transition-colors text-foreground">
                         {editingUser ? 'Edit User' : 'Create New User'}
                       </h3>
                       <form onSubmit={editingUser ? handleUpdateUser : handleCreateUser}>
                         <div className="space-y-4">
                           <div>
-                            <label className="block text-sm font-medium text-gray-700 mb-1">
+                            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
                               Full Name
                             </label>
                             <Input
@@ -769,7 +667,7 @@ export default function SettingsPage() {
                             <select
                               value={userForm.role}
                               onChange={(e) => setUserForm({ ...userForm, role: e.target.value })}
-                              className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500"
+                              className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-primary-500 focus:border-primary-500"
                               required
                             >
                               <option value="CASHIER">Cashier</option>
@@ -810,40 +708,40 @@ export default function SettingsPage() {
                 {/* Users List */}
                 <div className="space-y-4">
                   {users.length === 0 ? (
-                    <div className="text-center py-8 text-gray-500">
+                    <div className="text-center py-8 text-gray-500 dark:text-gray-400">
                       <div className="text-4xl mb-2">👥</div>
                       <p>No users found</p>
                       <p className="text-sm">Click "Add New User" to create the first user</p>
                     </div>
                   ) : (
                     <div className="overflow-x-auto">
-                      <table className="w-full border border-gray-200 rounded-lg">
-                        <thead className="bg-gray-50">
-                          <tr>
-                            <th className="px-4 py-3 text-left text-sm font-medium text-gray-900">User</th>
-                            <th className="px-4 py-3 text-left text-sm font-medium text-gray-900">Role</th>
-                            <th className="px-4 py-3 text-left text-sm font-medium text-gray-900">Created</th>
-                            <th className="px-4 py-3 text-center text-sm font-medium text-gray-900">Actions</th>
-                          </tr>
-                        </thead>
-                        <tbody className="divide-y divide-gray-200">
+                      <Table>
+                        <TableHeader>
+                          <TableRow>
+                            <TableHeaderCell>User</TableHeaderCell>
+                            <TableHeaderCell>Role</TableHeaderCell>
+                            <TableHeaderCell>Created</TableHeaderCell>
+                            <TableHeaderCell>Actions</TableHeaderCell>
+                          </TableRow>
+                        </TableHeader>
+                        <TableBody>
                           {users.map((u) => (
-                            <tr key={u.id} className="hover:bg-gray-50">
-                              <td className="px-4 py-3">
+                            <TableRow key={u.id}>
+                              <TableCell>
                                 <div>
-                                  <div className="font-medium text-gray-900">{u.name}</div>
-                                  <div className="text-sm text-gray-600">{u.email}</div>
+                                  <div className="font-medium text-gray-900 dark:text-gray-100">{u.name}</div>
+                                  <div className="text-sm text-gray-600 dark:text-gray-400">{u.email}</div>
                                 </div>
-                              </td>
-                              <td className="px-4 py-3">
+                              </TableCell>
+                              <TableCell>
                                 <Badge variant={u.role === 'ADMIN' ? 'primary' : 'secondary'}>
                                   {u.role}
                                 </Badge>
-                              </td>
-                              <td className="px-4 py-3 text-sm text-gray-600">
+                              </TableCell>
+                              <TableCell className="text-sm text-gray-600 dark:text-gray-400">
                                 {new Date(u.createdAt).toLocaleDateString()}
-                              </td>
-                              <td className="px-4 py-3">
+                              </TableCell>
+                              <TableCell>
                                 <div className="flex items-center justify-center space-x-2">
                                   <Button
                                     size="sm"
@@ -871,11 +769,11 @@ export default function SettingsPage() {
                                     </Button>
                                   )}
                                 </div>
-                              </td>
-                            </tr>
+                              </TableCell>
+                            </TableRow>
                           ))}
-                        </tbody>
-                      </table>
+                        </TableBody>
+                      </Table>
                     </div>
                   )}
                 </div>

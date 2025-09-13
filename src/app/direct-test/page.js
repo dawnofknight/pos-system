@@ -29,14 +29,14 @@ export default function DirectTest() {
   
   return (
     <div className="min-h-screen p-8">
-      <h1 className="text-4xl font-bold mb-8">Direct DOM Test</h1>
+      <h1 className="text-4xl font-bold mb-8 text-foreground">Direct DOM Test</h1>
       
       <div className="space-y-4">
         <p>Current state: {isDark ? 'Dark' : 'Light'}</p>
         
         <button
           onClick={handleToggle}
-          className="px-4 py-2 bg-blue-500 text-white rounded"
+          className="px-4 py-2 bg-primary-500 text-white rounded"
         >
           Toggle Theme
         </button>

@@ -11,6 +11,7 @@ async function main() {
   await prisma.sale.deleteMany({})
   await prisma.item.deleteMany({})
   await prisma.category.deleteMany({})
+  await prisma.paymentMethod.deleteMany({})
   await prisma.user.deleteMany({})
 
   // Create admin user
@@ -34,6 +35,20 @@ async function main() {
       role: 'CASHIER',
     },
   })
+
+  // Create payment methods
+  const paymentMethods = [
+    { name: 'Cash', enabled: true },
+    { name: 'Credit Card', enabled: true },
+    { name: 'Debit Card', enabled: true },
+    { name: 'Digital Wallet', enabled: true },
+  ]
+
+  for (const paymentMethod of paymentMethods) {
+    await prisma.paymentMethod.create({
+      data: paymentMethod,
+    })
+  }
 
   // Create categories
   const categories = [

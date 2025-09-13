@@ -24,10 +24,12 @@ export default function CreateSalePage() {
   const router = useRouter()
   const [items, setItems] = useState([])
   const [categories, setCategories] = useState([])
+  const [paymentMethods, setPaymentMethods] = useState([])
   const [cart, setCart] = useState([])
   const [loading, setLoading] = useState(true)
   const [processing, setProcessing] = useState(false)
   const [selectedCategory, setSelectedCategory] = useState('all')
+  const [selectedPaymentMethod, setSelectedPaymentMethod] = useState('')
   const [searchTerm, setSearchTerm] = useState('')
   const [settings, setSettings] = useState({
     taxEnabled: false,
@@ -43,6 +45,7 @@ export default function CreateSalePage() {
   useEffect(() => {
     fetchItems()
     fetchCategories()
+    fetchPaymentMethods()
     fetchSettings()
   }, [])
 
@@ -69,6 +72,25 @@ export default function CreateSalePage() {
       }
     } catch (error) {
       console.error('Error fetching categories:', error)
+    }
+  }
+
+  const fetchPaymentMethods = async () => {
+    try {
+      const response = await fetch('/api/payment-methods')
+      if (response.ok) {
+        const data = await response.json()
+        setPaymentMethods(data)
+        // Set default payment method to first enabled one
+        const defaultMethod = data.find(pm => pm.enabled)
+        if (defaultMethod && !selectedPaymentMethod) {
+          setSelectedPaymentMethod(defaultMethod.id.toString())
+        }
+      } else {
+        console.error('Failed to fetch payment methods:', response.status, response.statusText)
+      }
+    } catch (error) {
+      console.error('Error fetching payment methods:', error)
     }
   }
 
@@ -228,6 +250,11 @@ export default function CreateSalePage() {
       return
     }
 
+    if (!selectedPaymentMethod) {
+      alert('Please select a payment method')
+      return
+    }
+
     setProcessing(true)
 
     try {
@@ -238,7 +265,8 @@ export default function CreateSalePage() {
           price: item.price
         })),
         total: calculateGrandTotal(),
-        userId: user.id
+        userId: user.id,
+        paymentMethodId: parseInt(selectedPaymentMethod)
       }
 
       const response = await fetch('/api/sales', {
@@ -300,197 +328,172 @@ export default function CreateSalePage() {
             </div>
           )}
 
-          <div className="flex justify-between items-center mb-6">
-            <div>
-              <h1 
-                className="text-2xl font-bold transition-colors"
-                style={{ color: isDark ? '#ffffff' : '#111827' }}
-              >
-                Point of Sale
-              </h1>
-              <p 
-                className="transition-colors"
-                style={{ color: isDark ? '#d1d5db' : '#6b7280' }}
-              >
-                Select items to add to cart
-              </p>
-            </div>
-            <div className="flex items-center space-x-4">
-              {/* Draft controls */}
-              <div className="flex gap-2">
-                {draftSaved && (
-                  <span 
-                    className="px-2 py-1 text-sm rounded-lg transition-colors"
-                    style={{
-                      backgroundColor: isDark ? '#1e3a8a' : '#dbeafe',
-                      color: isDark ? '#93c5fd' : '#1e40af'
-                    }}
-                  >
-                    Draft saved
-                  </span>
-                )}
-                {hasDraft() && (
-                  <button
-                    onClick={loadDraft}
-                    className="px-3 py-2 text-white rounded-lg text-sm transition-colors duration-200"
-                    style={{
-                      backgroundColor: isDark ? '#1d4ed8' : '#2563eb'
-                    }}
-                    onMouseEnter={(e) => {
-                      e.target.style.backgroundColor = isDark ? '#1e40af' : '#1d4ed8'
-                    }}
-                    onMouseLeave={(e) => {
-                      e.target.style.backgroundColor = isDark ? '#1d4ed8' : '#2563eb'
-                    }}
-                  >
-                    Load Draft
-                  </button>
-                )}
-                {cart.length > 0 && (
-                  <>
-                    <button
-                      onClick={saveDraft}
-                      className="px-3 py-2 text-white rounded-lg text-sm transition-colors duration-200"
-                      style={{
-                        backgroundColor: isDark ? '#4b5563' : '#6b7280'
-                      }}
-                      onMouseEnter={(e) => {
-                        e.target.style.backgroundColor = isDark ? '#374151' : '#4b5563'
-                      }}
-                      onMouseLeave={(e) => {
-                        e.target.style.backgroundColor = isDark ? '#4b5563' : '#6b7280'
-                      }}
-                    >
-                      Save Draft
-                    </button>
-                    <button
-                      onClick={clearDraft}
-                      className="px-3 py-2 text-white rounded-lg text-sm transition-colors duration-200"
-                      style={{
-                        backgroundColor: isDark ? '#dc2626' : '#ef4444'
-                      }}
-                      onMouseEnter={(e) => {
-                        e.target.style.backgroundColor = isDark ? '#b91c1c' : '#dc2626'
-                      }}
-                      onMouseLeave={(e) => {
-                        e.target.style.backgroundColor = isDark ? '#dc2626' : '#ef4444'
-                      }}
-                    >
-                      Clear Cart
-                    </button>
-                  </>
-                )}
+          {/* Header Section */}
+          <div className="relative overflow-hidden rounded-2xl bg-gradient-to-br from-orange-50 via-white to-orange-100 dark:from-orange-900/20 dark:via-gray-900 dark:to-orange-800/20 border border-orange-200/50 dark:border-orange-700/30 backdrop-blur-xl mb-8">
+            <div className="absolute inset-0 bg-orange-50/50 dark:bg-orange-900/20" />
+            <div className="relative px-8 py-6">
+              <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-6">
+                <div className="space-y-2">
+                  <div className="flex items-center gap-3">
+                    <div className="p-3 rounded-xl bg-gradient-to-br from-orange-500 to-orange-600 shadow-lg">
+                      <span className="text-white text-2xl">🛒</span>
+                    </div>
+                    <div>
+                      <h1 className="text-3xl font-bold text-black dark:bg-gradient-to-r dark:from-orange-400 dark:via-orange-500 dark:to-orange-300 dark:bg-clip-text dark:text-transparent">
+                        Point of Sale
+                      </h1>
+                      <p className="text-black dark:text-orange-300 mt-1">
+                        Select items to add to cart • Cashier: <span className="font-medium text-black dark:text-orange-400">{user?.name}</span>
+                      </p>
+                    </div>
+                  </div>
+                </div>
+                <div className="flex flex-wrap items-center gap-3">
+                  {draftSaved && (
+                    <span className="px-4 py-2 text-sm font-medium bg-gradient-to-r from-green-100 to-emerald-100 dark:from-green-900/50 dark:to-emerald-900/50 text-green-700 dark:text-green-300 rounded-xl border border-green-200/50 dark:border-green-700/30 shadow-sm">
+                      ✓ Draft saved
+                    </span>
+                  )}
+                  {hasDraft() && (
+                    <Button
+                        onClick={loadDraft}
+                        variant="primary"
+                        size="sm"
+                        icon="📂"
+                        className="shadow-lg hover:shadow-xl transition-all duration-300 bg-gradient-to-r from-primary-600 to-orange-600 hover:from-primary-700 hover:to-orange-700"
+                      >
+                        Load Draft
+                      </Button>
+                  )}
+                  {cart.length > 0 && (
+                    <>
+                      <Button
+                        onClick={saveDraft}
+                        variant="secondary"
+                        size="sm"
+                        icon="💾"
+                        className="shadow-md hover:shadow-lg transition-all duration-200"
+                      >
+                        Save Draft
+                      </Button>
+                      <Button
+                        onClick={clearDraft}
+                        variant="danger"
+                        size="sm"
+                        icon="🗑️"
+                        className="shadow-md hover:shadow-lg transition-all duration-200"
+                      >
+                        Clear Cart
+                      </Button>
+                    </>
+                  )}
+                </div>
               </div>
-              <span 
-                className="text-sm transition-colors"
-                style={{ color: isDark ? '#d1d5db' : '#6b7280' }}
-              >
-                Cashier: {user?.name}
-              </span>
             </div>
           </div>
 
-          <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 h-full">
+          <div className="grid grid-cols-1 xl:grid-cols-4 gap-6 h-full">
             {/* Items Grid */}
-            <div className="lg:col-span-2">
-              <Card className="h-full">
-                <CardHeader>
-                  <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center space-y-4 sm:space-y-0">
-                    <h3 
-                      className="text-lg font-semibold transition-colors"
-                      style={{ color: isDark ? '#ffffff' : '#111827' }}
-                    >
-                      Items
-                    </h3>
-                    <div className="flex flex-col sm:flex-row space-y-2 sm:space-y-0 sm:space-x-4 w-full sm:w-auto">
-                      <Input
-                        placeholder="Search items..."
-                        value={searchTerm}
-                        onChange={(e) => setSearchTerm(e.target.value)}
-                        className="sm:w-64"
-                      />
+            <div className="xl:col-span-3">
+              <Card className="h-full glass-effect">
+                <CardHeader variant="glass" className="card-header-orange">
+                  <div className="flex flex-col lg:flex-row justify-between items-start lg:items-center gap-4">
+                    <div className="flex items-center gap-3">
+                      <div className="p-2 bg-primary-100 dark:bg-primary-900/30 rounded-lg">
+                        <span className="text-xl">🍽️</span>
+                      </div>
+                      <div>
+                        <h3 className="text-xl font-bold text-foreground">
+                          Menu Items
+                        </h3>
+                        <p className="text-sm text-orange-600 dark:text-orange-400">
+                          {filteredItems.length} items available
+                        </p>
+                      </div>
+                    </div>
+                    <div className="flex flex-col sm:flex-row gap-3 w-full lg:w-auto">
+                      <div className="relative">
+                        <Input
+                          placeholder="🔍 Search items..."
+                          value={searchTerm}
+                          onChange={(e) => setSearchTerm(e.target.value)}
+                          className="sm:w-64 pl-10"
+                        />
+                        <div className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400">
+                          <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+                          </svg>
+                        </div>
+                      </div>
                       <Select
                         value={selectedCategory}
                         onChange={(e) => setSelectedCategory(e.target.value)}
-                        options={[
-                          { value: 'all', label: 'All Categories' },
-                          ...categories.map(category => ({
-                            value: category.id.toString(),
-                            label: category.name
-                          }))
-                        ]}
-                      />
+                        className="min-w-[160px]"
+                      >
+                        <option value="all">🏷️ All Categories</option>
+                        {categories.map(category => (
+                          <option key={category.id} value={category.id.toString()}>
+                            {category.name}
+                          </option>
+                        ))}
+                      </Select>
                     </div>
                   </div>
                 </CardHeader>
-                <CardBody className="p-4">
-                  <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-4 max-h-96 overflow-y-auto">
+                <CardBody className="p-6">
+                  <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-4 max-h-[calc(100vh-300px)] overflow-y-auto custom-scrollbar">
                     {filteredItems.map((item) => (
                       <div
                         key={item.id}
                         onClick={() => addToCart(item)}
-                        className={`rounded-lg p-4 cursor-pointer transition-all hover:shadow-md ${
-                          item.stock <= 0 ? 'opacity-50 cursor-not-allowed' : ''
+                        className={`group relative bg-card rounded-xl p-4 cursor-pointer transition-all duration-300 hover:shadow-xl hover:-translate-y-1 border border-border ${
+                          item.stock <= 0 ? 'opacity-50 cursor-not-allowed grayscale' : 'hover:border-primary-300 dark:hover:border-primary-600'
                         }`}
-                        style={{
-                          backgroundColor: isDark ? '#1f2937' : '#ffffff',
-                          borderColor: isDark ? '#374151' : '#e5e7eb',
-                          borderWidth: '1px',
-                          borderStyle: 'solid'
-                        }}
-                        onMouseEnter={(e) => {
-                          if (item.stock > 0) {
-                            e.target.style.borderColor = isDark ? '#3b82f6' : '#2563eb'
-                          }
-                        }}
-                        onMouseLeave={(e) => {
-                          e.target.style.borderColor = isDark ? '#374151' : '#e5e7eb'
-                        }}
                       >
-                        <div 
-                          className="aspect-square rounded-lg mb-3 flex items-center justify-center p-2 transition-colors"
-                          style={{ backgroundColor: isDark ? '#374151' : '#f3f4f6' }}
-                        >
-                          <ProductImage item={item} size="xl" className="w-full h-full" />
+                        {/* Stock badge */}
+                        <div className="absolute top-2 right-2 z-10">
+                          <span className={`px-2 py-1 text-xs font-medium rounded-full ${
+                            item.stock <= 0 ? 'bg-red-100 dark:bg-red-900/30 text-red-700 dark:text-red-300' :
+                            item.stock <= 5 ? 'bg-yellow-100 dark:bg-yellow-900/30 text-yellow-700 dark:text-yellow-300' :
+                            'bg-green-100 dark:bg-green-900/30 text-green-700 dark:text-green-300'
+                          }`}>
+                            {item.stock <= 0 ? 'Out' : item.stock}
+                          </span>
                         </div>
-                        <div className="text-center">
-                          <h4 
-                            className="font-medium text-sm mb-1 truncate transition-colors"
-                            style={{ color: isDark ? '#ffffff' : '#111827' }}
-                          >
+                        
+                        {/* Product image */}
+                        <div className="aspect-square rounded-lg mb-3 bg-muted flex items-center justify-center p-2 group-hover:bg-primary-50 dark:group-hover:bg-primary-900/20 transition-colors">
+                          <ProductImage item={item} size="xl" className="w-full h-full object-cover rounded-md" />
+                        </div>
+                        
+                        {/* Product info */}
+                        <div className="text-center space-y-1">
+                          <h4 className="font-semibold text-sm text-foreground truncate group-hover:text-primary transition-colors">
                             {item.name}
                           </h4>
-                          <p 
-                            className="text-xs mb-2 transition-colors"
-                            style={{ color: isDark ? '#9ca3af' : '#6b7280' }}
-                          >
+                          <p className="text-xs text-gray-500 dark:text-gray-400 truncate">
                             {item.category.name}
                           </p>
-                          <p 
-                            className="text-lg font-bold transition-colors"
-                            style={{ color: isDark ? '#60a5fa' : '#2563eb' }}
-                          >
-                            {settings.currencySymbol}{item.price.toFixed(2)}
-                          </p>
-                          <p 
-                            className="text-xs mt-1 transition-colors"
-                            style={{ 
-                              color: item.stock <= 5 
-                                ? (isDark ? '#f87171' : '#ef4444') 
-                                : (isDark ? '#4ade80' : '#16a34a') 
-                            }}
-                          >
-                            Stock: {item.stock}
-                          </p>
+                          <div className="flex items-center justify-center gap-1">
+                            <span className="text-lg font-bold text-primary-600 dark:text-primary-400">
+                              {settings.currencySymbol}{item.price.toFixed(2)}
+                            </span>
+                          </div>
                         </div>
+                        
+                        {/* Hover overlay */}
+                        {item.stock > 0 && (
+                          <div className="absolute inset-0 bg-primary/10 rounded-xl opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
+                            <div className="bg-primary text-primary-foreground px-3 py-1.5 rounded-lg text-sm font-medium shadow-lg transform translate-y-2 group-hover:translate-y-0 transition-transform">
+                              + Add to Cart
+                            </div>
+                          </div>
+                        )}
                       </div>
                     ))}
                   </div>
                   {filteredItems.length === 0 && (
-                    <div 
-                      className="text-center py-8 transition-colors"
-                      style={{ color: isDark ? '#9ca3af' : '#6b7280' }}
-                    >
+                    <div className="text-center py-8 transition-colors text-muted-foreground">
                       No items found matching your criteria
                     </div>
                   )}
@@ -499,116 +502,162 @@ export default function CreateSalePage() {
             </div>
 
             {/* Cart */}
-            <div className="lg:col-span-1">
-              <Card className="h-full">
-                <CardHeader>
+            <div className="xl:col-span-1">
+              <Card className="h-full glass-effect flex flex-col">
+                <CardHeader variant="glass" className="card-header-orange">
                   <div className="flex justify-between items-center">
-                    <h3 
-                      className="text-lg font-semibold transition-colors"
-                      style={{ color: isDark ? '#ffffff' : '#111827' }}
-                    >
-                      Cart ({cart.length})
-                    </h3>
+                    <div className="flex items-center gap-3">
+                      <div className="p-2 bg-primary-100 dark:bg-primary-900/30 rounded-lg">
+                        <span className="text-xl">🛒</span>
+                      </div>
+                      <div>
+                        <h3 className="text-xl font-bold text-foreground">
+                          Cart
+                        </h3>
+                        <p className="text-sm text-gray-600 dark:text-gray-400">
+                          {cart.length} {cart.length === 1 ? 'item' : 'items'}
+                        </p>
+                      </div>
+                    </div>
                     {cart.length > 0 && (
                       <Button
                         size="sm"
                         variant="outline"
                         onClick={clearCart}
+                        className="text-red-600 hover:text-red-700 hover:bg-red-50 dark:hover:bg-red-900/20"
                       >
-                        Clear
+                        🗑️ Clear
                       </Button>
                     )}
                   </div>
                 </CardHeader>
-                <CardBody className="p-4 flex flex-col h-full">
+                <CardBody className="p-4 flex flex-col flex-1 min-h-0">
                   {cart.length === 0 ? (
-                    <div 
-                      className="flex-1 flex items-center justify-center transition-colors"
-                      style={{ color: isDark ? '#9ca3af' : '#6b7280' }}
-                    >
-                      <div className="text-center">
-                        <div className="text-4xl mb-2">🛒</div>
-                        <p>Cart is empty</p>
-                        <p className="text-sm">Click on items to add them</p>
+                    <div className="flex-1 flex items-center justify-center text-gray-500 dark:text-gray-400">
+                      <div className="text-center space-y-3">
+                        <div className="w-16 h-16 mx-auto bg-gray-100 dark:bg-gray-800 rounded-full flex items-center justify-center">
+                          <span className="text-2xl">🛒</span>
+                        </div>
+                        <div>
+                          <p className="font-medium">Cart is empty</p>
+                          <p className="text-sm text-gray-400 dark:text-gray-500">Click on items to add them</p>
+                        </div>
                       </div>
                     </div>
                   ) : (
-                    <div className="flex flex-col h-full">
-                      <div className="flex-1 overflow-y-auto space-y-2 mb-4">
+                    <div className="flex flex-col h-full min-h-0">
+                      <div className="flex-1 overflow-y-auto space-y-3 mb-4 custom-scrollbar min-h-0">
                         {cart.map((item) => (
                           <div 
                             key={item.itemId} 
-                            className="rounded-lg p-3 transition-colors"
-                            style={{ backgroundColor: isDark ? '#374151' : '#f9fafb' }}
+                            className="bg-muted rounded-xl p-4 border border-border hover:shadow-md transition-all duration-200"
                           >
-                            <div className="flex justify-between items-start mb-2">
-                              <div className="flex items-center gap-2 flex-1">
-                                <ProductImage item={item} size="sm" />
-                                <div>
-                                  <h4 className="font-medium text-sm text-gray-900 dark:text-white">{item.name}</h4>
-                                  <p className="text-xs text-gray-500 dark:text-gray-400">{settings.currencySymbol}{item.price.toFixed(2)} each</p>
-                                </div>
+                            <div className="flex items-start gap-3 mb-3">
+                              <div className="w-12 h-12 bg-card rounded-lg flex items-center justify-center flex-shrink-0">
+                                <ProductImage item={item} size="sm" className="w-8 h-8 object-cover rounded" />
                               </div>
-                              <Button
-                                size="sm"
-                                variant="outline"
+                              <div className="flex-1 min-w-0">
+                                <h4 className="font-semibold text-sm text-foreground truncate">{item.name}</h4>
+                                <p className="text-xs text-gray-500 dark:text-gray-400">{settings.currencySymbol}{item.price.toFixed(2)} each</p>
+                              </div>
+                              <button
                                 onClick={() => removeFromCart(item.itemId)}
-                                className="ml-2 p-1 h-6 w-6"
+                                className="w-6 h-6 flex items-center justify-center text-gray-400 hover:text-red-500 hover:bg-red-50 dark:hover:bg-red-900/20 rounded-full transition-colors flex-shrink-0"
                               >
-                                ×
-                              </Button>
+                                <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                                </svg>
+                              </button>
                             </div>
                             <div className="flex items-center justify-between">
-                              <div className="flex items-center space-x-2">
+                              <div className="flex items-center bg-card rounded-lg border border-border">
                                 <button
                                   onClick={() => updateQuantity(item.itemId, item.quantity - 1)}
-                                  className="w-6 h-6 flex items-center justify-center bg-gray-200 dark:bg-gray-600 text-gray-900 dark:text-white rounded text-sm hover:bg-gray-300 dark:hover:bg-gray-500 transition-colors duration-200"
+                                  className="w-8 h-8 flex items-center justify-center text-muted-foreground hover:bg-muted rounded-l-lg transition-colors"
                                 >
-                                  -
+                                  <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M20 12H4" />
+                                  </svg>
                                 </button>
-                                <span className="text-sm font-medium w-8 text-center text-gray-900 dark:text-white">{item.quantity}</span>
+                                <span className="w-12 text-center text-sm font-medium text-foreground border-x border-border py-2">{item.quantity}</span>
                                 <button
                                   onClick={() => updateQuantity(item.itemId, item.quantity + 1)}
-                                  className="w-6 h-6 flex items-center justify-center bg-gray-200 dark:bg-gray-600 text-gray-900 dark:text-white rounded text-sm hover:bg-gray-300 dark:hover:bg-gray-500 transition-colors duration-200"
+                                  className="w-8 h-8 flex items-center justify-center text-muted-foreground hover:bg-muted rounded-r-lg transition-colors"
                                 >
-                                  +
+                                  <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
+                                  </svg>
                                 </button>
                               </div>
-                              <div className="text-sm font-bold text-gray-900 dark:text-white">{settings.currencySymbol}{item.total.toFixed(2)}</div>
+                              <div className="text-right">
+                                <div className="text-lg font-bold text-primary-600 dark:text-primary-400">{settings.currencySymbol}{item.total.toFixed(2)}</div>
+                              </div>
                             </div>
                           </div>
                         ))}
                       </div>
 
-                      <div className="border-t border-gray-200 dark:border-gray-600 pt-4 space-y-2">
-                        <div className="flex justify-between text-sm text-gray-900 dark:text-gray-100">
-                          <span>Subtotal:</span>
-                          <span>{settings.currencySymbol}{calculateTotal().toFixed(2)}</span>
-                        </div>
-                        {settings.taxEnabled && (
-                          <div className="flex justify-between text-sm text-gray-900 dark:text-gray-100">
-                            <span>{settings.taxName} ({settings.taxRate}%):</span>
-                            <span>{settings.currencySymbol}{calculateTax().toFixed(2)}</span>
+                      {/* Order Summary */}
+                      <div className="bg-card rounded-xl p-4 border border-border space-y-3 flex-shrink-0">
+                        <h4 className="font-semibold text-foreground mb-3">Order Summary</h4>
+                        
+                        <div className="space-y-2">
+                          <div className="flex justify-between text-sm">
+                            <span className="text-gray-600 dark:text-gray-400">Subtotal:</span>
+                            <span className="font-medium text-foreground">{settings.currencySymbol}{calculateTotal().toFixed(2)}</span>
                           </div>
-                        )}
-                        <div className="flex justify-between text-lg font-bold border-t border-gray-200 dark:border-gray-600 pt-2 text-gray-900 dark:text-white">
-                          <span>Total:</span>
-                          <span>{settings.currencySymbol}{calculateGrandTotal().toFixed(2)}</span>
+                          {settings.taxEnabled && (
+                            <div className="flex justify-between text-sm">
+                              <span className="text-gray-600 dark:text-gray-400">{settings.taxName} ({settings.taxRate}%):</span>
+                              <span className="font-medium text-foreground">{settings.currencySymbol}{calculateTax().toFixed(2)}</span>
+                            </div>
+                          )}
+                          <div className="border-t border-gray-200 dark:border-gray-600 pt-2">
+                            <div className="flex justify-between">
+                              <span className="text-lg font-bold text-foreground">Total:</span>
+                              <span className="text-xl font-bold text-primary-600 dark:text-primary-400">{settings.currencySymbol}{calculateGrandTotal().toFixed(2)}</span>
+                            </div>
+                          </div>
+                        </div>
+                        
+                        {/* Payment Method Selection */}
+                        <div className="pt-3 border-t border-gray-200 dark:border-gray-600">
+                          <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                            💳 Payment Method
+                          </label>
+                          <Select
+                            value={selectedPaymentMethod}
+                            onChange={(e) => setSelectedPaymentMethod(e.target.value)}
+                            className="w-full mb-4"
+                          >
+                            <option value="">Select payment method</option>
+                            {paymentMethods
+                              .filter(pm => pm.enabled)
+                              .map(method => (
+                                <option key={method.id} value={method.id}>
+                                  {method.name}
+                                </option>
+                              ))
+                            }
+                          </Select>
                         </div>
                         
                         <Button
                           onClick={processSale}
-                          variant="success"
-                          className="w-full mt-4"
-                          disabled={processing}
+                          variant="primary"
+                          className="w-full bg-gradient-to-r from-primary-500 to-primary-600 hover:from-primary-600 hover:to-primary-700 text-white font-semibold py-3 rounded-xl shadow-lg hover:shadow-xl transition-all duration-200"
+                          disabled={processing || !selectedPaymentMethod}
                         >
                           {processing ? (
-                            <div className="flex items-center space-x-2">
+                            <div className="flex items-center justify-center space-x-2">
                               <LoadingSpinner size="sm" />
-                              <span>Processing...</span>
+                              <span>Processing Sale...</span>
                             </div>
                           ) : (
-                            'Complete Sale'
+                            <div className="flex items-center justify-center space-x-2">
+                              <span>💰</span>
+                              <span>Complete Sale</span>
+                            </div>
                           )}
                         </Button>
                       </div>
@@ -616,6 +665,8 @@ export default function CreateSalePage() {
                   )}
                 </CardBody>
               </Card>
+              
+
             </div>
           </div>
         </div>

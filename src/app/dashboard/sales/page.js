@@ -113,11 +113,11 @@ export default function SalesPage() {
         <div className="space-y-6">
           <div className="flex justify-between items-center">
             <div>
-              <h1 className="text-2xl font-bold text-gray-900 dark:text-white">Sales History</h1>
+              <h1 className="text-2xl font-bold text-foreground">Sales History</h1>
               <p className="text-gray-600">View and manage all sales transactions</p>
             </div>
             <Link href="/dashboard/sales/create">
-              <Button variant="primary" className="button-hover-effect">
+              <Button variant="primary" className="button-hover-effect bg-orange-600 hover:bg-orange-700">
                 + Create New Sale
               </Button>
             </Link>
@@ -127,7 +127,7 @@ export default function SalesPage() {
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
             <Card className="card-hover">
               <CardBody className="text-center">
-                <div className="text-2xl font-bold text-blue-600 mb-1">
+                <div className="text-2xl font-bold text-orange-600 mb-1">
                   {stats.totalSales}
                 </div>
                 <div className="text-sm text-gray-600">Total Sales</div>
@@ -169,7 +169,7 @@ export default function SalesPage() {
                     placeholder="Search sales by ID, cashier, or item name..."
                     value={searchTerm}
                     onChange={(e) => setSearchTerm(e.target.value)}
-                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-orange-500"
                   />
                 </div>
                 <div className="flex gap-2">
@@ -177,7 +177,7 @@ export default function SalesPage() {
                     type="date"
                     value={dateFilter}
                     onChange={(e) => setDateFilter(e.target.value)}
-                    className="px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                    className="px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-orange-500"
                   />
                   <Button
                     variant="outline"
@@ -194,7 +194,7 @@ export default function SalesPage() {
           </Card>
 
           <Card>
-            <CardHeader>
+            <CardHeader variant="glass" className="card-header-orange">
               <div className="flex justify-between items-center">
                 <h3 className="text-lg font-semibold">Recent Transactions</h3>
                 <div className="text-sm text-gray-500 dark:text-gray-400">
@@ -208,7 +208,7 @@ export default function SalesPage() {
                   <div className="text-gray-400 text-6xl mb-4">
                     {searchTerm || dateFilter ? '�' : '�🛒'}
                   </div>
-                  <h3 className="text-lg font-medium text-gray-900 dark:text-white mb-2">
+                  <h3 className="text-lg font-medium text-foreground mb-2">
                     {searchTerm || dateFilter ? 'No matching sales found' : 'No sales yet'}
                   </h3>
                   <p className="text-gray-600 mb-6">
@@ -282,8 +282,8 @@ export default function SalesPage() {
                         </TableCell>
                         <TableCell>
                           <div className="flex items-center gap-2">
-                            <div className="w-8 h-8 bg-blue-100 rounded-full flex items-center justify-center">
-                              <span className="text-blue-600 font-medium text-sm">
+                            <div className="w-8 h-8 bg-orange-100 rounded-full flex items-center justify-center">
+                              <span className="text-orange-600 font-medium text-sm">
                                 {sale.user.name.charAt(0).toUpperCase()}
                               </span>
                             </div>
