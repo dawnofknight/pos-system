@@ -106,9 +106,10 @@ export default function CreateSalePage() {
       if (response.ok) {
         const data = await response.json()
         setPaymentMethods(data)
-        const defaultMethod = data.find(pm => pm.enabled)
-        if (defaultMethod && !selectedPaymentMethod) {
-          setSelectedPaymentMethod(defaultMethod.id.toString())
+        // Set the first enabled payment method as default
+        const enabledMethods = data.filter(pm => pm.enabled)
+        if (enabledMethods.length > 0) {
+          setSelectedPaymentMethod(enabledMethods[0].id.toString())
         }
       }
     } catch (error) {
@@ -689,14 +690,14 @@ export default function CreateSalePage() {
                         </div>
                         {settings.taxEnabled && (
                           <div className="flex justify-between text-sm">
-                            <span className="text-gray-600 dark:text-gray-400">{settings.taxName} ({settings.taxRate}%):</span>
-                            <span className="font-medium text-gray-900 dark:text-white">{settings.currencySymbol}{calculateTax().toFixed(2)}</span>
+                            <span className="text-gray-600">{settings.taxName} ({settings.taxRate}%):</span>
+                            <span className="font-medium text-gray-900">{settings.currencySymbol}{calculateTax().toFixed(2)}</span>
                           </div>
                         )}
-                        <div className="border-t border-gray-200 dark:border-gray-600 pt-2">
+                        <div className="border-t border-gray-200 pt-2">
                           <div className="flex justify-between">
-                            <span className="text-lg font-bold text-gray-900 dark:text-white">Total:</span>
-                            <span className="text-xl font-bold text-orange-600 dark:text-orange-400">{settings.currencySymbol}{calculateGrandTotal().toFixed(2)}</span>
+                            <span className="text-lg font-bold text-gray-900">Total:</span>
+                            <span className="text-xl font-bold text-orange-600">{settings.currencySymbol}{calculateGrandTotal().toFixed(2)}</span>
                           </div>
                         </div>
                       </div>
@@ -706,21 +707,24 @@ export default function CreateSalePage() {
                         <label className="block text-sm font-medium text-gray-700 mb-2">
                           Payment Method
                         </label>
-                        <Select
-                          value={selectedPaymentMethod}
-                          onChange={(e) => setSelectedPaymentMethod(e.target.value)}
-                          className="w-full"
-                        >
-                          <option value="">Select payment method</option>
+                        <div className="grid grid-cols-2 gap-2">
                           {paymentMethods
                             .filter(pm => pm.enabled)
                             .map(method => (
-                              <option key={method.id} value={method.id}>
-                                {method.name}
-                              </option>
+                              <button
+                                key={method.id}
+                                type="button"
+                                onClick={() => setSelectedPaymentMethod(method.id)}
+                                className={`flex items-center justify-center p-3 rounded-lg border ${selectedPaymentMethod === method.id ? 'bg-orange-50 border-orange-500' : 'border-gray-300 hover:bg-gray-50'}`}
+                              >
+                                <div className="flex flex-col items-center">
+                                  <span className="text-xl mb-1">{method.name === 'Cash' ? '💵' : method.name === 'Credit Card' ? '💳' : method.name === 'Debit Card' ? '💳' : '📱'}</span>
+                                  <span className="font-medium">{method.name}</span>
+                                </div>
+                              </button>
                             ))
                           }
-                        </Select>
+                        </div>
                       </div>
                       
                       {/* Complete Order Button */}
