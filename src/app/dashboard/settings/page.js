@@ -38,8 +38,16 @@ export default function SettingsPage() {
     currencySymbol: 'Rp',
     taxEnabled: false,
     taxRate: 0,
-    taxName: 'Tax'
+    taxName: 'Tax',
+    tableCount: 6
   })
+  
+  // Table Form
+  const [tableForm, setTableForm] = useState({
+    name: '',
+    capacity: 4
+  })
+  const [editingTable, setEditingTable] = useState(null)
   
   // Payment Methods
   const [paymentMethods, setPaymentMethods] = useState([])
@@ -61,6 +69,7 @@ export default function SettingsPage() {
   const tabs = [
     { id: 'general', name: 'General', icon: '⚙️' },
     { id: 'payments', name: 'Payment Methods', icon: '💳' },
+    { id: 'tables', name: 'Table Management', icon: '🍽️' },
     ...(hasPermission('settings', 'edit') && user?.role === 'ADMIN' ? [
       { id: 'roles', name: 'Role Management', icon: '👥' },
       { id: 'users', name: 'User Management', icon: '👤' }
@@ -72,6 +81,7 @@ export default function SettingsPage() {
     { id: 'items', name: 'Items', description: 'Manage product inventory' },
     { id: 'sales', name: 'Sales', description: 'Process and view sales' },
     { id: 'categories', name: 'Categories', description: 'Manage product categories' },
+    { id: 'tables', name: 'Tables', description: 'Manage restaurant tables' },
     { id: 'users', name: 'Users', description: 'Manage user accounts' },
     { id: 'settings', name: 'Settings', description: 'System configuration' }
   ]
@@ -286,6 +296,90 @@ export default function SettingsPage() {
       setSaving(false)
     }
   }
+  
+  // Table Management
+  const [tables, setTables] = useState([])
+  const [isLoadingTables, setIsLoadingTables] = useState(false)
+  
+  const fetchTables = async () => {
+    setIsLoadingTables(true)
+    try {
+      const response = await fetch('/api/tables')
+      if (response.ok) {
+        const data = await response.json()
+        setTables(data)
+      }
+    } catch (error) {
+      console.error('Error fetching tables:', error)
+    } finally {
+      setIsLoadingTables(false)
+    }
+  }
+  
+  const createTable = async (tableData) => {
+    try {
+      const response = await fetch('/api/tables', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(tableData)
+      })
+      
+      if (response.ok) {
+        fetchTables()
+      } else {
+        const error = await response.json()
+        console.error('Error creating table:', error)
+      }
+    } catch (error) {
+      console.error('Error creating table:', error)
+    }
+  }
+  
+  const updateTable = async (id, tableData) => {
+    try {
+      const response = await fetch(`/api/tables/${id}`, {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(tableData)
+      })
+      
+      if (response.ok) {
+        fetchTables()
+      } else {
+        const error = await response.json()
+        console.error('Error updating table:', error)
+      }
+    } catch (error) {
+      console.error('Error updating table:', error)
+    }
+  }
+  
+  const deleteTable = async (id) => {
+    try {
+      const response = await fetch(`/api/tables/${id}`, {
+        method: 'DELETE'
+      })
+      
+      if (response.ok) {
+        fetchTables()
+      } else {
+        const error = await response.json()
+        console.error('Error deleting table:', error)
+      }
+    } catch (error) {
+      console.error('Error deleting table:', error)
+    }
+  }
+  
+  useEffect(() => {
+    if (activeTab === 'tables') {
+      fetchTables()
+    }
+  }, [activeTab])
 
   const togglePaymentMethod = async (methodId, enabled) => {
     try {
@@ -523,7 +617,216 @@ export default function SettingsPage() {
             </Card>
           )}
 
-          {/* Role Management Tab (Admin Only) */}
+          {/* Table Management Tab */}
+          {activeTab === 'tables' && (
+            <Card>
+              <CardHeader>
+                <h2 className="text-lg font-semibold transition-colors text-gray-900 dark:text-white">
+                  Table Management
+                </h2>
+                <p className="text-sm transition-colors text-gray-600 dark:text-gray-400">
+                  Configure restaurant tables and capacity
+                </p>
+              </CardHeader>
+              <CardBody>
+                <div className="space-y-6">
+                  {/* Table Count Setting */}
+                  <div>
+                    <h3 className="text-md font-medium mb-4 transition-colors text-gray-900 dark:text-white">
+                      Table Configuration
+                    </h3>
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
+                      <Input
+                        type="number"
+                        label="Number of Tables"
+                        value={settings.tableCount}
+                        min={1}
+                        max={50}
+                        onChange={(e) => setSettings({
+                          ...settings,
+                          tableCount: parseInt(e.target.value) || 1
+                        })}
+                      />
+                      <div className="flex items-end">
+                        <Button onClick={saveGeneralSettings} disabled={saving}>
+                          {saving ? 'Saving...' : 'Save Table Count'}
+                        </Button>
+                      </div>
+                    </div>
+                  </div>
+                  
+                  {/* Table List */}
+                  <div>
+                    <div className="flex justify-between items-center mb-4">
+                      <h3 className="text-md font-medium transition-colors text-gray-900 dark:text-white">
+                        Tables
+                      </h3>
+                      <Button
+                        onClick={() => {
+                          setEditingTable(null)
+                          setTableForm({ name: '', capacity: 4 })
+                          document.getElementById('tableFormModal').showModal()
+                        }}
+                      >
+                        Add Table
+                      </Button>
+                    </div>
+                    
+                    {isLoadingTables ? (
+                      <div className="flex justify-center py-8">
+                        <LoadingSpinner />
+                      </div>
+                    ) : (
+                      <Table>
+                        <TableHeader>
+                          <TableRow>
+                            <TableHeaderCell>Name</TableHeaderCell>
+                            <TableHeaderCell>Capacity</TableHeaderCell>
+                            <TableHeaderCell>Status</TableHeaderCell>
+                            <TableHeaderCell>Actions</TableHeaderCell>
+                          </TableRow>
+                        </TableHeader>
+                        <TableBody>
+                          {tables.length === 0 ? (
+                            <TableRow>
+                              <TableCell colSpan={4} className="text-center py-8">
+                                No tables found. Add your first table.
+                              </TableCell>
+                            </TableRow>
+                          ) : (
+                            tables.map((table) => (
+                              <TableRow key={table.id}>
+                                <TableCell>{table.name}</TableCell>
+                                <TableCell>{table.capacity}</TableCell>
+                                <TableCell>
+                                  <Badge
+                                    variant={table.status === 'available' ? 'success' : 
+                                           table.status === 'occupied' ? 'danger' : 'warning'}
+                                  >
+                                    {table.status.charAt(0).toUpperCase() + table.status.slice(1)}
+                                  </Badge>
+                                </TableCell>
+                                <TableCell>
+                                  <div className="flex space-x-2">
+                                    <Button
+                                      size="sm"
+                                      variant="outline"
+                                      onClick={() => {
+                                        setEditingTable(table)
+                                        setTableForm({
+                                          name: table.name,
+                                          capacity: table.capacity
+                                        })
+                                        document.getElementById('tableFormModal').showModal()
+                                      }}
+                                    >
+                                      Edit
+                                    </Button>
+                                    <Button
+                                      size="sm"
+                                      variant="danger"
+                                      onClick={() => document.getElementById(`deleteTableConfirm-${table.id}`).showModal()}
+                                    >
+                                      Delete
+                                    </Button>
+                                    
+                                    {/* Delete Confirmation Dialog */}
+                                    <dialog id={`deleteTableConfirm-${table.id}`} className="modal">
+                                      <div className="modal-box">
+                                        <h3 className="font-bold text-lg">Confirm Deletion</h3>
+                                        <p className="py-4">Are you sure you want to delete table {table.name}?</p>
+                                        <div className="modal-action">
+                                          <form method="dialog">
+                                            <div className="flex space-x-2">
+                                              <Button variant="outline" onClick={() => document.getElementById(`deleteTableConfirm-${table.id}`).close()}>Cancel</Button>
+                                              <Button variant="danger" onClick={() => {
+                                                 document.getElementById(`deleteTableConfirm-${table.id}`).close()
+                                                 deleteTable(table.id)
+                                               }}>Delete</Button>
+                                            </div>
+                                          </form>
+                                        </div>
+                                      </div>
+                                    </dialog>
+                                  </div>
+                                </TableCell>
+                              </TableRow>
+                            ))
+                          )}
+                        </TableBody>
+                      </Table>
+                    )}
+                  </div>
+                </div>
+              </CardBody>
+            </Card>
+          )}
+          
+          {/* Table Form Modal */}
+          <dialog id="tableFormModal" className="modal">
+            <div className="modal-box rounded-2xl shadow-2xl border border-orange-100 dark:border-orange-800/30 p-0 overflow-hidden">
+              <div className="flex items-center gap-3 p-4 mb-4 bg-gradient-to-r from-orange-50 to-orange-100 dark:from-orange-900/30 dark:to-orange-800/30 rounded-lg border-b border-orange-200/30 dark:border-orange-700/30">
+                <div className="p-2 rounded-lg bg-gradient-to-br from-orange-500 to-orange-600 shadow-md">
+                  <span className="text-white text-lg">{editingTable ? '✏️' : '➕'}</span>
+                </div>
+                <h3 className="text-xl font-semibold bg-gradient-to-r from-orange-600 to-orange-500 dark:from-orange-400 dark:to-orange-300 bg-clip-text text-transparent">
+                  {editingTable ? 'Edit Table' : 'Add New Table'}
+                </h3>
+              </div>
+              <form className="space-y-4 p-6">
+                <Input
+                  label="Table Name"
+                  value={tableForm.name}
+                  onChange={(e) => setTableForm({ ...tableForm, name: e.target.value })}
+                  placeholder="e.g., Table 1"
+                  required
+                  icon="🏷️"
+                  className="bg-orange-50/50 border-orange-200 focus:border-orange-400 rounded-xl transition-all duration-300"
+                />
+                <Input
+                  type="number"
+                  label="Capacity"
+                  value={tableForm.capacity}
+                  onChange={(e) => setTableForm({ ...tableForm, capacity: parseInt(e.target.value) || 1 })}
+                  min={1}
+                  max={20}
+                  required
+                  icon="👥"
+                  className="bg-orange-50/50 border-orange-200 focus:border-orange-400 rounded-xl transition-all duration-300"
+                />
+                <div className="flex flex-col sm:flex-row gap-3 pt-6 border-t border-gray-200 dark:border-gray-700">
+                  <Button 
+                    variant="outline" 
+                    onClick={() => document.getElementById('tableFormModal').close()}
+                    icon="❌"
+                    className="flex-1 hover:bg-gray-50 dark:hover:bg-gray-800 transition-all duration-200"
+                  >
+                    Cancel
+                  </Button>
+                  <Button
+                    onClick={(e) => {
+                      e.preventDefault()
+                      if (!tableForm.name) return
+                      
+                      if (editingTable) {
+                        updateTable(editingTable.id, tableForm)
+                      } else {
+                        createTable(tableForm)
+                      }
+                      
+                      document.getElementById('tableFormModal').close()
+                    }}
+                    icon={editingTable ? '✏️' : '✅'}
+                    className="flex-1 shadow-lg hover:shadow-xl transition-all duration-300 bg-gradient-to-r from-orange-500 to-orange-600 hover:from-orange-600 hover:to-orange-700"
+                  >
+                    {editingTable ? 'Update' : 'Create'}
+                  </Button>
+                </div>
+              </form>
+            </div>
+          </dialog>
+          
+          {/* Role Management Tab */}
           {activeTab === 'roles' && user?.role === 'ADMIN' && (
             <Card>
               <CardHeader>
