@@ -4,7 +4,6 @@ import { useState } from 'react'
 
 export default function DirectTest() {
   // Theme functionality removed
-  }
   
   return (
     <div className="min-h-screen p-8">
@@ -23,4 +22,4 @@ export default function DirectTest() {
       </div>
     </div>
   )
-
+}

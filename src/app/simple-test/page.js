@@ -30,7 +30,7 @@ export default function SimpleThemeTest() {
           <div className="mt-6 p-4 border border-gray-300 dark:border-gray-700 rounded">
             <h3 className="font-bold text-foreground mb-2">Debug Info</h3>
             <p className="text-sm text-gray-600 dark:text-gray-400">
-              React state: {isDark ? 'dark' : 'light'}
+              React state: light
             </p>
             <p className="text-sm text-gray-600 dark:text-gray-400">
               HTML classes: {typeof document !== 'undefined' ? document.documentElement.classList.toString() : 'loading...'}
