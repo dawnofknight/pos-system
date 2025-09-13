@@ -53,11 +53,14 @@ model Sale {
   total           Float
   userId          Int
   paymentMethodId Int
+  tableId         Int?
+  status          String        @default("completed") // "active", "completed", "cancelled"
   createdAt       DateTime      @default(now())
   updatedAt       DateTime      @updatedAt
   items           SaleItem[]
   user            User          @relation(fields: [userId], references: [id])
   paymentMethod   PaymentMethod @relation(fields: [paymentMethodId], references: [id])
+  table           Table?        @relation(fields: [tableId], references: [id])
 
   @@map("sales")
 }
@@ -86,6 +89,7 @@ model Settings {
   taxEnabled       Boolean  @default(false)
   taxRate          Float    @default(0.0)
   taxName          String   @default("Tax")
+  tableCount       Int      @default(6)
   createdAt        DateTime @default(now())
   updatedAt        DateTime @updatedAt
 
@@ -103,10 +107,22 @@ model PaymentMethod {
   @@map("payment_methods")
 }
 
+model Table {
+  id        Int      @id @default(autoincrement())
+  name      String   @unique
+  capacity  Int      @default(4)
+  status    String   @default("available") // "available", "occupied", "reserved"
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  sales     Sale[]
+
+  @@map("tables")
+}
+
 model RolePermission {
   id         Int      @id @default(autoincrement())
   role       UserRole
-  resource   String   // e.g., 'dashboard', 'items', 'sales', 'categories', 'users', 'settings'
+  resource   String   // e.g., 'dashboard', 'items', 'sales', 'categories', 'users', 'settings', 'tables'
   canView    Boolean  @default(false)
   canCreate  Boolean  @default(false)
   canEdit    Boolean  @default(false)

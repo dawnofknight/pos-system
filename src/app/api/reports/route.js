@@ -1,9 +1,7 @@
 import { NextResponse } from 'next/server'
-import { PrismaClient } from '@prisma/client'
 import { verifyToken } from '@/lib/auth'
 import { checkPermission } from '@/lib/rbac'
-
-const prisma = new PrismaClient()
+import { prisma } from '@/lib/prisma'
 
 // GET /api/reports - Get sales reports with filtering
 export async function GET(request) {
