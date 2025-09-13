@@ -4,7 +4,7 @@ import { useState, useEffect } from 'react'
 import AuthGuard from '@/components/AuthGuard'
 import DashboardLayout from '@/components/DashboardLayout'
 import { useAuth } from '@/contexts/AuthContext'
-import { useTheme } from '@/contexts/ThemeContext'
+
 import {
   Card,
   CardHeader,
@@ -18,7 +18,7 @@ import { formatCurrency } from '@/lib/utils'
 
 export default function ReportsPage() {
   const { user, token } = useAuth()
-  const { isDark } = useTheme()
+
   const [loading, setLoading] = useState(true)
   const [reportsData, setReportsData] = useState(null)
   const [paymentMethods, setPaymentMethods] = useState([])
@@ -141,7 +141,7 @@ export default function ReportsPage() {
               <h1 className="text-2xl font-bold text-foreground">
                 📊 Sales Reports
               </h1>
-              <p className="text-gray-600 dark:text-gray-400">
+              <p className="text-gray-600">
                 View sales analytics and performance metrics
               </p>
             </div>
@@ -157,7 +157,7 @@ export default function ReportsPage() {
             <CardBody>
               <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                  <label className="block text-sm font-medium text-gray-700 mb-2">
                     Period
                   </label>
                   <Select
@@ -227,13 +227,13 @@ export default function ReportsPage() {
               <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
                 <Card>
                   <CardBody className="text-center">
-                    <div className="text-2xl font-bold text-primary-600 dark:text-primary-400">
+                    <div className="text-2xl font-bold text-primary-600">
                       {reportsData.summary.totalSales}
                     </div>
-                    <div className="text-sm text-gray-600 dark:text-gray-400">
+                    <div className="text-sm text-gray-600">
                       Total Sales
                     </div>
-                    <div className="text-xs text-gray-500 dark:text-gray-500 mt-1">
+                    <div className="text-xs text-gray-500 mt-1">
                       {formatPeriodLabel(reportsData.summary.period)}
                     </div>
                   </CardBody>
@@ -241,7 +241,7 @@ export default function ReportsPage() {
 
                 <Card>
                   <CardBody className="text-center">
-                    <div className="text-2xl font-bold text-green-600 dark:text-green-400">
+                    <div className="text-2xl font-bold text-green-600">
                       {formatCurrency(reportsData.summary.totalRevenue, settings.currencySymbol)}
                     </div>
                     <div className="text-sm text-gray-600 dark:text-gray-400">
@@ -255,7 +255,7 @@ export default function ReportsPage() {
 
                 <Card>
                   <CardBody className="text-center">
-                    <div className="text-2xl font-bold text-purple-600 dark:text-purple-400">
+                    <div className="text-2xl font-bold text-purple-600">
                       {formatCurrency(reportsData.summary.averageSale, settings.currencySymbol)}
                     </div>
                     <div className="text-sm text-gray-600 dark:text-gray-400">
@@ -269,7 +269,7 @@ export default function ReportsPage() {
 
                 <Card>
                   <CardBody className="text-center">
-                    <div className="text-2xl font-bold text-orange-600 dark:text-orange-400">
+                    <div className="text-2xl font-bold text-orange-600">
                       {Object.keys(reportsData.paymentMethods).length}
                     </div>
                     <div className="text-sm text-gray-600 dark:text-gray-400">
@@ -292,7 +292,7 @@ export default function ReportsPage() {
                 <CardBody>
                   <div className="space-y-4">
                     {Object.entries(reportsData.paymentMethods).map(([method, stats]) => (
-                      <div key={method} className="flex justify-between items-center p-3 bg-gray-50 dark:bg-gray-700 rounded-lg">
+                      <div key={method} className="flex justify-between items-center p-3 bg-gray-50 rounded-lg">
                         <div>
                           <div className="font-medium text-foreground">{method}</div>
                           <div className="text-sm text-gray-600 dark:text-gray-400">
@@ -323,9 +323,9 @@ export default function ReportsPage() {
                 <CardBody>
                   <div className="space-y-3">
                     {reportsData.topItems.slice(0, 10).map((item, index) => (
-                      <div key={item.name} className="flex justify-between items-center p-3 bg-gray-50 dark:bg-gray-700 rounded-lg">
+                      <div key={item.name} className="flex justify-between items-center p-3 bg-gray-50 rounded-lg">
                         <div className="flex items-center space-x-3">
-                          <div className="w-8 h-8 bg-orange-100 dark:bg-orange-900 text-orange-600 dark:text-orange-400 rounded-full flex items-center justify-center text-sm font-bold">
+                          <div className="w-8 h-8 bg-orange-100 text-orange-600 rounded-full flex items-center justify-center text-sm font-bold">
                             {index + 1}
                           </div>
                           <div>
@@ -356,7 +356,7 @@ export default function ReportsPage() {
                 <CardBody>
                   <div className="space-y-4">
                     {Object.entries(reportsData.categories).map(([category, stats]) => (
-                      <div key={category} className="flex justify-between items-center p-3 bg-gray-50 dark:bg-gray-700 rounded-lg">
+                      <div key={category} className="flex justify-between items-center p-3 bg-gray-50 rounded-lg">
                         <div>
                           <div className="font-medium text-foreground">{category}</div>
                           <div className="text-sm text-gray-600 dark:text-gray-400">
@@ -384,7 +384,7 @@ export default function ReportsPage() {
                 <CardBody>
                   <div className="space-y-3">
                     {reportsData.sales.slice(0, 10).map((sale) => (
-                      <div key={sale.id} className="flex justify-between items-center p-3 bg-gray-50 dark:bg-gray-700 rounded-lg">
+                      <div key={sale.id} className="flex justify-between items-center p-3 bg-gray-50 rounded-lg">
                         <div>
                           <div className="font-medium text-foreground">
                             Sale #{sale.id}
@@ -392,7 +392,7 @@ export default function ReportsPage() {
                           <div className="text-sm text-gray-600 dark:text-gray-400">
                             {sale.user.name} • {sale.paymentMethod?.name || 'Unknown'} • {sale.itemCount} items
                           </div>
-                          <div className="text-xs text-gray-500 dark:text-gray-500">
+                          <div className="text-xs text-gray-500">
                             {new Date(sale.createdAt).toLocaleString()}
                           </div>
                         </div>
@@ -410,7 +410,7 @@ export default function ReportsPage() {
           ) : (
             <Card>
               <CardBody className="text-center py-12">
-                <div className="text-gray-500 dark:text-gray-400">
+                <div className="text-gray-500">
                   <div className="text-4xl mb-4">📊</div>
                   <p>No data available for the selected period</p>
                 </div>

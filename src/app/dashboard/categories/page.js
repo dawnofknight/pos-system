@@ -89,8 +89,8 @@ export default function CategoriesPage() {
       <DashboardLayout>
         <div className="space-y-8">
           {/* Header Section */}
-          <div className="relative overflow-hidden rounded-2xl bg-orange-50 dark:bg-orange-900/30 border border-orange-200/50 dark:border-orange-700/30 backdrop-blur-xl">
-            {/* <div className="absolute inset-0 bg-orange-50/50 dark:bg-orange-900/20" /> */}
+          <div className="relative overflow-hidden rounded-2xl bg-orange-50 border border-orange-200/50 backdrop-blur-xl">
+            {/* <div className="absolute inset-0 bg-orange-50/50" /> */}
             <div className="relative px-8 py-6">
               <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4">
                 <div className="space-y-2">
@@ -98,11 +98,11 @@ export default function CategoriesPage() {
                     <div className="p-2 rounded-xl bg-gradient-to-br from-orange-500 to-orange-600 shadow-lg">
                       <span className="text-white text-xl">📂</span>
                     </div>
-                    <h1 className="text-3xl font-bold text-black dark:bg-gradient-to-r dark:from-orange-400 dark:via-orange-500 dark:to-orange-300 dark:bg-clip-text dark:text-transparent">
+                    <h1 className="text-3xl font-bold text-black">
                       Categories Management
                     </h1>
                   </div>
-                  <p className="text-black dark:text-orange-300 ml-14">
+                  <p className="text-black ml-14">
                     Organize and manage your product categories
                   </p>
                 </div>
@@ -118,17 +118,17 @@ export default function CategoriesPage() {
             </div>
           </div>
 
-          <Card variant="glass" hover={true} className="backdrop-blur-xl border-white/20 dark:border-gray-700/30 shadow-xl">
+          <Card variant="glass" hover={true} className="backdrop-blur-xl border-white/20 shadow-xl">
             <CardHeader variant="glass" className="card-header-orange">
               <div className="flex items-center gap-3">
                 <div className="p-2 rounded-lg bg-gradient-to-br from-orange-500 to-orange-600 shadow-md">
                   <span className="text-white text-sm">📋</span>
                 </div>
                 <div>
-                  <h3 className="text-lg font-semibold text-black dark:bg-gradient-to-r dark:from-orange-400 dark:to-orange-500 dark:bg-clip-text dark:text-transparent">
+                  <h3 className="text-lg font-semibold text-black">
                     Product Categories
                   </h3>
-                  <p className="text-sm text-black dark:text-orange-400">
+                  <p className="text-sm text-black">
                     {categories.length} categories total
                   </p>
                 </div>
@@ -148,8 +148,8 @@ export default function CategoriesPage() {
                     <TableRow key={category.id}>
                       <TableCell>
                         <div className="flex items-center gap-3">
-                          <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-purple-100 to-indigo-100 dark:from-purple-900/50 dark:to-indigo-900/50 border-2 border-white/20 dark:border-gray-700/30 shadow-sm flex items-center justify-center">
-                            <span className="text-purple-600 dark:text-purple-400 text-lg">📂</span>
+                          <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-purple-100 to-indigo-100 border-2 border-white/20 shadow-sm flex items-center justify-center">
+                            <span className="text-purple-600 text-lg">📂</span>
                           </div>
                           <div>
                             <div className="font-semibold text-foreground">{category.name}</div>
@@ -157,7 +157,7 @@ export default function CategoriesPage() {
                         </div>
                       </TableCell>
                       <TableCell>
-                        <span className="inline-flex items-center px-3 py-1 rounded-xl text-sm font-medium bg-gradient-to-r from-emerald-100 to-green-100 dark:from-emerald-900/50 dark:to-green-900/50 text-emerald-700 dark:text-emerald-300 border border-emerald-200/50 dark:border-emerald-700/30 shadow-sm">
+                        <span className="inline-flex items-center px-3 py-1 rounded-xl text-sm font-medium bg-gradient-to-r from-emerald-100 to-green-100 text-emerald-700 border border-emerald-200/50 shadow-sm">
                           {category._count.items} items
                         </span>
                       </TableCell>

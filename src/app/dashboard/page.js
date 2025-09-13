@@ -3,7 +3,7 @@
 import { useState, useEffect } from 'react'
 import AuthGuard from '@/components/AuthGuard'
 import DashboardLayout from '@/components/DashboardLayout'
-import { useTheme } from '@/contexts/ThemeContext'
+
 import { Card, CardHeader, CardBody } from '@/components/ui'
 import { LoadingSpinner } from '@/components/ui'
 import { Badge } from '@/components/ui'
@@ -22,8 +22,7 @@ import ProductImage from '@/components/ProductImage'
 export default function Dashboard() {
   const [stats, setStats] = useState(null)
   const [loading, setLoading] = useState(true)
-  const { theme } = useTheme()
-  const isDark = theme === 'dark'
+
 
   useEffect(() => {
     fetchDashboardData()
@@ -66,12 +65,12 @@ export default function Dashboard() {
               </div>
               <div>
                 <h1 
-                  className="text-3xl font-bold text-foreground"
+                  className="text-3xl font-bold text-gray-900"
                 >
                   Dashboard
                 </h1>
                 <p 
-                  className="text-lg transition-colors text-gray-600 dark:text-gray-300"
+                  className="text-lg transition-colors text-gray-600"
                 >
                   Real-time insights into your business performance
                 </p>
@@ -90,7 +89,7 @@ export default function Dashboard() {
                         <span className="text-xl">💰</span>
                       </div>
                       <div>
-                        <dt className="text-sm font-semibold text-orange-600 dark:text-orange-400 uppercase tracking-wide">
+                        <dt className="text-sm font-semibold text-orange-600 uppercase tracking-wide">
                           Total Sales
                         </dt>
                       </div>
@@ -98,11 +97,11 @@ export default function Dashboard() {
                     <dd className="text-2xl font-bold bg-gradient-to-r from-orange-600 to-orange-700 bg-clip-text text-transparent mb-1">
                       ${stats?.stats?.totalSales?.amount?.toFixed(2) || '0.00'}
                     </dd>
-                    <dd className="text-sm font-medium text-orange-600 dark:text-orange-400">
+                    <dd className="text-sm font-medium text-orange-600">
                       {stats?.stats?.totalSales?.count || 0} transactions
                     </dd>
                   </div>
-                  <div className="w-16 h-16 rounded-2xl bg-gradient-to-br from-orange-100 to-orange-200 dark:from-orange-900/30 dark:to-orange-800/30 flex items-center justify-center">
+                  <div className="w-16 h-16 rounded-2xl bg-gradient-to-br from-orange-100 to-orange-200 flex items-center justify-center">
                     <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-orange-500 to-orange-600 opacity-20"></div>
                   </div>
                 </div>
@@ -118,7 +117,7 @@ export default function Dashboard() {
                         <span className="text-xl">📈</span>
                       </div>
                       <div>
-                        <dt className="text-sm font-semibold text-primary-600 dark:text-primary-400 uppercase tracking-wide">
+                        <dt className="text-sm font-semibold text-primary-600 uppercase tracking-wide">
                           Today's Sales
                         </dt>
                       </div>
@@ -126,11 +125,11 @@ export default function Dashboard() {
                     <dd className="text-2xl font-bold bg-gradient-to-r from-primary-600 to-orange-600 bg-clip-text text-transparent mb-1">
                       ${stats?.stats?.todaySales?.amount?.toFixed(2) || '0.00'}
                     </dd>
-                    <dd className="text-sm font-medium text-gray-600 dark:text-gray-400">
+                    <dd className="text-sm font-medium text-gray-600">
                       {stats?.stats?.todaySales?.count || 0} transactions
                     </dd>
                   </div>
-                  <div className="w-16 h-16 rounded-2xl bg-gradient-to-br from-primary-100 to-orange-100 dark:from-primary-900/30 dark:to-orange-900/30 flex items-center justify-center">
+                  <div className="w-16 h-16 rounded-2xl bg-gradient-to-br from-primary-100 to-orange-100 flex items-center justify-center">
                     <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-primary-500 to-orange-600 opacity-20"></div>
                   </div>
                 </div>
@@ -146,7 +145,7 @@ export default function Dashboard() {
                         <span className="text-xl">📦</span>
                       </div>
                       <div>
-                        <dt className="text-sm font-semibold text-orange-600 dark:text-orange-400 uppercase tracking-wide">
+                        <dt className="text-sm font-semibold text-orange-600 uppercase tracking-wide">
                           Total Items
                         </dt>
                       </div>
@@ -154,11 +153,11 @@ export default function Dashboard() {
                     <dd className="text-2xl font-bold bg-gradient-to-r from-orange-600 to-orange-700 bg-clip-text text-transparent mb-1">
                       {stats?.stats?.totalItems || 0}
                     </dd>
-                    <dd className="text-sm font-medium text-orange-600 dark:text-orange-400">
+                    <dd className="text-sm font-medium text-orange-600">
                       In inventory
                     </dd>
                   </div>
-                  <div className="w-16 h-16 rounded-2xl bg-gradient-to-br from-orange-100 to-orange-200 dark:from-orange-900/30 dark:to-orange-800/30 flex items-center justify-center">
+                  <div className="w-16 h-16 rounded-2xl bg-gradient-to-br from-orange-100 to-orange-200 flex items-center justify-center">
                     <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-orange-500 to-orange-600 opacity-20"></div>
                   </div>
                 </div>
@@ -186,7 +185,7 @@ export default function Dashboard() {
                       Items under 10
                     </dd>
                   </div>
-                  <div className="w-16 h-16 rounded-2xl bg-gradient-to-br from-orange-100 to-red-100 dark:from-orange-900/30 dark:to-red-900/30 flex items-center justify-center">
+                  <div className="w-16 h-16 rounded-2xl bg-gradient-to-br from-orange-100 to-red-100 flex items-center justify-center">
                     <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-orange-500 to-red-600 opacity-20"></div>
                   </div>
                 </div>
@@ -204,10 +203,10 @@ export default function Dashboard() {
                     <span className="text-lg">🧾</span>
                   </div>
                   <div>
-                    <h3 className="text-xl font-bold text-foreground">
+                    <h3 className="text-xl font-bold text-gray-900">
                       Recent Sales
                     </h3>
-                    <p className="text-sm text-gray-600 dark:text-gray-400">
+                    <p className="text-sm text-gray-600">
                       Latest transactions
                     </p>
                   </div>
@@ -237,13 +236,13 @@ export default function Dashboard() {
                   </Table>
                 ) : (
                   <div className="text-center py-12">
-                    <div className="w-16 h-16 mx-auto mb-4 rounded-2xl bg-gradient-to-br from-gray-100 to-gray-200 dark:from-gray-800 dark:to-gray-700 flex items-center justify-center">
+                    <div className="w-16 h-16 mx-auto mb-4 rounded-2xl bg-gradient-to-br from-gray-100 to-gray-200 flex items-center justify-center">
                       <span className="text-2xl opacity-50">📊</span>
                     </div>
-                    <p className="text-lg font-medium text-gray-600 dark:text-gray-400">
+                    <p className="text-lg font-medium text-gray-600">
                       No recent sales
                     </p>
-                    <p className="text-sm text-gray-500 dark:text-gray-500">
+                    <p className="text-sm text-gray-500">
                       Sales will appear here once you start making transactions
                     </p>
                   </div>
@@ -259,10 +258,10 @@ export default function Dashboard() {
                     <span className="text-lg">🏆</span>
                   </div>
                   <div>
-                    <h3 className="text-xl font-bold text-foreground">
+                    <h3 className="text-xl font-bold text-gray-900">
                       Top Selling Items
                     </h3>
-                    <p className="text-sm text-gray-600 dark:text-gray-400">
+                    <p className="text-sm text-gray-600">
                       Best performers
                     </p>
                   </div>
@@ -284,7 +283,7 @@ export default function Dashboard() {
                           <TableCell>
                             <div className="flex items-center gap-3">
                               <ProductImage item={item} size="sm" />
-                              <span className="font-medium text-foreground">{item.name}</span>
+                              <span className="font-medium text-gray-900">{item.name}</span>
                             </div>
                           </TableCell>
                           <TableCell>{item.totalSold}</TableCell>
@@ -295,13 +294,13 @@ export default function Dashboard() {
                   </Table>
                 ) : (
                   <div className="text-center py-12">
-                    <div className="w-16 h-16 mx-auto mb-4 rounded-2xl bg-gradient-to-br from-gray-100 to-gray-200 dark:from-gray-800 dark:to-gray-700 flex items-center justify-center">
+                    <div className="w-16 h-16 mx-auto mb-4 rounded-2xl bg-gradient-to-br from-gray-100 to-gray-200 flex items-center justify-center">
                       <span className="text-2xl opacity-50">🏆</span>
                     </div>
-                    <p className="text-lg font-medium text-gray-600 dark:text-gray-400">
+                    <p className="text-lg font-medium text-gray-600">
                       No sales data
                     </p>
-                    <p className="text-sm text-gray-500 dark:text-gray-500">
+                    <p className="text-sm text-gray-500">
                       Top selling items will appear here after sales are made
                     </p>
                   </div>

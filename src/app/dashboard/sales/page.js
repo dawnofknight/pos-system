@@ -197,7 +197,7 @@ export default function SalesPage() {
             <CardHeader variant="glass" className="card-header-orange">
               <div className="flex justify-between items-center">
                 <h3 className="text-lg font-semibold">Recent Transactions</h3>
-                <div className="text-sm text-gray-500 dark:text-gray-400">
+                <div className="text-sm text-gray-500">
                   {filteredSales.length} of {sales.length} transactions
                 </div>
               </div>
@@ -246,7 +246,7 @@ export default function SalesPage() {
                                 year: 'numeric'
                               })}
                             </div>
-                            <div className="text-sm text-gray-500 dark:text-gray-400">
+                            <div className="text-sm text-gray-500">
                               {new Date(sale.createdAt).toLocaleTimeString('en-US', {
                                 hour: '2-digit',
                                 minute: '2-digit'
@@ -260,11 +260,11 @@ export default function SalesPage() {
                               <div key={index} className="flex items-center gap-2 text-sm">
                                 <ProductImage item={item.item} size="xs" />
                                 <span>{item.item.name}</span>
-                                <span className="text-gray-500 dark:text-gray-400">×{item.quantity}</span>
+                                <span className="text-gray-500">×{item.quantity}</span>
                               </div>
                             ))}
                             {sale.items.length > 2 && (
-                              <div className="text-xs text-gray-500 dark:text-gray-400">
+                              <div className="text-xs text-gray-500">
                                 +{sale.items.length - 2} more items
                               </div>
                             )}
@@ -275,7 +275,7 @@ export default function SalesPage() {
                             <div className="text-lg font-bold text-green-600">
                               ${sale.total.toFixed(2)}
                             </div>
-                            <div className="text-xs text-gray-500 dark:text-gray-400">
+                            <div className="text-xs text-gray-500">
                               {sale.items.reduce((sum, item) => sum + item.quantity, 0)} items
                             </div>
                           </div>

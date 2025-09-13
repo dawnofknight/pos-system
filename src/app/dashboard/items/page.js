@@ -250,17 +250,17 @@ export default function ItemsPage() {
       <DashboardLayout>
         <div className="space-y-8">
           {/* Header Section */}
-          <div className="relative overflow-hidden rounded-3xl bg-gradient-to-br from-primary-50 via-orange-50 to-red-50 dark:from-primary-900/20 dark:via-orange-900/20 dark:to-red-900/20 p-8">
+          <div className="relative overflow-hidden rounded-3xl bg-gradient-to-br from-primary-50 via-orange-50 to-red-50 p-8">
             <div className="relative z-10 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
               <div className="flex items-center gap-4">
                 <div className="w-16 h-16 rounded-2xl bg-gradient-to-br from-orange-500 to-red-600 flex items-center justify-center shadow-xl">
                   <span className="text-2xl">📦</span>
                 </div>
                 <div>
-                  <h1 className="text-3xl font-bold text-black dark:bg-gradient-to-r dark:from-orange-600 dark:to-red-600 dark:bg-clip-text dark:text-transparent">
+                  <h1 className="text-3xl font-bold text-black">
                     Items Management
                   </h1>
-                  <p className="text-black dark:text-orange-900 mt-1">
+                  <p className="text-black mt-1">
                     Manage your inventory items and stock levels
                   </p>
                 </div>
@@ -288,7 +288,7 @@ export default function ItemsPage() {
                     <h3 className="text-xl font-bold bg-gradient-to-r from-orange-600 to-orange-700 bg-clip-text text-transparent">
                       Inventory Items
                     </h3>
-                    <p className="text-sm text-orange-600 dark:text-orange-400">
+                    <p className="text-sm text-orange-600">
                       {items.length} items in stock
                     </p>
                   </div>
@@ -320,21 +320,21 @@ export default function ItemsPage() {
                               />
                             </div>
                           ) : (
-                            <div className="w-14 h-14 bg-gradient-to-br from-gray-100 to-gray-200 dark:from-gray-700 dark:to-gray-600 rounded-xl flex items-center justify-center text-xl shadow-lg">
+                            <div className="w-14 h-14 bg-gradient-to-br from-gray-100 to-gray-200 rounded-xl flex items-center justify-center text-xl shadow-lg">
                               {item.emoji || '📦'}
                             </div>
                           )}
                           <div>
                             <div className="font-semibold text-foreground">{item.name}</div>
                             {item.description && (
-                              <div className="text-sm text-gray-500 dark:text-gray-400 mt-1">{item.description}</div>
+                              <div className="text-sm text-gray-500 mt-1">{item.description}</div>
                             )}
                           </div>
                         </div>
                       </TableCell>
                       <TableCell>{item.category.name}</TableCell>
                       <TableCell>
-                        <div className="font-semibold text-emerald-600 dark:text-emerald-400">
+                        <div className="font-semibold text-emerald-600">
                           ${item.price.toFixed(2)}
                         </div>
                       </TableCell>
@@ -480,7 +480,7 @@ export default function ItemsPage() {
                 variant="glass"
               />
               
-              <div className="flex flex-col sm:flex-row gap-3 pt-6 border-t border-gray-200 dark:border-gray-700">
+              <div className="flex flex-col sm:flex-row gap-3 pt-6 border-t border-gray-200">
                 <Button 
                   type="submit" 
                   variant="primary" 
@@ -499,7 +499,7 @@ export default function ItemsPage() {
                     resetForm()
                   }}
                   icon="❌"
-                  className="flex-1 hover:bg-gray-50 dark:hover:bg-gray-800 transition-all duration-200"
+                  className="flex-1 hover:bg-gray-50 transition-all duration-200"
                 >
                   Cancel
                 </Button>

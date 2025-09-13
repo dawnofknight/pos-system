@@ -1,6 +1,6 @@
 /** @type {import('tailwindcss').Config} */
 module.exports = {
-  darkMode: 'class',
+  darkMode: 'class', // Disable dark mode by setting to 'class' but not using it
   content: [
     './src/pages/**/*.{js,ts,jsx,tsx,mdx}',
     './src/components/**/*.{js,ts,jsx,tsx,mdx}',
@@ -72,8 +72,6 @@ module.exports = {
           800: '#991b1b',
           900: '#7f1d1d',
         },
-        background: 'var(--background)',
-        foreground: 'var(--foreground)',
       },
       fontFamily: {
         sans: ['Inter', 'system-ui', 'sans-serif'],

@@ -4,7 +4,7 @@ import { useState, useEffect } from 'react'
 import AuthGuard from '@/components/AuthGuard'
 import DashboardLayout from '@/components/DashboardLayout'
 import { useAuth } from '@/contexts/AuthContext'
-import { useTheme } from '@/contexts/ThemeContext'
+
 import { useRBAC, withPermission } from '@/contexts/RBACContext'
 import { 
   Card, 
@@ -25,8 +25,8 @@ import {
 
 export default function SettingsPage() {
   const { user } = useAuth()
-  const { theme } = useTheme()
-  const isDark = theme === 'dark'
+
+
   const { hasPermission } = useRBAC()
   const [loading, setLoading] = useState(true)
   const [saving, setSaving] = useState(false)
@@ -348,7 +348,7 @@ export default function SettingsPage() {
       <DashboardLayout>
         <div className="space-y-6">
           <div>
-            <h1 className="text-2xl font-bold transition-colors text-foreground">
+            <h1 className="text-2xl font-bold transition-colors text-gray-900 dark:text-white">
               Settings
             </h1>
             <p className="transition-colors text-gray-600 dark:text-gray-400">
@@ -380,7 +380,7 @@ export default function SettingsPage() {
           {activeTab === 'general' && (
             <Card>
               <CardHeader>
-                <h2 className="text-lg font-semibold transition-colors text-foreground">
+                <h2 className="text-lg font-semibold transition-colors text-gray-900 dark:text-white">
                   General Settings
                 </h2>
                 <p className="text-sm transition-colors text-gray-600 dark:text-gray-400">
@@ -391,7 +391,7 @@ export default function SettingsPage() {
                 <div className="space-y-6">
                   {/* Currency Settings */}
                   <div>
-                    <h3 className="text-md font-medium mb-4 transition-colors text-foreground">
+                    <h3 className="text-md font-medium mb-4 transition-colors text-gray-900 dark:text-white">
                       Currency
                     </h3>
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -414,10 +414,10 @@ export default function SettingsPage() {
                   <div className="border-t pt-6">
                     <div className="flex items-center justify-between mb-4">
                       <div>
-                        <h3 className="text-md font-medium transition-colors text-foreground">
+                        <h3 className="text-md font-medium transition-colors text-gray-900">
                           Tax Configuration
                         </h3>
-                        <p className="text-sm transition-colors text-gray-600 dark:text-gray-400">
+                        <p className="text-sm transition-colors text-gray-600">
                           Enable and configure tax calculations
                         </p>
                       </div>
@@ -428,7 +428,7 @@ export default function SettingsPage() {
                           onChange={(e) => setSettings(s => ({ ...s, taxEnabled: e.target.checked }))}
                           className="sr-only peer"
                         />
-                        <div className="w-11 h-6 bg-gray-200 dark:bg-gray-600 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-orange-300 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-orange-100"></div>
+                        <div className="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-orange-300 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-orange-100"></div>
                       </label>
                     </div>
                     
@@ -473,10 +473,10 @@ export default function SettingsPage() {
           {activeTab === 'payments' && (
             <Card>
               <CardHeader>
-                <h2 className="text-lg font-semibold transition-colors text-foreground">
+                <h2 className="text-lg font-semibold transition-colors text-gray-900">
                   Payment Methods
                 </h2>
-                <p className="text-sm transition-colors text-gray-600 dark:text-gray-400">
+                <p className="text-sm transition-colors text-gray-600">
                   Configure available payment options
                 </p>
               </CardHeader>
@@ -485,10 +485,10 @@ export default function SettingsPage() {
                   {paymentMethods.map((method) => (
                     <div 
                       key={method.id} 
-                      className="flex items-center justify-between p-4 rounded-lg transition-colors  dark:border-gray-600"
+                      className="flex items-center justify-between p-4 rounded-lg transition-colors"
                     >
                       <div className="flex items-center gap-3">
-                        <span className="text-2xl text-gray-700 dark:text-gray-300">
+                        <span className="text-2xl text-gray-700">
                           {method.name === 'Cash' ? '💵' : 
                            method.name === 'Transfer' ? '🏦' : 
                            method.name === 'Debit' ? '💳' : '💰'}
@@ -513,7 +513,7 @@ export default function SettingsPage() {
                             onChange={(e) => togglePaymentMethod(method.id, e.target.checked)}
                             className="sr-only peer"
                           />
-                          <div className="w-11 h-6 bg-gray-200 dark:bg-gray-600 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-orange-300 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-orange-100"></div>
+                          <div className="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-orange-300 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-orange-100"></div>
                         </label>
                       </div>
                     </div>
@@ -527,10 +527,10 @@ export default function SettingsPage() {
           {activeTab === 'roles' && user?.role === 'ADMIN' && (
             <Card>
               <CardHeader>
-                <h2 className="text-lg font-semibold transition-colors text-foreground">
+                <h2 className="text-lg font-semibold transition-colors text-gray-900">
                   Role Management
                 </h2>
-                <p className="text-sm transition-colors text-gray-600 dark:text-gray-400">
+                <p className="text-sm transition-colors text-gray-600">
                   Configure permissions for different user roles
                 </p>
               </CardHeader>
@@ -542,7 +542,7 @@ export default function SettingsPage() {
                         <Badge variant={role === 'ADMIN' ? 'primary' : 'secondary'}>
                           {role}
                         </Badge>
-                        <span className="text-lg font-medium transition-colors text-foreground">
+                        <span className="text-lg font-medium transition-colors text-gray-900">
                           {role} Permissions
                         </span>
                       </div>
@@ -565,10 +565,10 @@ export default function SettingsPage() {
                                 <TableRow key={resource.id}>
                                   <TableCell>
                                     <div>
-                                      <div className="font-medium transition-colors text-foreground">
+                                      <div className="font-medium transition-colors text-gray-900">
                                         {resource.name}
                                       </div>
-                                      <div className="text-sm transition-colors text-gray-600 dark:text-gray-400">
+                                      <div className="text-sm transition-colors text-gray-600">
                                         {resource.description}
                                       </div>
                                     </div>
@@ -604,7 +604,7 @@ export default function SettingsPage() {
                 <div className="flex justify-between items-center">
                   <div>
                     <h2 className="text-lg font-semibold">User Management</h2>
-                    <p className="text-sm text-gray-600 dark:text-gray-400">Create, edit, and manage user accounts</p>
+                    <p className="text-sm text-gray-600">Create, edit, and manage user accounts</p>
                   </div>
                   <Button
                     onClick={() => setShowUserForm(true)}
@@ -618,14 +618,14 @@ export default function SettingsPage() {
                 {/* User Form Modal */}
                 {showUserForm && (
                   <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-                    <div className="bg-white dark:bg-gray-800 rounded-lg p-6 w-full max-w-md transition-colors">
-                      <h3 className="text-lg font-semibold mb-4 transition-colors text-foreground">
+                    <div className="bg-white rounded-lg p-6 w-full max-w-md transition-colors">
+                      <h3 className="text-lg font-semibold mb-4 transition-colors text-gray-900">
                         {editingUser ? 'Edit User' : 'Create New User'}
                       </h3>
                       <form onSubmit={editingUser ? handleUpdateUser : handleCreateUser}>
                         <div className="space-y-4">
                           <div>
-                            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+                            <label className="block text-sm font-medium text-gray-700 mb-1">
                               Full Name
                             </label>
                             <Input
@@ -708,7 +708,7 @@ export default function SettingsPage() {
                 {/* Users List */}
                 <div className="space-y-4">
                   {users.length === 0 ? (
-                    <div className="text-center py-8 text-gray-500 dark:text-gray-400">
+                    <div className="text-center py-8 text-gray-500">
                       <div className="text-4xl mb-2">👥</div>
                       <p>No users found</p>
                       <p className="text-sm">Click "Add New User" to create the first user</p>
@@ -729,8 +729,8 @@ export default function SettingsPage() {
                             <TableRow key={u.id}>
                               <TableCell>
                                 <div>
-                                  <div className="font-medium text-gray-900 dark:text-gray-100">{u.name}</div>
-                                  <div className="text-sm text-gray-600 dark:text-gray-400">{u.email}</div>
+                                  <div className="font-medium text-gray-900">{u.name}</div>
+                                  <div className="text-sm text-gray-600">{u.email}</div>
                                 </div>
                               </TableCell>
                               <TableCell>
@@ -738,7 +738,7 @@ export default function SettingsPage() {
                                   {u.role}
                                 </Badge>
                               </TableCell>
-                              <TableCell className="text-sm text-gray-600 dark:text-gray-400">
+                              <TableCell className="text-sm text-gray-600">
                                 {new Date(u.createdAt).toLocaleDateString()}
                               </TableCell>
                               <TableCell>
@@ -763,7 +763,6 @@ export default function SettingsPage() {
                                       size="sm"
                                       variant="outline"
                                       onClick={() => handleDeleteUser(u.id)}
-                                      className="text-red-600 hover:text-red-700"
                                     >
                                       Delete
                                     </Button>

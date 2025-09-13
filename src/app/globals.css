@@ -373,6 +373,23 @@ input:focus, select:focus, textarea:focus {
   background: rgb(31, 41, 55) !important;
 }
 
+/* Default table styling for non-glass tables */
+table thead {
+  background: rgb(255, 237, 213) !important; /* Orange header */
+}
+
+table tbody {
+  background: rgb(255, 255, 255) !important; /* White background */
+}
+
+.dark table thead {
+  background: rgb(124, 45, 18) !important; /* Dark orange header */
+}
+
+.dark table tbody {
+  background: rgb(31, 41, 55) !important; /* Dark background */
+}
+
 /* Ensure proper text contrast in tables */
 .glass-effect table thead th {
   color: rgb(75, 85, 99) !important;
@@ -388,6 +405,23 @@ input:focus, select:focus, textarea:focus {
 
 .dark .glass-effect table tbody td {
   color: rgb(243, 244, 246) !important;
+}
+
+/* Default table text colors */
+table thead th {
+  color: rgb(0, 0, 0) !important; /* Black text for headers in light mode */
+}
+
+table tbody td {
+  color: rgb(0, 0, 0) !important; /* Black text for body cells in light mode */
+}
+
+.dark table thead th {
+  color: rgb(243, 244, 246) !important; /* Light text for headers in dark mode */
+}
+
+.dark table tbody td {
+  color: rgb(243, 244, 246) !important; /* Light text for body cells in dark mode */
 }
 
 /* Orange hover effect for table rows */
@@ -406,6 +440,23 @@ input:focus, select:focus, textarea:focus {
 
 .dark .glass-effect table thead tr:hover {
   background: rgb(124, 45, 18) !important;
+}
+
+/* Default table row hover effects */
+table tbody tr:hover {
+  background: rgb(255, 237, 213) !important; /* Soft orange hover */
+}
+
+.dark table tbody tr:hover {
+  background: rgb(124, 45, 18) !important; /* Dark orange hover */
+}
+
+table thead tr:hover {
+  background: rgb(254, 215, 170) !important; /* Slightly lighter orange for headers */
+}
+
+.dark table thead tr:hover {
+  background: rgb(154, 52, 18) !important; /* Slightly lighter dark orange for headers */
 }
 
 /* Orange accent for card headers */
