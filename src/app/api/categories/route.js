@@ -1,6 +1,7 @@
 import { NextResponse } from 'next/server'
 import { verifyToken } from '@/lib/auth'
 import { prisma } from '@/lib/prisma'
+import { getCacheOrSet, invalidateCache, CACHE_PREFIXES, DEFAULT_TTL } from '@/lib/cache'
 
 export async function GET(request) {
   try {
@@ -14,14 +15,24 @@ export async function GET(request) {
       return NextResponse.json({ error: 'Invalid token' }, { status: 401 })
     }
 
-    const categories = await prisma.category.findMany({
-      include: {
-        _count: {
-          select: { items: true }
-        }
+    // Cache key for categories list
+    const cacheKey = `${CACHE_PREFIXES.CATEGORIES}list`
+    
+    // Use cache or fetch fresh data
+    const categories = await getCacheOrSet(
+      cacheKey,
+      async () => {
+        return await prisma.category.findMany({
+          include: {
+            _count: {
+              select: { items: true }
+            }
+          },
+          orderBy: { name: 'asc' }
+        })
       },
-      orderBy: { name: 'asc' }
-    })
+      DEFAULT_TTL.LONG // Cache for 30 minutes
+    )
 
     return NextResponse.json({ categories })
   } catch (error) {
@@ -54,6 +65,10 @@ export async function POST(request) {
         description: description || ''
       }
     })
+
+    // Invalidate related caches
+    await invalidateCache.categories()
+    await invalidateCache.dashboard()
 
     return NextResponse.json({ category }, { status: 201 })
   } catch (error) {

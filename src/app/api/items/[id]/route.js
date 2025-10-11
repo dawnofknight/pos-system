@@ -2,6 +2,7 @@ import { NextResponse } from 'next/server'
 import { verifyToken } from '@/lib/auth'
 import { prisma } from '@/lib/prisma'
 import { deleteImage } from '@/lib/imageUtils'
+import { invalidateCache } from '@/lib/cache'
 
 export async function GET(request, { params }) {
   try {
@@ -71,6 +72,11 @@ export async function PUT(request, { params }) {
       }
     })
 
+    // Invalidate related caches after item update
+    await invalidateCache.items()
+    await invalidateCache.categories()
+    await invalidateCache.dashboard()
+
     return NextResponse.json({ item })
   } catch (error) {
     console.error('Error updating item:', error)
@@ -105,6 +111,11 @@ export async function DELETE(request, { params }) {
     await prisma.item.delete({
       where: { id: parseInt(awaitedParams.id) }
     })
+
+    // Invalidate related caches after item deletion
+    await invalidateCache.items()
+    await invalidateCache.categories()
+    await invalidateCache.dashboard()
 
     return NextResponse.json({ message: 'Item deleted successfully' })
   } catch (error) {

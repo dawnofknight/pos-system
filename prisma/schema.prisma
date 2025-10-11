@@ -90,6 +90,8 @@ model Settings {
   taxRate          Float    @default(0.0)
   taxName          String   @default("Tax")
   tableCount       Int      @default(6)
+  appName          String   @default("POS System Restaurant Management")
+  logoPath         String?  // Path to uploaded logo file
   createdAt        DateTime @default(now())
   updatedAt        DateTime @updatedAt
 

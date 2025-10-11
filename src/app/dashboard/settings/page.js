@@ -39,8 +39,15 @@ export default function SettingsPage() {
     taxEnabled: false,
     taxRate: 0,
     taxName: 'Tax',
-    tableCount: 6
+    tableCount: 6,
+    appName: 'POS System Restaurant Management',
+    logoPath: null
   })
+  
+  // Logo upload state
+  const [logoFile, setLogoFile] = useState(null)
+  const [logoPreview, setLogoPreview] = useState(null)
+  const [uploadingLogo, setUploadingLogo] = useState(false)
   
   // Table Form
   const [tableForm, setTableForm] = useState({
@@ -296,6 +303,68 @@ export default function SettingsPage() {
       setSaving(false)
     }
   }
+
+  // Logo upload handlers
+  const handleLogoChange = (e) => {
+    const file = e.target.files[0]
+    if (file) {
+      setLogoFile(file)
+      const reader = new FileReader()
+      reader.onload = (e) => setLogoPreview(e.target.result)
+      reader.readAsDataURL(file)
+    }
+  }
+
+  const uploadLogo = async () => {
+    if (!logoFile) return
+
+    setUploadingLogo(true)
+    try {
+      const formData = new FormData()
+      formData.append('logo', logoFile)
+
+      const response = await fetch('/api/settings/logo', {
+        method: 'POST',
+        body: formData
+      })
+
+      if (response.ok) {
+        const data = await response.json()
+        setSettings(s => ({ ...s, logoPath: data.logoPath }))
+        setLogoFile(null)
+        setLogoPreview(null)
+        alert('Logo uploaded successfully!')
+      } else {
+        const error = await response.json()
+        alert(error.error || 'Failed to upload logo')
+      }
+    } catch (error) {
+      console.error('Error uploading logo:', error)
+      alert('Error uploading logo')
+    } finally {
+      setUploadingLogo(false)
+    }
+  }
+
+  const deleteLogo = async () => {
+    if (!settings.logoPath) return
+
+    try {
+      const response = await fetch('/api/settings/logo', {
+        method: 'DELETE'
+      })
+
+      if (response.ok) {
+        setSettings(s => ({ ...s, logoPath: null }))
+        alert('Logo deleted successfully!')
+      } else {
+        alert('Failed to delete logo')
+      }
+    } catch (error) {
+      console.error('Error deleting logo:', error)
+      alert('Error deleting logo')
+    }
+  }
   
   // Table Management
   const [tables, setTables] = useState([])
@@ -501,6 +570,81 @@ export default function SettingsPage() {
                         onChange={(e) => setSettings(s => ({ ...s, currencySymbol: e.target.value }))}
                         placeholder="$"
                       />
+                    </div>
+                  </div>
+
+                  {/* Branding Settings */}
+                  <div className="border-t pt-6">
+                    <div className="mb-4">
+                      <h3 className="text-md font-medium transition-colors text-gray-900">
+                        Branding Configuration
+                      </h3>
+                      <p className="text-sm transition-colors text-gray-600">
+                        Customize your application name and logo
+                      </p>
+                    </div>
+                    
+                    <div className="grid grid-cols-1 gap-4">
+                      <Input
+                        label="Application Name"
+                        value={settings.appName}
+                        onChange={(e) => setSettings(s => ({ ...s, appName: e.target.value }))}
+                        placeholder="POS System Restaurant Management"
+                      />
+                      
+                      <div>
+                        <label className="block text-sm font-medium text-gray-700 mb-2">
+                          Logo
+                        </label>
+                        
+                        {/* Current Logo Display */}
+                        {settings.logoPath && (
+                          <div className="mb-4">
+                            <img 
+                              src={settings.logoPath} 
+                              alt="Current Logo" 
+                              className="h-16 w-auto object-contain border rounded"
+                            />
+                            <Button
+                              onClick={deleteLogo}
+                              className="mt-2 text-sm bg-red-600 hover:bg-red-700 text-white"
+                            >
+                              Delete Logo
+                            </Button>
+                          </div>
+                        )}
+                        
+                        {/* Logo Upload */}
+                        <div className="flex items-center gap-4">
+                          <input
+                            type="file"
+                            accept="image/*"
+                            onChange={handleLogoChange}
+                            className="block w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-orange-50 file:text-orange-700 hover:file:bg-orange-100"
+                          />
+                          {logoFile && (
+                            <Button
+                              onClick={uploadLogo}
+                              disabled={uploadingLogo}
+                              className="bg-orange-600 hover:bg-orange-700 text-white"
+                            >
+                              {uploadingLogo ? 'Uploading...' : 'Upload'}
+                            </Button>
+                          )}
+                        </div>
+                        
+                        {/* Logo Preview */}
+                        {logoPreview && (
+                          <div className="mt-4">
+                            <p className="text-sm text-gray-600 mb-2">Preview:</p>
+                            <img 
+                              src={logoPreview} 
+                              alt="Logo Preview" 
+                              className="h-16 w-auto object-contain border rounded"
+                            />
+                          </div>
+                        )}
+                      </div>
                     </div>
                   </div>
 

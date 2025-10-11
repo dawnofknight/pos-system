@@ -1,6 +1,7 @@
 import { NextResponse } from 'next/server'
 import { verifyToken } from '@/lib/auth'
 import { prisma } from '@/lib/prisma'
+import { getCacheOrSet, invalidateCache, CACHE_PREFIXES, DEFAULT_TTL } from '@/lib/cache'
 
 export async function GET(request) {
   try {
@@ -14,19 +15,29 @@ export async function GET(request) {
       return NextResponse.json({ error: 'Invalid token' }, { status: 401 })
     }
 
-    const sales = await prisma.sale.findMany({
-      include: {
-        items: {
+    // Cache key for sales list
+    const cacheKey = `${CACHE_PREFIXES.SALES}list`
+    
+    // Use cache or fetch fresh data
+    const sales = await getCacheOrSet(
+      cacheKey,
+      async () => {
+        return await prisma.sale.findMany({
           include: {
-            item: true
-          }
-        },
-        user: {
-          select: { name: true }
-        }
+            items: {
+              include: {
+                item: true
+              }
+            },
+            user: {
+              select: { name: true }
+            }
+          },
+          orderBy: { createdAt: 'desc' }
+        })
       },
-      orderBy: { createdAt: 'desc' }
-    })
+      DEFAULT_TTL.SHORT // Cache for 5 minutes (sales data changes frequently)
+    )
 
     return NextResponse.json({ sales })
   } catch (error) {
@@ -98,6 +109,11 @@ export async function POST(request) {
         }
       }
     })
+
+    // Invalidate related caches after sale creation
+    await invalidateCache.sales()
+    await invalidateCache.dashboard()
+    await invalidateCache.items() // Items stock changed
 
     return NextResponse.json({ sale: completeSale }, { status: 201 })
   } catch (error) {

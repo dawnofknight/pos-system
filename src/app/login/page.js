@@ -1,6 +1,6 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { useAuth } from '@/contexts/AuthContext'
 import { Button, Input, Card, CardBody } from '@/components/ui'
 import Link from 'next/link'
@@ -12,7 +12,31 @@ export default function Login() {
   })
   const [error, setError] = useState('')
   const [loading, setLoading] = useState(false)
+  const [settings, setSettings] = useState({
+    appName: "POS System",
+    logoPath: "/burger-logo.svg"
+  })
   const { login } = useAuth()
+
+  // Fetch branding for dynamic logo and app name
+  useEffect(() => {
+    const fetchBranding = async () => {
+      try {
+        const response = await fetch('/api/branding');
+        if (response.ok) {
+          const data = await response.json();
+          setSettings({
+            appName: data.appName || "POS System",
+            logoPath: data.logoPath || "/burger-logo.svg"
+          });
+        }
+      } catch (error) {
+        console.error('Error fetching branding:', error);
+      }
+    };
+
+    fetchBranding();
+  }, []);
 
   const handleChange = (e) => {
     setFormData({
@@ -39,7 +63,7 @@ export default function Login() {
     <div className="min-h-screen flex items-center justify-center bg-gray-50">
       <div className="max-w-md w-full space-y-8 p-8">
         <div className="flex flex-col items-center">
-          <img src="/burger-logo.svg" alt="FastPOS Logo" className="h-24 w-24 mb-4" />
+          <img src={settings.logoPath} alt="Logo" className="h-24 w-24 mb-4" />
           <h2 className="mt-2 text-center text-3xl font-bold text-gray-900">
             Sign in to your account
           </h2>

@@ -20,12 +20,13 @@ export async function GET(request) {
     if (!settings) {
       settings = await prisma.settings.create({
         data: {
-          currency: 'USD',
-          currencySymbol: '$',
+          currency: 'IDR',
+          currencySymbol: 'Rp',
           taxEnabled: false,
           taxRate: 0.0,
           taxName: 'Tax',
-          tableCount: 6
+          tableCount: 6,
+          appName: 'POS System Restaurant Management'
         }
       })
     }
@@ -61,7 +62,7 @@ export async function PUT(request) {
       return NextResponse.json({ error: 'Access denied. Admin required.' }, { status: 403 })
     }
 
-    const { currency, currencySymbol, taxEnabled, taxRate, taxName, tableCount } = await request.json()
+    const { currency, currencySymbol, taxEnabled, taxRate, taxName, tableCount, appName } = await request.json()
 
     // Get existing settings or create new
     let settings = await prisma.settings.findFirst()
@@ -75,7 +76,8 @@ export async function PUT(request) {
           taxEnabled: taxEnabled !== undefined ? taxEnabled : settings.taxEnabled,
           taxRate: taxRate !== undefined ? taxRate : settings.taxRate,
           taxName: taxName || settings.taxName,
-          tableCount: tableCount !== undefined ? tableCount : settings.tableCount
+          tableCount: tableCount !== undefined ? tableCount : settings.tableCount,
+          appName: appName || settings.appName
         }
       })
     } else {
@@ -86,7 +88,8 @@ export async function PUT(request) {
           taxEnabled: taxEnabled || false,
           taxRate: taxRate || 0.0,
           taxName: taxName || 'Tax',
-          tableCount: tableCount || 6
+          tableCount: tableCount || 6,
+          appName: appName || 'POS System Restaurant Management'
         }
       })
     }
