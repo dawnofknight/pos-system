@@ -27,6 +27,10 @@ export default function ItemsPage() {
   const [loading, setLoading] = useState(true)
   const [showModal, setShowModal] = useState(false)
   const [editingItem, setEditingItem] = useState(null)
+  const [settings, setSettings] = useState({
+    currency: 'IDR',
+    currencySymbol: 'Rp'
+  })
   const [formData, setFormData] = useState({
     name: '',
     description: '',
@@ -43,7 +47,23 @@ export default function ItemsPage() {
   useEffect(() => {
     fetchItems()
     fetchCategories()
+    fetchSettings()
   }, [])
+
+  const fetchSettings = async () => {
+    try {
+      const response = await fetch('/api/branding')
+      if (response.ok) {
+        const data = await response.json()
+        setSettings(prev => ({
+          ...prev,
+          ...data
+        }))
+      }
+    } catch (error) {
+      console.error('Error fetching settings:', error)
+    }
+  }
 
   const fetchItems = async () => {
     try {
@@ -335,7 +355,7 @@ export default function ItemsPage() {
                       <TableCell>{item.category.name}</TableCell>
                       <TableCell>
                         <div className="font-semibold text-emerald-600">
-                          ${item.price.toFixed(2)}
+                          {settings.currencySymbol}{item.price.toFixed(2)}
                         </div>
                       </TableCell>
                       <TableCell>
@@ -436,7 +456,7 @@ export default function ItemsPage() {
               
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <Input
-                  label="Price (Rp)"
+                  label={`Price (${settings.currencySymbol})`}
                   name="price"
                   type="number"
                   step="0.01"
