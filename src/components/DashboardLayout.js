@@ -8,6 +8,7 @@ import { useTheme } from "@/contexts/ThemeContext";
 
 export default function DashboardLayout({ children }) {
   const [sidebarOpen, setSidebarOpen] = useState(false);
+  const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
   const [settings, setSettings] = useState({
     appName: "POS System",
     logoPath: "/burger-logo.svg"
@@ -169,24 +170,47 @@ export default function DashboardLayout({ children }) {
       </div>
 
       {/* Desktop sidebar */}
-      <div className='hidden lg:fixed lg:inset-y-0 lg:flex lg:w-72 lg:flex-col'>
+      <div className={`hidden lg:fixed lg:inset-y-0 lg:flex lg:flex-col ${sidebarCollapsed ? 'lg:w-20' : 'lg:w-72'} transition-all duration-300`}>
         <div className='flex min-h-0 flex-1 flex-col modern-card border-0 rounded-none border-r border-gray-200'>
           <div className='flex-1 flex flex-col overflow-y-auto'>
             {/* Desktop Header */}
-            <div className='flex-shrink-0 px-6 py-8 border-b border-gray-200'>
-              <div className='flex items-center space-x-4'>
+            <div className='flex-shrink-0 px-6 py-8 border-b border-gray-200 flex justify-between items-center'>
+              {!sidebarCollapsed && (
+                <div className='flex items-center space-x-4'>
+                  <img
+                    src={settings.logoPath}
+                    alt='Logo'
+                    className='w-12 h-12'
+                  />
+                  <div>
+                    <h1 className='text-2xl font-bold text-gradient'>
+                      {settings.appName}
+                    </h1>
+                    <p className='text-sm text-gray-500'>Restaurant Management</p>
+                  </div>
+                </div>
+              )}
+              {sidebarCollapsed && (
                 <img
                   src={settings.logoPath}
                   alt='Logo'
-                  className='w-12 h-12'
+                  className='w-10 h-10 mx-auto'
                 />
-                <div>
-                  <h1 className='text-2xl font-bold text-gradient'>
-                    {settings.appName}
-                  </h1>
-                  <p className='text-sm text-gray-500'>Restaurant Management</p>
-                </div>
-              </div>
+              )}
+              <button 
+                onClick={() => setSidebarCollapsed(!sidebarCollapsed)}
+                className="text-gray-500 hover:text-gray-700 p-1 rounded-full hover:bg-gray-100"
+              >
+                {sidebarCollapsed ? (
+                  <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 5l7 7-7 7M5 5l7 7-7 7" />
+                  </svg>
+                ) : (
+                  <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11 19l-7-7 7-7m8 14l-7-7 7-7" />
+                  </svg>
+                )}
+              </button>
             </div>
 
             {/* Desktop Navigation */}
@@ -203,18 +227,20 @@ export default function DashboardLayout({ children }) {
                         : "text-gray-900 hover:bg-gray-100"
                     }`}
                   >
-                    <span className='mr-4 text-xl'>{item.icon}</span>
-                    <div className='flex-1'>
-                      <div className='font-semibold'>{item.name}</div>
-                      <div
-                        className={`text-xs mt-0.5 ${
-                          isActive ? "font-semibold" : "text-gray-500"
-                        }`}
-                      >
-                        {item.description}
+                    <span className={`text-xl ${sidebarCollapsed ? 'mx-auto' : 'mr-4'}`}>{item.icon}</span>
+                    {!sidebarCollapsed && (
+                      <div className='flex-1'>
+                        <div className='font-semibold'>{item.name}</div>
+                        <div
+                          className={`text-xs mt-0.5 ${
+                            isActive ? "font-semibold" : "text-gray-500"
+                          }`}
+                        >
+                          {item.description}
+                        </div>
                       </div>
-                    </div>
-                    {isActive && (
+                    )}
+                    {!sidebarCollapsed && isActive && (
                       <div className='w-2 h-2 bg-orange-600 rounded-full opacity-80'></div>
                     )}
                   </a>
@@ -228,7 +254,7 @@ export default function DashboardLayout({ children }) {
         </div>
       </div>
 
-      <div className='lg:pl-72'>
+      <div className={`${sidebarCollapsed ? 'lg:pl-20' : 'lg:pl-72'} transition-all duration-300`}>
         {/* Top navigation */}
         <div className='sticky top-0 z-40 flex h-20 modern-card border-0 rounded-none border-b border-gray-200 backdrop-blur-xl bg-white/80'>
           <button

@@ -25,6 +25,10 @@ export default function SalesPage() {
   const [loading, setLoading] = useState(true)
   const [searchTerm, setSearchTerm] = useState('')
   const [dateFilter, setDateFilter] = useState('')
+  const [settings, setSettings] = useState({
+    currency: 'IDR',
+    currencySymbol: 'Rp'
+  })
   const [stats, setStats] = useState({
     totalSales: 0,
     totalRevenue: 0,
@@ -34,11 +38,27 @@ export default function SalesPage() {
 
   useEffect(() => {
     fetchSales()
+    fetchSettings()
   }, [])
 
   useEffect(() => {
     filterSales()
   }, [sales, searchTerm, dateFilter])
+
+  const fetchSettings = async () => {
+    try {
+      const response = await fetch('/api/branding')
+      if (response.ok) {
+        const data = await response.json()
+        setSettings(prev => ({
+          ...prev,
+          ...data
+        }))
+      }
+    } catch (error) {
+      console.error('Error fetching settings:', error)
+    }
+  }
 
   const fetchSales = async () => {
     try {
@@ -136,7 +156,7 @@ export default function SalesPage() {
             <Card className="card-hover">
               <CardBody className="text-center">
                 <div className="text-2xl font-bold text-green-600 mb-1">
-                  ${stats.totalRevenue.toFixed(2)}
+                  {settings.currencySymbol}{stats.totalRevenue.toFixed(2)}
                 </div>
                 <div className="text-sm text-gray-600">Total Revenue</div>
               </CardBody>
@@ -152,7 +172,7 @@ export default function SalesPage() {
             <Card className="card-hover">
               <CardBody className="text-center">
                 <div className="text-2xl font-bold text-orange-600 mb-1">
-                  ${stats.todayRevenue.toFixed(2)}
+                  {settings.currencySymbol}{stats.todayRevenue.toFixed(2)}
                 </div>
                 <div className="text-sm text-gray-600">Today's Revenue</div>
               </CardBody>

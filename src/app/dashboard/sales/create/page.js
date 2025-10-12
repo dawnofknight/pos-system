@@ -46,6 +46,7 @@ export default function CreateSalePage() {
   const [currentStep, setCurrentStep] = useState('table') // 'table' or 'menu'
   const [orderNumber, setOrderNumber] = useState('')
   const [guestCount, setGuestCount] = useState(2)
+  const [paymentMethodOpen, setPaymentMethodOpen] = useState(true)
   
   // Generate order number
   useEffect(() => {
@@ -116,10 +117,13 @@ export default function CreateSalePage() {
 
   const fetchSettings = async () => {
     try {
-      const response = await fetch('/api/settings')
+      const response = await fetch('/api/branding')
       if (response.ok) {
         const data = await response.json()
-        setSettings(data)
+        setSettings(prev => ({
+          ...prev,
+          ...data
+        }))
       }
     } catch (error) {
       console.error('Error fetching settings:', error)
@@ -533,9 +537,9 @@ export default function CreateSalePage() {
             </div>
           ) : (
             // Menu Selection Step
-            <div className="flex h-[calc(100vh-120px)]">
+            <div className="flex flex-col md:flex-row h-auto min-h-[calc(100vh-120px)]">
               {/* Left Side - Menu */}
-              <div className="flex-1 p-6">
+              <div className="flex-1 p-4 md:p-6">
                 <div className="bg-white rounded-2xl shadow-sm border border-gray-200 h-full flex flex-col">
                   {/* Menu Header */}
                   <div className="p-6 border-b border-gray-200">
@@ -562,8 +566,8 @@ export default function CreateSalePage() {
                       </div>
                     </div>
                     
-                    {/* Search and Filter */}
-                    <div className="flex gap-4">
+                    {/* Search */}
+                    <div className="flex gap-4 mb-4">
                       <div className="flex-1 relative">
                         <Input
                           placeholder="🔍 Search menu items..."
@@ -577,25 +581,40 @@ export default function CreateSalePage() {
                           </svg>
                         </div>
                       </div>
-                      
-                      <Select
-                        value={selectedCategory}
-                        onChange={(e) => setSelectedCategory(e.target.value)}
-                        className="min-w-[160px]"
+                    </div>
+                    
+                    {/* Category Tabs */}
+                    <div className="flex overflow-x-auto pb-2 mb-2 scrollbar-hide">
+                      <div 
+                        className={`flex-shrink-0 px-4 py-2 mr-2 rounded-full cursor-pointer text-sm font-medium transition-colors ${
+                          selectedCategory === 'all' 
+                            ? 'bg-orange-500 text-white' 
+                            : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+                        }`}
+                        onClick={() => setSelectedCategory('all')}
                       >
-                        <option value="all">All Categories</option>
-                        {categories.map(category => (
-                          <option key={category.id} value={category.id.toString()}>
-                            {category.name}
-                          </option>
-                        ))}
-                      </Select>
+                        All
+                      </div>
+                      
+                      {categories.map(category => (
+                        <div
+                          key={category.id}
+                          className={`flex-shrink-0 px-4 py-2 mr-2 rounded-full cursor-pointer text-sm font-medium transition-colors ${
+                            selectedCategory === category.id.toString() 
+                              ? 'bg-orange-500 text-white' 
+                              : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+                          }`}
+                          onClick={() => setSelectedCategory(category.id.toString())}
+                        >
+                          {category.name}
+                        </div>
+                      ))}
                     </div>
                   </div>
                   
                   {/* Menu Items Grid */}
-                  <div className="flex-1 p-6 overflow-y-auto">
-                    <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-4">
+                    <div className="flex-1 p-4 md:p-6 overflow-y-auto">
+                      <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3 md:gap-4">
                       {filteredItems.map((item) => (
                         <div
                           key={item.id}
@@ -616,8 +635,8 @@ export default function CreateSalePage() {
                           </div>
                           
                           {/* Product image */}
-                          <div className="aspect-square rounded-lg mb-3 bg-white flex items-center justify-center p-2">
-                            <ProductImage item={item} size="lg" className="w-full h-full object-cover rounded-md" />
+                          <div className="aspect-square rounded-lg mb-3 bg-white flex items-center justify-center p-2 max-h-32">
+                            <ProductImage item={item} size="lg" className="w-full h-full object-contain rounded-md" />
                           </div>
                           
                           {/* Product info */}
@@ -656,7 +675,7 @@ export default function CreateSalePage() {
               </div>
               
               {/* Right Side - Cart */}
-              <div className="w-96 p-6 pl-0">
+              <div className="w-full md:w-96 p-4 md:p-6 md:pl-0">
                 <div className="bg-white rounded-2xl shadow-sm border border-gray-200 h-full flex flex-col">
                   {/* Cart Header */}
                   <div className="p-6 border-b border-gray-200">
@@ -761,27 +780,44 @@ export default function CreateSalePage() {
                       
                       {/* Payment Method */}
                       <div className="mb-4">
-                        <label className="block text-sm font-medium text-gray-700 mb-2">
-                          Payment Method
-                        </label>
-                        <div className="grid grid-cols-2 gap-2">
-                          {paymentMethods
-                            .filter(pm => pm.enabled)
-                            .map(method => (
-                              <button
-                                key={method.id}
-                                type="button"
-                                onClick={() => setSelectedPaymentMethod(method.id)}
-                                className={`flex items-center justify-center p-3 rounded-lg border ${selectedPaymentMethod === method.id ? 'bg-orange-50 border-orange-500' : 'border-gray-300 hover:bg-gray-50'}`}
-                              >
-                                <div className="flex flex-col items-center">
-                                  <span className="text-xl mb-1">{method.name === 'Cash' ? '💵' : method.name === 'Credit Card' ? '💳' : method.name === 'Debit Card' ? '💳' : '📱'}</span>
-                                  <span className="font-medium">{method.name}</span>
-                                </div>
-                              </button>
-                            ))
-                          }
+                        <div className="flex items-center justify-between mb-2 cursor-pointer" 
+                             onClick={() => setPaymentMethodOpen(!paymentMethodOpen)}>
+                          <label className="block text-sm font-medium text-gray-700">
+                            Payment Method
+                          </label>
+                          <button className="text-gray-500 hover:text-gray-700">
+                            {paymentMethodOpen ? (
+                              <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 15l7-7 7 7" />
+                              </svg>
+                            ) : (
+                              <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+                              </svg>
+                            )}
+                          </button>
                         </div>
+                        
+                        {paymentMethodOpen && (
+                          <div className="grid grid-cols-2 gap-2">
+                            {paymentMethods
+                              .filter(pm => pm.enabled)
+                              .map(method => (
+                                <button
+                                  key={method.id}
+                                  type="button"
+                                  onClick={() => setSelectedPaymentMethod(method.id)}
+                                  className={`flex items-center justify-center p-3 rounded-lg border ${selectedPaymentMethod === method.id ? 'bg-orange-50 border-orange-500' : 'border-gray-300 hover:bg-gray-50'}`}
+                                >
+                                  <div className="flex flex-col items-center">
+                                    <span className="text-xl mb-1">{method.name === 'Cash' ? '💵' : method.name === 'Credit Card' ? '💳' : method.name === 'Debit Card' ? '💳' : '📱'}</span>
+                                    <span className="font-medium">{method.name}</span>
+                                  </div>
+                                </button>
+                              ))
+                            }
+                          </div>
+                        )}
                       </div>
                       
                       {/* Complete Order Button */}
