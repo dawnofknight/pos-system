@@ -3,6 +3,7 @@ import { verifyToken } from '@/lib/auth'
 import { prisma } from '@/lib/prisma'
 import { deleteImage } from '@/lib/imageUtils'
 import { invalidateCache } from '@/lib/cache'
+import { logActivity } from '@/lib/auditLogger'
 
 export async function GET(request, { params }) {
   try {
@@ -46,6 +47,16 @@ export async function PUT(request, { params }) {
     if (!decoded) {
       return NextResponse.json({ error: 'Invalid token' }, { status: 401 })
     }
+    
+    // Fetch complete user data for audit logging
+    const user = await prisma.user.findUnique({
+      where: { id: decoded.userId },
+      select: { id: true, name: true, email: true, role: true }
+    })
+    
+    if (!user) {
+      return NextResponse.json({ error: 'User not found' }, { status: 404 })
+    }
 
     const { name, description, price, stock, categoryId, emoji, image, imageType } = await request.json()
 
@@ -76,6 +87,23 @@ export async function PUT(request, { params }) {
     await invalidateCache.items()
     await invalidateCache.categories()
     await invalidateCache.dashboard()
+    
+    // Log the update activity
+    await logActivity({
+      action: 'update',
+      resource: 'item',
+      resourceId: awaitedParams.id,
+      user: {
+        id: user.id,
+        name: user.name,
+        email: user.email,
+        role: user.role
+      },
+      details: {
+        description: `Updated item: ${name}`,
+        changes: { name, price, stock, categoryId }
+      }
+    })
 
     return NextResponse.json({ item })
   } catch (error) {

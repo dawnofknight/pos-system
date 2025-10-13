@@ -5,10 +5,12 @@ import { usePathname, useRouter } from "next/navigation";
 import { useAuth } from "@/contexts/AuthContext";
 import { useRBAC } from "@/contexts/RBACContext";
 import { useTheme } from "@/contexts/ThemeContext";
+import AuditLogViewer from "@/components/AuditLogViewer";
 
 export default function DashboardLayout({ children }) {
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
+  const [showAuditLogs, setShowAuditLogs] = useState(false);
   const [settings, setSettings] = useState({
     appName: "POS System",
     logoPath: "/burger-logo.svg"
@@ -37,6 +39,15 @@ export default function DashboardLayout({ children }) {
     };
 
     fetchBranding();
+    
+    // Add event listener for closing audit logs
+    const handleCloseAuditLogs = () => setShowAuditLogs(false);
+    window.addEventListener('closeAuditLogs', handleCloseAuditLogs);
+    
+    // Clean up event listener
+    return () => {
+      window.removeEventListener('closeAuditLogs', handleCloseAuditLogs);
+    };
   }, []);
 
   const allNavigation = [
@@ -270,6 +281,13 @@ export default function DashboardLayout({ children }) {
             {/* Search and breadcrumb area */}
             <div className='flex flex-1 items-center'>
               <div className='flex items-center space-x-4'>
+                <button 
+                  onClick={() => setShowAuditLogs(!showAuditLogs)}
+                  className="flex items-center space-x-1 text-sm bg-blue-50 hover:bg-blue-100 text-blue-700 px-3 py-1 rounded-full transition-all duration-200"
+                >
+                  <span>📋</span>
+                  <span>Audit Logs</span>
+                </button>
                 <div className='hidden md:flex items-center space-x-2 text-sm text-gray-500'>
                   <span>🏠</span>
                   <span>/</span>
@@ -311,7 +329,29 @@ export default function DashboardLayout({ children }) {
           </div>
         </div>
 
-        <main className='p-6 min-h-screen bg-gray-50'>{children}</main>
+        <main className='p-6 min-h-screen bg-gray-50'>
+          {showAuditLogs && (
+            <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50">
+              <div className="relative w-full max-w-6xl bg-white rounded-xl shadow-2xl overflow-hidden">
+                <div className="sticky top-0 z-10 flex items-center p-4 border-b border-gray-200 bg-white">
+                  <h2 className="text-xl font-bold text-gray-800 mr-4">Audit Logs</h2>
+                  <button 
+                    onClick={() => setShowAuditLogs(false)}
+                    className="bg-red-500 hover:bg-red-600 text-white px-3 py-1 rounded-lg flex items-center transition-all duration-200 shadow-md ml-2"
+                  >
+                    <span className="mr-1">Close</span>
+                    <span className="text-xl">✕</span>
+                  </button>
+                  <div className="flex-grow"></div>
+                </div>
+                <div className="max-h-[80vh] overflow-y-auto p-4">
+                  <AuditLogViewer />
+                </div>
+              </div>
+            </div>
+          )}
+          {children}
+        </main>
       </div>
     </div>
   );
