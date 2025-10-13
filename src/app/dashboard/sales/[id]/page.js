@@ -164,7 +164,7 @@ export default function SaleDetailsPage() {
                             </div>
                           </TableCell>
                           <TableCell>
-                            <span className="font-medium">${item.price.toFixed(2)}</span>
+                            <span className="font-medium">Rp{item.price.toFixed(2)}</span>
                           </TableCell>
                           <TableCell>
                             <span className="bg-primary-100 text-primary-800 px-2 py-1 rounded-full text-sm font-medium">
@@ -172,7 +172,7 @@ export default function SaleDetailsPage() {
                             </span>
                           </TableCell>
                           <TableCell>
-                            <span className="font-semibold">${(item.price * item.quantity).toFixed(2)}</span>
+                            <span className="font-semibold">Rp{(item.price * item.quantity).toFixed(2)}</span>
                           </TableCell>
                         </TableRow>
                       ))}
@@ -190,16 +190,16 @@ export default function SaleDetailsPage() {
                   <div className="space-y-3">
                     <div className="flex justify-between">
                       <span className="text-gray-600">Subtotal</span>
-                      <span className="font-medium">${subtotal.toFixed(2)}</span>
+                      <span className="font-medium">Rp{subtotal.toFixed(2)}</span>
                     </div>
                     <div className="flex justify-between">
                       <span className="text-gray-600">Tax (10%)</span>
-                      <span className="font-medium">${tax.toFixed(2)}</span>
+                      <span className="font-medium">Rp{tax.toFixed(2)}</span>
                     </div>
                     <div className="border-t pt-3">
                       <div className="flex justify-between items-center">
                         <span className="text-lg font-semibold">Total</span>
-                        <span className="text-2xl font-bold text-green-600">${sale.total.toFixed(2)}</span>
+                        <span className="text-2xl font-bold text-green-600">Rp{sale.total.toFixed(2)}</span>
                       </div>
                     </div>
                   </div>
@@ -296,7 +296,7 @@ export default function SaleDetailsPage() {
                       variant="outline" 
                       className="w-full"
                       onClick={() => {
-                        navigator.clipboard.writeText(`Sale #${sale.id} - $${sale.total.toFixed(2)}`)
+                        navigator.clipboard.writeText(`Sale #${sale.id} - Rp${sale.total.toFixed(2)}`)
                         alert('Sale details copied to clipboard!')
                       }}
                     >

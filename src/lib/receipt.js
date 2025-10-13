@@ -116,8 +116,8 @@ export const generateReceiptHTML = (sale) => {
               <div class="item">
                 <div class="item-name">${item.item.emoji || '📦'} ${item.item.name}</div>
                 <div class="item-qty">${item.quantity}x</div>
-                <div class="item-price">$${item.price.toFixed(2)}</div>
-                <div class="item-total">$${(item.price * item.quantity).toFixed(2)}</div>
+                <div class="item-price">Rp${item.price.toFixed(2)}</div>
+                <div class="item-total">Rp${(item.price * item.quantity).toFixed(2)}</div>
               </div>
             `).join('')}
           </div>
@@ -125,15 +125,15 @@ export const generateReceiptHTML = (sale) => {
           <div class="totals">
             <div class="total-line">
               <span>Subtotal:</span>
-              <span>$${subtotal.toFixed(2)}</span>
+              <span>Rp${subtotal.toFixed(2)}</span>
             </div>
             <div class="total-line">
               <span>Tax (10%):</span>
-              <span>$${tax.toFixed(2)}</span>
+              <span>Rp${tax.toFixed(2)}</span>
             </div>
             <div class="total-line final">
               <span>TOTAL:</span>
-              <span>$${sale.total.toFixed(2)}</span>
+              <span>Rp${sale.total.toFixed(2)}</span>
             </div>
           </div>
           
@@ -160,7 +160,7 @@ export const generateReceiptHTML = (sale) => {
 }
 
 export const generateSaleCSV = (sale) => {
-  const header = ['Sale ID', 'Date', 'Time', 'Item', 'Category', 'Quantity', 'Unit Price', 'Total Price', 'Cashier']
+  const header = ['Sale ID', 'Date', 'Time', 'Item', 'Category', 'Quantity', 'Unit Price (Rp)', 'Total Price (Rp)', 'Cashier']
   const rows = sale.items.map(item => [
     sale.id,
     new Date(sale.createdAt).toLocaleDateString(),
@@ -168,8 +168,8 @@ export const generateSaleCSV = (sale) => {
     item.item.name,
     item.item.category?.name || 'N/A',
     item.quantity,
-    item.price.toFixed(2),
-    (item.price * item.quantity).toFixed(2),
+    `Rp${item.price.toFixed(2)}`,
+    `Rp${(item.price * item.quantity).toFixed(2)}`,
     sale.user.name
   ])
   

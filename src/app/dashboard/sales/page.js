@@ -293,7 +293,7 @@ export default function SalesPage() {
                         <TableCell>
                           <div className="text-right">
                             <div className="text-lg font-bold text-green-600">
-                              ${sale.total.toFixed(2)}
+                              Rp{sale.total.toFixed(2)}
                             </div>
                             <div className="text-xs text-gray-500">
                               {sale.items.reduce((sum, item) => sum + item.quantity, 0)} items
