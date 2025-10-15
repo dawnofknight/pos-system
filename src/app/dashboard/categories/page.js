@@ -23,6 +23,10 @@ export default function CategoriesPage() {
   const [categories, setCategories] = useState([])
   const [loading, setLoading] = useState(true)
   const [showModal, setShowModal] = useState(false)
+  const [showItemsModal, setShowItemsModal] = useState(false)
+  const [selectedCategory, setSelectedCategory] = useState(null)
+  const [categoryItems, setCategoryItems] = useState([])
+  const [itemsLoading, setItemsLoading] = useState(false)
   const [formData, setFormData] = useState({
     name: ''
   })
@@ -69,6 +73,27 @@ export default function CategoriesPage() {
       }
     } catch (error) {
       console.error('Error saving category:', error)
+    }
+  }
+
+  const handleCategoryClick = async (category) => {
+    setSelectedCategory(category)
+    setShowItemsModal(true)
+    setItemsLoading(true)
+    
+    try {
+      const response = await fetch(`/api/items?categoryId=${category.id}`)
+      if (response.ok) {
+        const data = await response.json()
+        setCategoryItems(data.items || [])
+      } else {
+        setCategoryItems([])
+      }
+    } catch (error) {
+      console.error('Error fetching category items:', error)
+      setCategoryItems([])
+    } finally {
+      setItemsLoading(false)
     }
   }
 
@@ -145,7 +170,11 @@ export default function CategoriesPage() {
                 </TableHeader>
                 <TableBody>
                   {categories.map((category) => (
-                    <TableRow key={category.id}>
+                    <TableRow 
+                      key={category.id}
+                      className="cursor-pointer hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors duration-200"
+                      onClick={() => handleCategoryClick(category)}
+                    >
                       <TableCell>
                         <div className="flex items-center gap-3">
                           <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-purple-100 to-indigo-100 border-2 border-white/20 shadow-sm flex items-center justify-center">
@@ -225,6 +254,84 @@ export default function CategoriesPage() {
                 </Button>
               </div>
             </form>
+          </Modal>
+
+          {/* Category Items Modal */}
+          <Modal 
+            isOpen={showItemsModal} 
+            onClose={() => {
+              setShowItemsModal(false)
+              setSelectedCategory(null)
+              setCategoryItems([])
+            }}
+            title={
+              <div className="flex items-center gap-3 p-4 bg-gradient-to-r from-blue-50 to-indigo-50 dark:from-blue-900/30 dark:to-indigo-900/30 border-b border-blue-200/30 dark:border-blue-700/30">
+                <div className="p-2 rounded-lg bg-gradient-to-br from-blue-500 to-indigo-600 shadow-md">
+                  <span className="text-white text-lg">📦</span>
+                </div>
+                <h3 className="text-xl font-semibold bg-gradient-to-r from-blue-600 to-indigo-600 dark:from-blue-400 dark:to-indigo-400 bg-clip-text text-transparent">
+                   Items in &quot;{selectedCategory?.name}&quot;
+                 </h3>
+              </div>
+            }
+            size="lg"
+          >
+            <div className="p-6">
+              {itemsLoading ? (
+                <div className="flex items-center justify-center h-32">
+                  <LoadingSpinner size="lg" />
+                </div>
+              ) : categoryItems.length > 0 ? (
+                <div className="space-y-4">
+                  <div className="grid gap-4">
+                    {categoryItems.map((item) => (
+                      <div 
+                         key={item.id} 
+                         className="flex items-center justify-between p-4 rounded-xl bg-gradient-to-r from-gray-50 to-white border border-gray-200 hover:shadow-md hover:border-gray-300 transition-all duration-200"
+                       >
+                        <div className="flex items-center gap-4">
+                          <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-blue-100 to-indigo-100 border border-blue-200 shadow-sm flex items-center justify-center">
+                             <span className="text-blue-700 text-xl">📦</span>
+                           </div>
+                          <div>
+                             <h4 className="font-semibold text-gray-900">{item.name}</h4>
+                             <p className="text-sm text-gray-600">
+                               Stock: {item.stock} | Price: Rp {item.price?.toLocaleString('id-ID') || '0'}
+                             </p>
+                           </div>
+                         </div>
+                         <div className="text-right">
+                           <div className="text-lg font-bold text-gray-900">
+                             Rp {item.price?.toLocaleString('id-ID') || '0'}
+                           </div>
+                           <div className={`text-sm px-2 py-1 rounded-lg ${
+                             item.stock > 10 
+                               ? 'bg-green-100 text-green-800 border border-green-200' 
+                               : item.stock > 0 
+                                 ? 'bg-yellow-100 text-yellow-800 border border-yellow-200'
+                                 : 'bg-red-100 text-red-800 border border-red-200'
+                           }`}>
+                            {item.stock > 0 ? `${item.stock} in stock` : 'Out of stock'}
+                          </div>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              ) : (
+                <div className="text-center py-8">
+                   <div className="w-16 h-16 mx-auto mb-4 rounded-full bg-gray-100 border border-gray-200 flex items-center justify-center">
+                     <span className="text-gray-500 text-2xl">📦</span>
+                   </div>
+                   <h3 className="text-lg font-medium text-gray-900 mb-2">
+                     No items found
+                   </h3>
+                   <p className="text-gray-600">
+                     This category doesn&apos;t have any items yet.
+                   </p>
+                 </div>
+              )}
+            </div>
           </Modal>
         </div>
       </DashboardLayout>

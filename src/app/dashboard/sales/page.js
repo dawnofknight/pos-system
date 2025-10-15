@@ -25,6 +25,9 @@ export default function SalesPage() {
   const [loading, setLoading] = useState(true)
   const [searchTerm, setSearchTerm] = useState('')
   const [dateFilter, setDateFilter] = useState('')
+  const [startDate, setStartDate] = useState('')
+  const [endDate, setEndDate] = useState('')
+  const [periodFilter, setPeriodFilter] = useState('all') // 'all', 'week', 'month', 'year'
   const [settings, setSettings] = useState({
     currency: 'IDR',
     currencySymbol: 'Rp'
@@ -33,7 +36,9 @@ export default function SalesPage() {
     totalSales: 0,
     totalRevenue: 0,
     todaySales: 0,
-    todayRevenue: 0
+    todayRevenue: 0,
+    periodSales: 0,
+    periodRevenue: 0
   })
 
   useEffect(() => {
@@ -43,7 +48,7 @@ export default function SalesPage() {
 
   useEffect(() => {
     filterSales()
-  }, [sales, searchTerm, dateFilter])
+  }, [sales, searchTerm, dateFilter, periodFilter, startDate, endDate])
 
   const fetchSettings = async () => {
     try {
@@ -96,22 +101,73 @@ export default function SalesPage() {
       })
     }
 
+    // Apply date range filter
+    if (startDate && endDate) {
+      const start = new Date(startDate)
+      start.setHours(0, 0, 0, 0)
+      
+      const end = new Date(endDate)
+      end.setHours(23, 59, 59, 999)
+      
+      filtered = filtered.filter(sale => {
+        const saleDate = new Date(sale.createdAt)
+        return saleDate >= start && saleDate <= end
+      })
+    } else if (startDate) {
+      const start = new Date(startDate)
+      start.setHours(0, 0, 0, 0)
+      
+      filtered = filtered.filter(sale => {
+        const saleDate = new Date(sale.createdAt)
+        return saleDate >= start
+      })
+    } else if (endDate) {
+      const end = new Date(endDate)
+      end.setHours(23, 59, 59, 999)
+      
+      filtered = filtered.filter(sale => {
+        const saleDate = new Date(sale.createdAt)
+        return saleDate <= end
+      })
+    }
+
     setFilteredSales(filtered)
   }
 
   const calculateStats = (salesData) => {
     const today = new Date()
     today.setHours(0, 0, 0, 0)
+    
+    // Calculate period start date based on filter
+    const periodStartDate = new Date()
+    if (periodFilter === 'week') {
+      // Set to beginning of current week (Sunday)
+      const day = periodStartDate.getDay()
+      periodStartDate.setDate(periodStartDate.getDate() - day)
+    } else if (periodFilter === 'month') {
+      // Set to beginning of current month
+      periodStartDate.setDate(1)
+    } else if (periodFilter === 'year') {
+      // Set to beginning of current year
+      periodStartDate.setMonth(0, 1)
+    }
+    periodStartDate.setHours(0, 0, 0, 0)
 
     const todaySales = salesData.filter(sale => 
       new Date(sale.createdAt) >= today
     )
+    
+    const periodSales = periodFilter === 'all' 
+      ? salesData 
+      : salesData.filter(sale => new Date(sale.createdAt) >= periodStartDate)
 
     setStats({
       totalSales: salesData.length,
       totalRevenue: salesData.reduce((sum, sale) => sum + sale.total, 0),
       todaySales: todaySales.length,
-      todayRevenue: todaySales.reduce((sum, sale) => sum + sale.total, 0)
+      todayRevenue: todaySales.reduce((sum, sale) => sum + sale.total, 0),
+      periodSales: periodSales.length,
+      periodRevenue: periodSales.reduce((sum, sale) => sum + sale.total, 0)
     })
   }
 
@@ -164,17 +220,27 @@ export default function SalesPage() {
             <Card className="card-hover">
               <CardBody className="text-center">
                 <div className="text-2xl font-bold text-purple-600 mb-1">
-                  {stats.todaySales}
+                  {stats.periodSales}
                 </div>
-                <div className="text-sm text-gray-600">Today's Sales</div>
+                <div className="text-sm text-gray-600">
+                  {periodFilter === 'all' ? 'All Time Sales' : 
+                   periodFilter === 'week' ? 'This Week Sales' : 
+                   periodFilter === 'month' ? 'This Month Sales' : 
+                   'This Year Sales'}
+                </div>
               </CardBody>
             </Card>
             <Card className="card-hover">
               <CardBody className="text-center">
                 <div className="text-2xl font-bold text-orange-600 mb-1">
-                  {settings.currencySymbol}{stats.todayRevenue.toFixed(2)}
+                  {settings.currencySymbol}{stats.periodRevenue.toFixed(2)}
                 </div>
-                <div className="text-sm text-gray-600">Today's Revenue</div>
+                <div className="text-sm text-gray-600">
+                  {periodFilter === 'all' ? 'All Time Revenue' : 
+                   periodFilter === 'week' ? 'This Week Revenue' : 
+                   periodFilter === 'month' ? 'This Month Revenue' : 
+                   'This Year Revenue'}
+                </div>
               </CardBody>
             </Card>
           </div>
@@ -199,16 +265,62 @@ export default function SalesPage() {
                     onChange={(e) => setDateFilter(e.target.value)}
                     className="px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-orange-500"
                   />
+                  <select
+                    value={periodFilter}
+                    onChange={(e) => setPeriodFilter(e.target.value)}
+                    className="px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-orange-500"
+                  >
+                    <option value="all">All Time</option>
+                    <option value="week">This Week</option>
+                    <option value="month">This Month</option>
+                    <option value="year">This Year</option>
+                  </select>
                   <Button
                     variant="outline"
                     onClick={() => {
                       setSearchTerm('')
                       setDateFilter('')
+                      setPeriodFilter('all')
+                      setStartDate('')
+                      setEndDate('')
                     }}
                   >
                     Clear
                   </Button>
                 </div>
+              </div>
+              
+              {/* Date Range Filter */}
+              <div className="mt-4 border-t pt-4">
+                <h3 className="text-sm font-medium mb-2">Date Range Filter</h3>
+                <div className="flex flex-col md:flex-row gap-4">
+                   <div>
+                     <label className="block text-xs text-gray-500 mb-1">Start Date</label>
+                     <input
+                       type="date"
+                       value={startDate}
+                       onChange={(e) => setStartDate(e.target.value)}
+                       className="px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-orange-500"
+                     />
+                   </div>
+                   <div>
+                     <label className="block text-xs text-gray-500 mb-1">End Date</label>
+                     <input
+                       type="date"
+                       value={endDate}
+                       onChange={(e) => setEndDate(e.target.value)}
+                       className="px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-orange-500"
+                     />
+                   </div>
+                   <div className="flex items-end">
+                     <button
+                       onClick={() => filterSales()}
+                       className="px-4 py-2 bg-orange-500 text-white rounded-lg hover:bg-orange-600 transition-colors"
+                     >
+                       Search
+                     </button>
+                   </div>
+                 </div>
               </div>
             </CardBody>
           </Card>

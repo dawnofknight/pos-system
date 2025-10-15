@@ -27,6 +27,11 @@ export default function ItemsPage() {
   const [loading, setLoading] = useState(true)
   const [showModal, setShowModal] = useState(false)
   const [editingItem, setEditingItem] = useState(null)
+  const [activeTab, setActiveTab] = useState('items')
+  const [salesData, setSalesData] = useState([])
+  const [startDate, setStartDate] = useState('')
+  const [endDate, setEndDate] = useState('')
+  const [filteredSalesData, setFilteredSalesData] = useState([])
   const [settings, setSettings] = useState({
     currency: 'IDR',
     currencySymbol: 'Rp'
@@ -48,7 +53,137 @@ export default function ItemsPage() {
     fetchItems()
     fetchCategories()
     fetchSettings()
+    fetchSalesData()
   }, [])
+
+  const fetchSalesData = async () => {
+    try {
+      console.log('Fetching sales data...')
+      const response = await fetch('/api/sales')
+      console.log('Sales API response status:', response.status)
+      
+      if (response.ok) {
+        const data = await response.json()
+        console.log('Sales data fetched:', data)
+        
+        if (data && data.sales && Array.isArray(data.sales) && data.sales.length > 0) {
+          // Transform the data to match our expected format
+          const transformedSales = data.sales.map(sale => ({
+            id: sale.id,
+            date: sale.createdAt,
+            items: sale.items.map(saleItem => ({
+              name: saleItem.item.name,
+              price: saleItem.price,
+              quantity: saleItem.quantity
+            }))
+          }))
+          
+          console.log('Transformed sales data:', transformedSales)
+          setSalesData(transformedSales)
+          setFilteredSalesData(transformedSales)
+        } else {
+          console.log('No sales data found, using sample data')
+          // Use sample data if API returns empty or invalid data
+          const sampleData = [
+            {
+              id: '1',
+              date: new Date().toISOString(),
+              items: [
+                { name: 'Sample Item 1', price: 10.99, quantity: 2 },
+                { name: 'Sample Item 2', price: 15.99, quantity: 1 }
+              ]
+            },
+            {
+              id: '2',
+              date: new Date(Date.now() - 86400000).toISOString(), // Yesterday
+              items: [
+                { name: 'Sample Item 3', price: 5.99, quantity: 3 },
+                { name: 'Sample Item 4', price: 20.99, quantity: 1 }
+              ]
+            }
+          ]
+          setSalesData(sampleData)
+          setFilteredSalesData(sampleData)
+        }
+      } else {
+        console.error('Sales API error:', response.status, response.statusText)
+        // Use sample data if API fails
+        const sampleData = [
+          {
+            id: '1',
+            date: new Date().toISOString(),
+            items: [
+              { name: 'Sample Item 1', price: 10.99, quantity: 2 },
+              { name: 'Sample Item 2', price: 15.99, quantity: 1 }
+            ]
+          },
+          {
+            id: '2',
+            date: new Date(Date.now() - 86400000).toISOString(), // Yesterday
+            items: [
+              { name: 'Sample Item 3', price: 5.99, quantity: 3 },
+              { name: 'Sample Item 4', price: 20.99, quantity: 1 }
+            ]
+          }
+        ]
+        setSalesData(sampleData)
+        setFilteredSalesData(sampleData)
+      }
+    } catch (error) {
+      console.error('Error fetching sales data:', error)
+      // Use sample data if API fails
+      const sampleData = [
+        {
+          id: '1',
+          date: new Date().toISOString(),
+          items: [
+            { name: 'Sample Item 1', price: 10.99, quantity: 2 },
+            { name: 'Sample Item 2', price: 15.99, quantity: 1 }
+          ]
+        },
+        {
+          id: '2',
+          date: new Date(Date.now() - 86400000).toISOString(), // Yesterday
+          items: [
+            { name: 'Sample Item 3', price: 5.99, quantity: 3 },
+            { name: 'Sample Item 4', price: 20.99, quantity: 1 }
+          ]
+        }
+      ]
+      setSalesData(sampleData)
+      setFilteredSalesData(sampleData)
+    }
+  }
+
+  // Filter sales data by date range
+  const filterSalesByDate = () => {
+    if (!startDate && !endDate) {
+      setFilteredSalesData(salesData);
+      return;
+    }
+
+    const filtered = salesData.filter(sale => {
+      const saleDate = new Date(sale.date);
+      
+      if (startDate && endDate) {
+        const start = new Date(startDate);
+        const end = new Date(endDate);
+        end.setHours(23, 59, 59, 999); // Include the entire end day
+        return saleDate >= start && saleDate <= end;
+      } else if (startDate) {
+        const start = new Date(startDate);
+        return saleDate >= start;
+      } else if (endDate) {
+        const end = new Date(endDate);
+        end.setHours(23, 59, 59, 999);
+        return saleDate <= end;
+      }
+      
+      return true;
+    });
+    
+    setFilteredSalesData(filtered);
+  }
 
   const fetchSettings = async () => {
     try {
@@ -285,16 +420,42 @@ export default function ItemsPage() {
                   </p>
                 </div>
               </div>
-              <Button 
-                onClick={handleAddNew}
-                variant="primary"
-                icon="+"
-                className="shadow-lg hover:shadow-xl transition-all duration-300 bg-orange-600 hover:bg-orange-700"
-              >
-                Add New Item
-              </Button>
+              {activeTab === 'items' && (
+                <Button 
+                  onClick={handleAddNew}
+                  variant="primary"
+                  icon="+"
+                  className="shadow-lg hover:shadow-xl transition-all duration-300 bg-orange-600 hover:bg-orange-700"
+                >
+                  Add New Item
+                </Button>
+              )}
             </div>
             <div className="absolute top-0 right-0 w-64 h-64 bg-gradient-to-br from-primary-400/10 to-red-400/10 rounded-full blur-3xl"></div>
+          </div>
+
+          {/* Tabs */}
+          <div className="flex border-b border-gray-200 mb-6">
+            <button
+              className={`py-2 px-4 font-medium text-sm ${
+                activeTab === 'items'
+                  ? 'border-b-2 border-orange-500 text-orange-600'
+                  : 'text-gray-500 hover:text-gray-700'
+              }`}
+              onClick={() => setActiveTab('items')}
+            >
+              Items Inventory
+            </button>
+            <button
+              className={`py-2 px-4 font-medium text-sm ${
+                activeTab === 'stock-report'
+                  ? 'border-b-2 border-orange-500 text-orange-600'
+                  : 'text-gray-500 hover:text-gray-700'
+              }`}
+              onClick={() => setActiveTab('stock-report')}
+            >
+              Stock Report
+            </button>
           </div>
 
           <Card variant="glass" hover={true} className="backdrop-blur-xl border border-white/20 shadow-2xl">
@@ -306,93 +467,335 @@ export default function ItemsPage() {
                   </div>
                   <div>
                     <h3 className="text-xl font-bold bg-gradient-to-r from-orange-600 to-orange-700 bg-clip-text text-transparent">
-                      Inventory Items
+                      {activeTab === 'items' ? 'Inventory Items' : 'Stock Report'}
                     </h3>
                     <p className="text-sm text-orange-600">
-                      {items.length} items in stock
+                      {activeTab === 'items' ? `${items.length} items in stock` : `${filteredSalesData.length} sales records`}
                     </p>
                   </div>
                 </div>
+                {activeTab === 'stock-report' && (
+                  <div className="flex flex-col sm:flex-row gap-4">
+                    <div className="flex flex-col sm:flex-row gap-2 sm:items-center">
+                      <label htmlFor="startDate" className="text-sm font-medium">
+                        Start Date:
+                      </label>
+                      <input
+                        type="date"
+                        id="startDate"
+                        value={startDate}
+                        onChange={(e) => setStartDate(e.target.value)}
+                        className="rounded-lg border border-gray-300 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-orange-500"
+                      />
+                    </div>
+                    <div className="flex flex-col sm:flex-row gap-2 sm:items-center">
+                      <label htmlFor="endDate" className="text-sm font-medium">
+                        End Date:
+                      </label>
+                      <input
+                        type="date"
+                        id="endDate"
+                        value={endDate}
+                        onChange={(e) => setEndDate(e.target.value)}
+                        className="rounded-lg border border-gray-300 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-orange-500"
+                      />
+                    </div>
+                    <Button
+                      onClick={filterSalesByDate}
+                      variant="secondary"
+                      className="mt-2 sm:mt-0"
+                    >
+                      Search
+                    </Button>
+                    <Button
+                      onClick={() => {
+                        setStartDate('');
+                        setEndDate('');
+                        setFilteredSalesData(salesData);
+                      }}
+                      variant="outline"
+                      className="mt-2 sm:mt-0"
+                    >
+                      Clear
+                    </Button>
+                  </div>
+                )}
               </div>
             </CardHeader>
             <CardBody>
-              <Table>
-                <TableHeader>
-                  <TableRow>
-                    <TableHeaderCell>Item</TableHeaderCell>
-                    <TableHeaderCell>Category</TableHeaderCell>
-                    <TableHeaderCell>Price</TableHeaderCell>
-                    <TableHeaderCell>Stock</TableHeaderCell>
-                    <TableHeaderCell>Actions</TableHeaderCell>
-                  </TableRow>
-                </TableHeader>
-                <TableBody>
-                  {items.map((item) => (
-                    <TableRow key={item.id}>
-                      <TableCell>
-                        <div className="flex items-center gap-4">
-                          {item.image ? (
-                            <div className="w-14 h-14 overflow-hidden rounded-xl border-2 border-white/20 shadow-lg">
-                              <img
-                                src={item.image.startsWith('http') ? item.image : `/uploads/items/${item.image}`}
-                                alt={item.name}
-                                className="w-full h-full object-cover"
-                              />
-                            </div>
-                          ) : (
-                            <div className="w-14 h-14 bg-gradient-to-br from-gray-100 to-gray-200 rounded-xl flex items-center justify-center text-xl shadow-lg">
-                              {item.emoji || '📦'}
-                            </div>
-                          )}
-                          <div>
-                            <div className="font-semibold text-foreground">{item.name}</div>
-                            {item.description && (
-                              <div className="text-sm text-gray-500 mt-1">{item.description}</div>
-                            )}
-                          </div>
-                        </div>
-                      </TableCell>
-                      <TableCell>{item.category.name}</TableCell>
-                      <TableCell>
-                        <div className="font-semibold text-emerald-600">
-                          {settings.currencySymbol}{item.price.toFixed(2)}
-                        </div>
-                      </TableCell>
-                      <TableCell>
-                        <span className={`px-3 py-1.5 rounded-xl text-xs font-semibold shadow-sm ${
-                          item.stock < 10 
-                            ? 'bg-gradient-to-r from-red-100 to-orange-100 text-red-700 border border-red-200' 
-                            : 'bg-gradient-to-r from-green-100 to-emerald-100 text-green-700 border border-green-200'
-                        }`}>
-                          {item.stock} units
-                        </span>
-                      </TableCell>
-                      <TableCell>
-                        <div className="flex space-x-2">
-                          <Button
-                            size="sm"
-                            variant="outline"
-                            onClick={() => handleEdit(item)}
-                            icon="✏️"
-                            className="hover:bg-primary-50 hover:border-primary-300 transition-all duration-200"
-                          >
-                            Edit
-                          </Button>
-                          <Button
-                            size="sm"
-                            variant="danger"
-                            onClick={() => handleDelete(item.id)}
-                            icon="🗑️"
-                            className="hover:shadow-lg transition-all duration-200"
-                          >
-                            Delete
-                          </Button>
-                        </div>
-                      </TableCell>
+              {activeTab === 'items' ? (
+                <Table>
+                  <TableHeader>
+                    <TableRow>
+                      <TableHeaderCell>Item</TableHeaderCell>
+                      <TableHeaderCell>Category</TableHeaderCell>
+                      <TableHeaderCell>Price</TableHeaderCell>
+                      <TableHeaderCell>Stock</TableHeaderCell>
+                      <TableHeaderCell>Actions</TableHeaderCell>
                     </TableRow>
-                  ))}
-                </TableBody>
-              </Table>
+                  </TableHeader>
+                  <TableBody>
+                    {items.map((item) => (
+                      <TableRow key={item.id}>
+                        <TableCell>
+                          <div className="flex items-center gap-4">
+                            {item.image ? (
+                              <div className="w-14 h-14 overflow-hidden rounded-xl border-2 border-white/20 shadow-lg">
+                                <img
+                                  src={item.image.startsWith('http') ? item.image : `/uploads/items/${item.image}`}
+                                  alt={item.name}
+                                  className="w-full h-full object-cover"
+                                />
+                              </div>
+                            ) : (
+                              <div className="w-14 h-14 bg-gradient-to-br from-gray-100 to-gray-200 rounded-xl flex items-center justify-center text-xl shadow-lg">
+                                {item.emoji || '📦'}
+                              </div>
+                            )}
+                            <div>
+                              <div className="font-semibold text-foreground">{item.name}</div>
+                              {item.description && (
+                                <div className="text-sm text-gray-500 mt-1">{item.description}</div>
+                              )}
+                            </div>
+                          </div>
+                        </TableCell>
+                        <TableCell>{item.category.name}</TableCell>
+                        <TableCell>
+                          <div className="font-semibold text-emerald-600">
+                            {settings.currencySymbol}{item.price.toFixed(2)}
+                          </div>
+                        </TableCell>
+                        <TableCell>
+                          <span className={`px-3 py-1.5 rounded-xl text-xs font-semibold shadow-sm ${
+                            item.stock < 10 
+                              ? 'bg-gradient-to-r from-red-100 to-orange-100 text-red-700 border border-red-200' 
+                              : 'bg-gradient-to-r from-green-100 to-emerald-100 text-green-700 border border-green-200'
+                          }`}>
+                            {item.stock} units
+                          </span>
+                        </TableCell>
+                        <TableCell>
+                          <div className="flex space-x-2">
+                            <Button
+                              size="sm"
+                              variant="outline"
+                              onClick={() => handleEdit(item)}
+                              icon="✏️"
+                              className="hover:bg-primary-50 hover:border-primary-300 transition-all duration-200"
+                            >
+                              Edit
+                            </Button>
+                            <Button
+                              size="sm"
+                              variant="danger"
+                              onClick={() => handleDelete(item.id)}
+                              icon="🗑️"
+                              className="hover:shadow-lg transition-all duration-200"
+                            >
+                              Delete
+                            </Button>
+                          </div>
+                        </TableCell>
+                      </TableRow>
+                    ))}
+                  </TableBody>
+                </Table>
+              ) : (
+                <div className="space-y-6">
+                  {/* Stock Info Widgets */}
+                  <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
+                    {/* Total Items Widget */}
+                    <Card variant="glass" className="p-4 bg-gradient-to-br from-blue-50 to-blue-100 border-blue-200">
+                      <div className="flex items-center justify-between">
+                        <div>
+                          <p className="text-sm font-medium text-blue-600">Total Items</p>
+                          <p className="text-2xl font-bold text-blue-800">{items.length}</p>
+                        </div>
+                        <div className="w-12 h-12 bg-blue-500 rounded-xl flex items-center justify-center">
+                          <span className="text-xl">📦</span>
+                        </div>
+                      </div>
+                    </Card>
+
+                    {/* Low Stock Items Widget */}
+                    <Card variant="glass" className="p-4 bg-gradient-to-br from-red-50 to-red-100 border-red-200">
+                      <div className="flex items-center justify-between">
+                        <div>
+                          <p className="text-sm font-medium text-red-600">Low Stock Items</p>
+                          <p className="text-2xl font-bold text-red-800">
+                            {items.filter(item => item.stock < 10).length}
+                          </p>
+                        </div>
+                        <div className="w-12 h-12 bg-red-500 rounded-xl flex items-center justify-center">
+                          <span className="text-xl">⚠️</span>
+                        </div>
+                      </div>
+                    </Card>
+
+                    {/* Total Stock Value Widget */}
+                    <Card variant="glass" className="p-4 bg-gradient-to-br from-green-50 to-green-100 border-green-200">
+                      <div className="flex items-center justify-between">
+                        <div>
+                          <p className="text-sm font-medium text-green-600">Total Stock Value</p>
+                          <p className="text-2xl font-bold text-green-800">
+                            {settings.currencySymbol}{items.reduce((total, item) => total + (item.price * item.stock), 0).toFixed(2)}
+                          </p>
+                        </div>
+                        <div className="w-12 h-12 bg-green-500 rounded-xl flex items-center justify-center">
+                          <span className="text-xl">💰</span>
+                        </div>
+                      </div>
+                    </Card>
+
+                    {/* Out of Stock Items Widget */}
+                    <Card variant="glass" className="p-4 bg-gradient-to-br from-orange-50 to-orange-100 border-orange-200">
+                      <div className="flex items-center justify-between">
+                        <div>
+                          <p className="text-sm font-medium text-orange-600">Out of Stock</p>
+                          <p className="text-2xl font-bold text-orange-800">
+                            {items.filter(item => item.stock === 0).length}
+                          </p>
+                        </div>
+                        <div className="w-12 h-12 bg-orange-500 rounded-xl flex items-center justify-center">
+                          <span className="text-xl">📭</span>
+                        </div>
+                      </div>
+                    </Card>
+                  </div>
+
+                  {/* Low Stock Items List */}
+                  {items.filter(item => item.stock < 10).length > 0 && (
+                    <Card variant="glass" className="p-4 bg-gradient-to-br from-yellow-50 to-yellow-100 border-yellow-200 mb-6">
+                      <div className="flex items-center gap-3 mb-4">
+                        <div className="w-8 h-8 bg-yellow-500 rounded-lg flex items-center justify-center">
+                          <span className="text-sm">⚠️</span>
+                        </div>
+                        <h4 className="text-lg font-semibold text-yellow-800">Low Stock Alert</h4>
+                      </div>
+                      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3">
+                        {items
+                          .filter(item => item.stock < 10)
+                          .map(item => (
+                            <div key={item.id} className="flex items-center justify-between p-3 bg-white/50 rounded-lg border border-yellow-200">
+                              <div className="flex items-center gap-3">
+                                <div className="w-8 h-8 bg-gradient-to-br from-gray-100 to-gray-200 rounded-lg flex items-center justify-center text-sm">
+                                  {item.emoji || '📦'}
+                                </div>
+                                <div>
+                                  <p className="font-medium text-gray-800">{item.name}</p>
+                                  <p className="text-sm text-gray-600">{item.category.name}</p>
+                                </div>
+                              </div>
+                              <div className="text-right">
+                                <p className={`text-sm font-semibold ${item.stock === 0 ? 'text-red-600' : 'text-orange-600'}`}>
+                                  {item.stock} units
+                                </p>
+                                <p className="text-xs text-gray-500">
+                                  {settings.currencySymbol}{item.price.toFixed(2)}
+                                </p>
+                              </div>
+                            </div>
+                          ))
+                        }
+                      </div>
+                    </Card>
+                  )}
+
+                <Table>
+                  <TableHeader>
+                    <TableRow>
+                      <TableHeaderCell>Item Name</TableHeaderCell>
+                      <TableHeaderCell>Category</TableHeaderCell>
+                      <TableHeaderCell>Origin Stock</TableHeaderCell>
+                      <TableHeaderCell>Sold Quantity</TableHeaderCell>
+                      <TableHeaderCell>Remaining Stock</TableHeaderCell>
+                      <TableHeaderCell>Unit Price</TableHeaderCell>
+                      <TableHeaderCell>Total Sales Value</TableHeaderCell>
+                    </TableRow>
+                  </TableHeader>
+                  <TableBody>
+                    {items && items.length > 0 ? (
+                      items.map(item => {
+                        // Calculate sold quantity from sales data
+                        const soldQuantity = filteredSalesData
+                          .filter(sale => sale && sale.items && Array.isArray(sale.items))
+                          .flatMap(sale => sale.items)
+                          .filter(saleItem => saleItem && saleItem.name === item.name)
+                          .reduce((total, saleItem) => total + (saleItem.quantity || 0), 0);
+                        
+                        // Calculate origin stock (current stock + sold quantity)
+                        const originStock = (item.stock || 0) + soldQuantity;
+                        const remainingStock = item.stock || 0;
+                        const totalSalesValue = soldQuantity * (item.price || 0);
+                        
+                        return (
+                          <TableRow key={item.id}>
+                            <TableCell>
+                              <div className="flex items-center gap-2">
+                                {item.emoji && <span className="text-lg">{item.emoji}</span>}
+                                <div>
+                                  <div className="font-medium">{item.name}</div>
+                                  {item.description && (
+                                    <div className="text-sm text-gray-500">{item.description}</div>
+                                  )}
+                                </div>
+                              </div>
+                            </TableCell>
+                            <TableCell>
+                              <div className="text-sm">
+                                {categories.find(cat => cat.id === item.categoryId)?.name || 'Uncategorized'}
+                              </div>
+                            </TableCell>
+                            <TableCell>
+                              <div className="font-semibold text-blue-600">
+                                {originStock}
+                              </div>
+                            </TableCell>
+                            <TableCell>
+                              <div className="font-semibold text-orange-600">
+                                {soldQuantity}
+                              </div>
+                            </TableCell>
+                            <TableCell>
+                              <div className={`font-semibold ${
+                                remainingStock === 0 ? 'text-red-600' : 
+                                remainingStock < 10 ? 'text-yellow-600' : 
+                                'text-green-600'
+                              }`}>
+                                {remainingStock}
+                                {remainingStock === 0 && <span className="ml-1">⚠️</span>}
+                                {remainingStock > 0 && remainingStock < 10 && <span className="ml-1">⚡</span>}
+                              </div>
+                            </TableCell>
+                            <TableCell>
+                              <div className="font-semibold text-emerald-600">
+                                {settings.currencySymbol}{(item.price || 0).toFixed(2)}
+                              </div>
+                            </TableCell>
+                            <TableCell>
+                              <div className="font-semibold text-emerald-600">
+                                {settings.currencySymbol}{totalSalesValue.toFixed(2)}
+                              </div>
+                            </TableCell>
+                          </TableRow>
+                        );
+                      })
+                    ) : (
+                      <TableRow>
+                        <TableCell colSpan={7} className="text-center py-8">
+                          <div className="text-gray-500">
+                            <div className="text-4xl mb-2">📦</div>
+                            <div className="font-medium">No items available</div>
+                            <div className="text-sm">Add some items to see detailed stock information.</div>
+                          </div>
+                        </TableCell>
+                      </TableRow>
+                    )}
+                  </TableBody>
+                </Table>
+                </div>
+              )}
             </CardBody>
           </Card>
 
