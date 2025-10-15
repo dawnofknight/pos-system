@@ -212,6 +212,8 @@ const translations = {
     backToSales: "Back to Sales",
     orderType: "Order Type",
 
+    order: "Order",
+
     // Settings page
     systemSettings: "System Settings",
     configureSystemPreferences:
@@ -483,6 +485,7 @@ const translations = {
     takeAway: "Bawa Pulang",
     tableService: "Layanan meja",
     toGo: "Untuk dibawa",
+    order: "Pesanan",
 
     // Sales create page - Table selection
     tableSelection: "Pilih Meja",

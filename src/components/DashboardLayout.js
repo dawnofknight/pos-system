@@ -7,6 +7,7 @@ import { useRBAC } from "@/contexts/RBACContext";
 import { useTheme } from "@/contexts/ThemeContext";
 import { useLanguage } from "@/contexts/LanguageContext";
 import AuditLogViewer from "@/components/AuditLogViewer";
+import LanguageSwitcher from "@/components/LanguageSwitcher";
 
 export default function DashboardLayout({ children }) {
   const [sidebarOpen, setSidebarOpen] = useState(false);
@@ -302,6 +303,9 @@ export default function DashboardLayout({ children }) {
 
             {/* User menu */}
             <div className='flex items-center space-x-4'>
+              {/* Language Switcher */}
+              <LanguageSwitcher />
+              
               {/* User info */}
               <div className='hidden md:flex items-center space-x-3'>
                 <div className='text-right'>
