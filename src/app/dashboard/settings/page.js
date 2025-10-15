@@ -4,6 +4,7 @@ import { useState, useEffect } from 'react'
 import AuthGuard from '@/components/AuthGuard'
 import DashboardLayout from '@/components/DashboardLayout'
 import { useAuth } from '@/contexts/AuthContext'
+import { useLanguage } from '@/contexts/LanguageContext'
 
 import { useRBAC, withPermission } from '@/contexts/RBACContext'
 import { 
@@ -25,7 +26,7 @@ import {
 
 export default function SettingsPage() {
   const { user } = useAuth()
-
+  const { t } = useLanguage()
 
   const { hasPermission } = useRBAC()
   const [loading, setLoading] = useState(true)
@@ -74,23 +75,23 @@ export default function SettingsPage() {
   })
 
   const tabs = [
-    { id: 'general', name: 'General', icon: '⚙️' },
-    { id: 'payments', name: 'Payment Methods', icon: '💳' },
-    { id: 'tables', name: 'Table Management', icon: '🍽️' },
+    { id: 'general', name: t('general'), icon: '⚙️' },
+    { id: 'payments', name: t('paymentMethods'), icon: '💳' },
+    { id: 'tables', name: t('tableManagement'), icon: '🍽️' },
     ...(hasPermission('settings', 'edit') && user?.role === 'ADMIN' ? [
-      { id: 'roles', name: 'Role Management', icon: '👥' },
-      { id: 'users', name: 'User Management', icon: '👤' }
+      { id: 'roles', name: t('roleManagement'), icon: '👥' },
+      { id: 'users', name: t('userManagement'), icon: '👤' }
     ] : [])
   ]
 
   const resources = [
-    { id: 'dashboard', name: 'Dashboard', description: 'Access to dashboard overview' },
-    { id: 'items', name: 'Items', description: 'Manage product inventory' },
-    { id: 'sales', name: 'Sales', description: 'Process and view sales' },
-    { id: 'categories', name: 'Categories', description: 'Manage product categories' },
-    { id: 'tables', name: 'Tables', description: 'Manage restaurant tables' },
-    { id: 'users', name: 'Users', description: 'Manage user accounts' },
-    { id: 'settings', name: 'Settings', description: 'System configuration' }
+    { id: 'dashboard', name: t('dashboard'), description: t('dashboardDescription') },
+    { id: 'items', name: t('items'), description: t('itemsDescription') },
+    { id: 'sales', name: t('sales'), description: t('salesDescription') },
+    { id: 'categories', name: t('categories'), description: t('categoriesDescription') },
+    { id: 'tables', name: t('tables'), description: t('tablesDescription') },
+    { id: 'users', name: t('users'), description: t('usersDescription') },
+    { id: 'settings', name: t('settings'), description: t('settingsDescription') }
   ]
 
   useEffect(() => {
@@ -164,17 +165,17 @@ export default function SettingsPage() {
       })
 
       if (response.ok) {
-        alert('User created successfully!')
+        alert(t('userCreatedSuccessfully'))
         setUserForm({ name: '', email: '', password: '', role: 'CASHIER' })
         setShowUserForm(false)
         fetchUsers()
       } else {
         const error = await response.json()
-        alert(`Error: ${error.error}`)
+        alert(`${t('error')}: ${error.error}`)
       }
     } catch (error) {
       console.error('Error creating user:', error)
-      alert('Error creating user')
+      alert(t('errorCreatingUser'))
     } finally {
       setSaving(false)
     }
@@ -197,18 +198,18 @@ export default function SettingsPage() {
       })
 
       if (response.ok) {
-        alert('User updated successfully!')
+        alert(t('userUpdatedSuccessfully'))
         setUserForm({ name: '', email: '', password: '', role: 'CASHIER' })
         setEditingUser(null)
         setShowUserForm(false)
         fetchUsers()
       } else {
         const error = await response.json()
-        alert(`Error: ${error.error}`)
+        alert(`${t('error')}: ${error.error}`)
       }
     } catch (error) {
       console.error('Error updating user:', error)
-      alert('Error updating user')
+      alert(t('errorUpdatingUser'))
     } finally {
       setSaving(false)
     }
@@ -216,11 +217,11 @@ export default function SettingsPage() {
 
   const handleDeleteUser = async (userId) => {
     if (userId === user.id) {
-      alert("You cannot delete your own account")
+      alert(t('cannotDeleteOwnAccount'))
       return
     }
 
-    if (!confirm('Are you sure you want to delete this user?')) return
+    if (!confirm(t('confirmDeleteUser'))) return
 
     try {
       const response = await fetch(`/api/users/${userId}`, {
@@ -228,20 +229,20 @@ export default function SettingsPage() {
       })
 
       if (response.ok) {
-        alert('User deleted successfully!')
+        alert(t('userDeletedSuccessfully'))
         fetchUsers()
       } else {
         const error = await response.json()
-        alert(`Error: ${error.error}`)
+        alert(`${t('error')}: ${error.error}`)
       }
     } catch (error) {
       console.error('Error deleting user:', error)
-      alert('Error deleting user')
+      alert(t('errorDeletingUser'))
     }
   }
 
   const handleResetPassword = async (userId) => {
-    const newPassword = prompt('Enter new password:')
+    const newPassword = prompt(t('enterNewPassword'))
     if (!newPassword) return
 
     try {
@@ -252,14 +253,14 @@ export default function SettingsPage() {
       })
 
       if (response.ok) {
-        alert('Password reset successfully!')
+        alert(t('passwordResetSuccessfully'))
       } else {
         const error = await response.json()
-        alert(`Error: ${error.error}`)
+        alert(`${t('error')}: ${error.error}`)
       }
     } catch (error) {
       console.error('Error resetting password:', error)
-      alert('Error resetting password')
+      alert(t('errorResettingPassword'))
     }
   }
 
@@ -292,13 +293,13 @@ export default function SettingsPage() {
       })
 
       if (response.ok) {
-        alert('Settings saved successfully!')
+        alert(t('settingsSavedSuccessfully'))
       } else {
-        alert('Failed to save settings')
+        alert(t('failedToSaveSettings'))
       }
     } catch (error) {
       console.error('Error saving settings:', error)
-      alert('Error saving settings')
+      alert(t('errorSavingSettings'))
     } finally {
       setSaving(false)
     }
@@ -333,14 +334,14 @@ export default function SettingsPage() {
         setSettings(s => ({ ...s, logoPath: data.logoPath }))
         setLogoFile(null)
         setLogoPreview(null)
-        alert('Logo uploaded successfully!')
+        alert(t('logoUploadedSuccessfully'))
       } else {
         const error = await response.json()
-        alert(error.error || 'Failed to upload logo')
+        alert(error.error || t('failedToUploadLogo'))
       }
     } catch (error) {
       console.error('Error uploading logo:', error)
-      alert('Error uploading logo')
+      alert(t('errorUploadingLogo'))
     } finally {
       setUploadingLogo(false)
     }
@@ -356,13 +357,13 @@ export default function SettingsPage() {
 
       if (response.ok) {
         setSettings(s => ({ ...s, logoPath: null }))
-        alert('Logo deleted successfully!')
+        alert(t('logoDeletedSuccessfully'))
       } else {
-        alert('Failed to delete logo')
+        alert(t('failedToDeleteLogo'))
       }
     } catch (error) {
       console.error('Error deleting logo:', error)
-      alert('Error deleting logo')
+      alert(t('errorDeletingLogo'))
     }
   }
   
@@ -512,10 +513,10 @@ export default function SettingsPage() {
         <div className="space-y-6">
           <div>
             <h1 className="text-2xl font-bold transition-colors text-gray-900 dark:text-white">
-              Settings
+              {t('settings')}
             </h1>
             <p className="transition-colors text-gray-600 dark:text-gray-400">
-              Manage your POS system configuration
+              {t('manageSystemConfiguration')}
             </p>
           </div>
 
@@ -544,10 +545,10 @@ export default function SettingsPage() {
             <Card>
               <CardHeader>
                 <h2 className="text-lg font-semibold transition-colors text-gray-900 dark:text-white">
-                  General Settings
+                  {t('generalSettings')}
                 </h2>
                 <p className="text-sm transition-colors text-gray-600 dark:text-gray-400">
-                  Configure currency and tax settings
+                  {t('configureCurrencyAndTax')}
                 </p>
               </CardHeader>
               <CardBody>
@@ -555,17 +556,17 @@ export default function SettingsPage() {
                   {/* Currency Settings */}
                   <div>
                     <h3 className="text-md font-medium mb-4 transition-colors text-gray-900 dark:text-white">
-                      Currency
+                      {t('currency')}
                     </h3>
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                       <Input
-                        label="Currency Code"
+                        label={t('currencyCode')}
                         value={settings.currency}
                         onChange={(e) => setSettings(s => ({ ...s, currency: e.target.value }))}
                         placeholder="USD"
                       />
                       <Input
-                        label="Currency Symbol"
+                        label={t('currencySymbol')}
                         value={settings.currencySymbol}
                         onChange={(e) => setSettings(s => ({ ...s, currencySymbol: e.target.value }))}
                         placeholder="$"
@@ -577,16 +578,16 @@ export default function SettingsPage() {
                   <div className="border-t pt-6">
                     <div className="mb-4">
                       <h3 className="text-md font-medium transition-colors text-gray-900">
-                        Branding Configuration
+                        {t('brandingConfiguration')}
                       </h3>
                       <p className="text-sm transition-colors text-gray-600">
-                        Customize your application name and logo
+                        {t('customizeAppNameAndLogo')}
                       </p>
                     </div>
                     
                     <div className="grid grid-cols-1 gap-4">
                       <Input
-                        label="Application Name"
+                        label={t('applicationName')}
                         value={settings.appName}
                         onChange={(e) => setSettings(s => ({ ...s, appName: e.target.value }))}
                         placeholder="POS System Restaurant Management"
@@ -594,7 +595,7 @@ export default function SettingsPage() {
                       
                       <div>
                         <label className="block text-sm font-medium text-gray-700 mb-2">
-                          Logo
+                          {t('logo')}
                         </label>
                         
                         {/* Current Logo Display */}
@@ -602,14 +603,14 @@ export default function SettingsPage() {
                           <div className="mb-4">
                             <img 
                               src={settings.logoPath} 
-                              alt="Current Logo" 
+                              alt={t('currentLogo')} 
                               className="h-16 w-auto object-contain border rounded"
                             />
                             <Button
                               onClick={deleteLogo}
                               className="mt-2 text-sm bg-red-600 hover:bg-red-700 text-white"
                             >
-                              Delete Logo
+                              {t('deleteLogo')}
                             </Button>
                           </div>
                         )}
@@ -628,7 +629,7 @@ export default function SettingsPage() {
                               disabled={uploadingLogo}
                               className="bg-orange-600 hover:bg-orange-700 text-white"
                             >
-                              {uploadingLogo ? 'Uploading...' : 'Upload'}
+                              {uploadingLogo ? t('uploading') : t('upload')}
                             </Button>
                           )}
                         </div>
@@ -636,10 +637,10 @@ export default function SettingsPage() {
                         {/* Logo Preview */}
                         {logoPreview && (
                           <div className="mt-4">
-                            <p className="text-sm text-gray-600 mb-2">Preview:</p>
+                            <p className="text-sm text-gray-600 mb-2">{t('preview')}:</p>
                             <img 
                               src={logoPreview} 
-                              alt="Logo Preview" 
+                              alt={t('logoPreview')} 
                               className="h-16 w-auto object-contain border rounded"
                             />
                           </div>
@@ -653,10 +654,10 @@ export default function SettingsPage() {
                     <div className="flex items-center justify-between mb-4">
                       <div>
                         <h3 className="text-md font-medium transition-colors text-gray-900">
-                          Tax Configuration
+                          {t('taxConfiguration')}
                         </h3>
                         <p className="text-sm transition-colors text-gray-600">
-                          Enable and configure tax calculations
+                          {t('enableAndConfigureTax')}
                         </p>
                       </div>
                       <label className="relative inline-flex items-center cursor-pointer">
@@ -673,13 +674,13 @@ export default function SettingsPage() {
                     {settings.taxEnabled && (
                       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                         <Input
-                          label="Tax Name"
+                          label={t('taxName')}
                           value={settings.taxName}
                           onChange={(e) => setSettings(s => ({ ...s, taxName: e.target.value }))}
-                          placeholder="Tax"
+                          placeholder={t('tax')}
                         />
                         <Input
-                          label="Tax Rate (%)"
+                          label={t('taxRatePercent')}
                           type="number"
                           step="0.01"
                           min="0"
@@ -699,7 +700,7 @@ export default function SettingsPage() {
                       className="flex items-center gap-2"
                     >
                       {saving && <LoadingSpinner size="sm" />}
-                      Save Settings
+                      {t('saveSettings')}
                     </Button>
                   </div>
                 </div>
@@ -712,10 +713,10 @@ export default function SettingsPage() {
             <Card>
               <CardHeader>
                 <h2 className="text-lg font-semibold transition-colors text-gray-900">
-                  Payment Methods
+                  {t('paymentMethods')}
                 </h2>
                 <p className="text-sm transition-colors text-gray-600">
-                  Configure available payment options
+                  {t('configurePaymentOptions')}
                 </p>
               </CardHeader>
               <CardBody>
@@ -733,16 +734,16 @@ export default function SettingsPage() {
                         </span>
                         <div>
                           <h4 className="font-medium transition-colors" style={{ color: 'var(--foreground)' }}>
-                            {method.name}
+                            {t(method.name.toLowerCase())}
                           </h4>
                           <p className="text-sm transition-colors" style={{ color: 'var(--muted-foreground)' }}>
-                            {method.enabled ? 'Available for transactions' : 'Disabled'}
+                            {method.enabled ? t('availableForTransactions') : t('disabled')}
                           </p>
                         </div>
                       </div>
                       <div className="flex items-center gap-2">
                         <Badge variant={method.enabled ? 'warning' : 'secondary'}>
-                          {method.enabled ? 'Enabled' : 'Disabled'}
+                          {method.enabled ? t('enabled') : t('disabled')}
                         </Badge>
                         <label className="relative inline-flex items-center cursor-pointer">
                           <input
@@ -766,10 +767,10 @@ export default function SettingsPage() {
             <Card>
               <CardHeader>
                 <h2 className="text-lg font-semibold transition-colors text-gray-900 dark:text-white">
-                  Table Management
+                  {t('tableManagement')}
                 </h2>
                 <p className="text-sm transition-colors text-gray-600 dark:text-gray-400">
-                  Configure restaurant tables and capacity
+                  {t('configureRestaurantTables')}
                 </p>
               </CardHeader>
               <CardBody>
@@ -777,24 +778,24 @@ export default function SettingsPage() {
                   {/* Table Count Setting */}
                   <div>
                     <h3 className="text-md font-medium mb-4 transition-colors text-gray-900 dark:text-white">
-                      Table Configuration
+                      {t('tableConfiguration')}
                     </h3>
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
                       <Input
-                        type="number"
-                        label="Number of Tables"
-                        value={settings.tableCount}
-                        min={1}
-                        max={50}
-                        onChange={(e) => setSettings({
-                          ...settings,
-                          tableCount: parseInt(e.target.value) || 1
-                        })}
-                      />
+                          type="number"
+                          label={t('numberOfTables')}
+                          value={settings.tableCount}
+                          min={1}
+                          max={50}
+                          onChange={(e) => setSettings({
+                            ...settings,
+                            tableCount: parseInt(e.target.value) || 1
+                          })}
+                        />
                       <div className="flex items-end">
                         <Button onClick={saveGeneralSettings} disabled={saving}>
-                          {saving ? 'Saving...' : 'Save Table Count'}
-                        </Button>
+                            {saving ? t('saving') : t('saveTableCount')}
+                          </Button>
                       </div>
                     </div>
                   </div>
@@ -803,7 +804,7 @@ export default function SettingsPage() {
                   <div>
                     <div className="flex justify-between items-center mb-4">
                       <h3 className="text-md font-medium transition-colors text-gray-900 dark:text-white">
-                        Tables
+                        {t('tables')}
                       </h3>
                       <Button
                         onClick={() => {
@@ -812,8 +813,8 @@ export default function SettingsPage() {
                           document.getElementById('tableFormModal').showModal()
                         }}
                       >
-                        Add Table
-                      </Button>
+                          {t('addTable')}
+                        </Button>
                     </div>
                     
                     {isLoadingTables ? (
@@ -824,17 +825,17 @@ export default function SettingsPage() {
                       <Table>
                         <TableHeader>
                           <TableRow>
-                            <TableHeaderCell>Name</TableHeaderCell>
-                            <TableHeaderCell>Capacity</TableHeaderCell>
-                            <TableHeaderCell>Status</TableHeaderCell>
-                            <TableHeaderCell>Actions</TableHeaderCell>
+                            <TableHeaderCell>{t('name')}</TableHeaderCell>
+                            <TableHeaderCell>{t('capacity')}</TableHeaderCell>
+                            <TableHeaderCell>{t('status')}</TableHeaderCell>
+                            <TableHeaderCell>{t('actions')}</TableHeaderCell>
                           </TableRow>
                         </TableHeader>
                         <TableBody>
                           {tables.length === 0 ? (
                             <TableRow>
                               <TableCell colSpan={4} className="text-center py-8">
-                                No tables found. Add your first table.
+                                {t('noTablesFound')}
                               </TableCell>
                             </TableRow>
                           ) : (
@@ -847,7 +848,7 @@ export default function SettingsPage() {
                                     variant={table.status === 'available' ? 'success' : 
                                            table.status === 'occupied' ? 'danger' : 'warning'}
                                   >
-                                    {table.status.charAt(0).toUpperCase() + table.status.slice(1)}
+                                    {t(table.status)}
                                   </Badge>
                                 </TableCell>
                                 <TableCell>
@@ -864,29 +865,29 @@ export default function SettingsPage() {
                                         document.getElementById('tableFormModal').showModal()
                                       }}
                                     >
-                                      Edit
+                                      {t('edit')}
                                     </Button>
                                     <Button
                                       size="sm"
                                       variant="danger"
                                       onClick={() => document.getElementById(`deleteTableConfirm-${table.id}`).showModal()}
                                     >
-                                      Delete
+                                      {t('delete')}
                                     </Button>
                                     
                                     {/* Delete Confirmation Dialog */}
                                     <dialog id={`deleteTableConfirm-${table.id}`} className="modal">
                                       <div className="modal-box">
-                                        <h3 className="font-bold text-lg">Confirm Deletion</h3>
-                                        <p className="py-4">Are you sure you want to delete table {table.name}?</p>
+                                        <h3 className="font-bold text-lg">{t('confirmDeletion')}</h3>
+                                        <p className="py-4">{t('areYouSureDeleteTable')} {table.name}?</p>
                                         <div className="modal-action">
                                           <form method="dialog">
                                             <div className="flex space-x-2">
-                                              <Button variant="outline" onClick={() => document.getElementById(`deleteTableConfirm-${table.id}`).close()}>Cancel</Button>
+                                              <Button variant="outline" onClick={() => document.getElementById(`deleteTableConfirm-${table.id}`).close()}>{t('cancel')}</Button>
                                               <Button variant="danger" onClick={() => {
                                                  document.getElementById(`deleteTableConfirm-${table.id}`).close()
                                                  deleteTable(table.id)
-                                               }}>Delete</Button>
+                                               }}>{t('delete')}</Button>
                                             </div>
                                           </form>
                                         </div>
@@ -914,12 +915,12 @@ export default function SettingsPage() {
                   <span className="text-white text-lg">{editingTable ? '✏️' : '➕'}</span>
                 </div>
                 <h3 className="text-xl font-semibold bg-gradient-to-r from-orange-600 to-orange-500 dark:from-orange-400 dark:to-orange-300 bg-clip-text text-transparent">
-                  {editingTable ? 'Edit Table' : 'Add New Table'}
+                  {editingTable ? t('editTable') : t('addNewTable')}
                 </h3>
               </div>
               <form className="space-y-4 p-6">
                 <Input
-                  label="Table Name"
+                  label={t('tableName')}
                   value={tableForm.name}
                   onChange={(e) => setTableForm({ ...tableForm, name: e.target.value })}
                   placeholder="e.g., Table 1"
@@ -929,7 +930,7 @@ export default function SettingsPage() {
                 />
                 <Input
                   type="number"
-                  label="Capacity"
+                  label={t('capacity')}
                   value={tableForm.capacity}
                   onChange={(e) => setTableForm({ ...tableForm, capacity: parseInt(e.target.value) || 1 })}
                   min={1}
@@ -945,7 +946,7 @@ export default function SettingsPage() {
                     icon="❌"
                     className="flex-1 hover:bg-gray-50 dark:hover:bg-gray-800 transition-all duration-200"
                   >
-                    Cancel
+                    {t('cancel')}
                   </Button>
                   <Button
                     onClick={(e) => {
@@ -963,7 +964,7 @@ export default function SettingsPage() {
                     icon={editingTable ? '✏️' : '✅'}
                     className="flex-1 shadow-lg hover:shadow-xl transition-all duration-300 bg-gradient-to-r from-orange-500 to-orange-600 hover:from-orange-600 hover:to-orange-700"
                   >
-                    {editingTable ? 'Update' : 'Create'}
+                    {editingTable ? t('update') : t('create')}
                   </Button>
                 </div>
               </form>
@@ -975,10 +976,10 @@ export default function SettingsPage() {
             <Card>
               <CardHeader>
                 <h2 className="text-lg font-semibold transition-colors text-gray-900">
-                  Role Management
+                  {t('roleManagement')}
                 </h2>
                 <p className="text-sm transition-colors text-gray-600">
-                  Configure permissions for different user roles
+                  {t('configurePermissionsForRoles')}
                 </p>
               </CardHeader>
               <CardBody>
@@ -990,7 +991,7 @@ export default function SettingsPage() {
                           {role}
                         </Badge>
                         <span className="text-lg font-medium transition-colors text-gray-900">
-                          {role} Permissions
+                          {t(role.toLowerCase())} {t('permissions')}
                         </span>
                       </div>
                       
@@ -998,11 +999,11 @@ export default function SettingsPage() {
                         <Table>
                           <TableHeader>
                             <TableRow>
-                              <TableHeaderCell>Resource</TableHeaderCell>
-                              <TableHeaderCell>View</TableHeaderCell>
-                              <TableHeaderCell>Create</TableHeaderCell>
-                              <TableHeaderCell>Edit</TableHeaderCell>
-                              <TableHeaderCell>Delete</TableHeaderCell>
+                              <TableHeaderCell>{t('resource')}</TableHeaderCell>
+                              <TableHeaderCell>{t('view')}</TableHeaderCell>
+                              <TableHeaderCell>{t('create')}</TableHeaderCell>
+                              <TableHeaderCell>{t('edit')}</TableHeaderCell>
+                              <TableHeaderCell>{t('delete')}</TableHeaderCell>
                             </TableRow>
                           </TableHeader>
                           <TableBody>
@@ -1050,14 +1051,14 @@ export default function SettingsPage() {
               <CardHeader>
                 <div className="flex justify-between items-center">
                   <div>
-                    <h2 className="text-lg font-semibold">User Management</h2>
-                    <p className="text-sm text-gray-600">Create, edit, and manage user accounts</p>
+                    <h2 className="text-lg font-semibold">{t('userManagement')}</h2>
+                    <p className="text-sm text-gray-600">{t('createEditManageUsers')}</p>
                   </div>
                   <Button
                     onClick={() => setShowUserForm(true)}
                     variant="primary"
                   >
-                    Add New User
+                    {t('addNewUser')}
                   </Button>
                 </div>
               </CardHeader>
@@ -1067,49 +1068,49 @@ export default function SettingsPage() {
                   <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
                     <div className="bg-white rounded-lg p-6 w-full max-w-md transition-colors">
                       <h3 className="text-lg font-semibold mb-4 transition-colors text-gray-900">
-                        {editingUser ? 'Edit User' : 'Create New User'}
+                        {editingUser ? t('editUser') : t('createNewUser')}
                       </h3>
                       <form onSubmit={editingUser ? handleUpdateUser : handleCreateUser}>
                         <div className="space-y-4">
                           <div>
                             <label className="block text-sm font-medium text-gray-700 mb-1">
-                              Full Name
+                              {t('fullName')}
                             </label>
                             <Input
                               type="text"
                               value={userForm.name}
                               onChange={(e) => setUserForm({ ...userForm, name: e.target.value })}
                               required
-                              placeholder="Enter full name"
+                              placeholder={t('enterFullName')}
                             />
                           </div>
                           <div>
                             <label className="block text-sm font-medium text-gray-700 mb-1">
-                              Email
+                              {t('email')}
                             </label>
                             <Input
                               type="email"
                               value={userForm.email}
                               onChange={(e) => setUserForm({ ...userForm, email: e.target.value })}
                               required
-                              placeholder="Enter email address"
+                              placeholder={t('enterEmailAddress')}
                             />
                           </div>
                           <div>
                             <label className="block text-sm font-medium text-gray-700 mb-1">
-                              Password {editingUser && "(leave empty to keep current)"}
+                              {t('password')} {editingUser && `(${t('leaveEmptyToKeepCurrent')})`}
                             </label>
                             <Input
                               type="password"
                               value={userForm.password}
                               onChange={(e) => setUserForm({ ...userForm, password: e.target.value })}
                               required={!editingUser}
-                              placeholder={editingUser ? "Enter new password" : "Enter password"}
+                              placeholder={editingUser ? t('enterNewPassword') : t('enterPassword')}
                             />
                           </div>
                           <div>
                             <label className="block text-sm font-medium text-gray-700 mb-1">
-                              Role
+                              {t('role')}
                             </label>
                             <select
                               value={userForm.role}
@@ -1117,8 +1118,8 @@ export default function SettingsPage() {
                               className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-primary-500 focus:border-primary-500"
                               required
                             >
-                              <option value="CASHIER">Cashier</option>
-                              <option value="ADMIN">Admin</option>
+                              <option value="CASHIER">{t('cashier')}</option>
+                              <option value="ADMIN">{t('admin')}</option>
                             </select>
                           </div>
                         </div>
@@ -1132,10 +1133,10 @@ export default function SettingsPage() {
                             {saving ? (
                               <div className="flex items-center space-x-2">
                                 <LoadingSpinner size="sm" />
-                                <span>{editingUser ? 'Updating...' : 'Creating...'}</span>
+                                <span>{editingUser ? t('updating') : t('creating')}</span>
                               </div>
                             ) : (
-                              editingUser ? 'Update User' : 'Create User'
+                              editingUser ? t('updateUser') : t('createUser')
                             )}
                           </Button>
                           <Button
@@ -1144,7 +1145,7 @@ export default function SettingsPage() {
                             onClick={cancelUserForm}
                             className="flex-1"
                           >
-                            Cancel
+                            {t('cancel')}
                           </Button>
                         </div>
                       </form>
@@ -1157,18 +1158,18 @@ export default function SettingsPage() {
                   {users.length === 0 ? (
                     <div className="text-center py-8 text-gray-500">
                       <div className="text-4xl mb-2">👥</div>
-                      <p>No users found</p>
-                      <p className="text-sm">Click "Add New User" to create the first user</p>
+                      <p>{t('noUsersFound')}</p>
+                      <p className="text-sm">{t('clickAddNewUserToCreate')}</p>
                     </div>
                   ) : (
                     <div className="overflow-x-auto">
                       <Table>
                         <TableHeader>
                           <TableRow>
-                            <TableHeaderCell>User</TableHeaderCell>
-                            <TableHeaderCell>Role</TableHeaderCell>
-                            <TableHeaderCell>Created</TableHeaderCell>
-                            <TableHeaderCell>Actions</TableHeaderCell>
+                            <TableHeaderCell>{t('user')}</TableHeaderCell>
+                            <TableHeaderCell>{t('role')}</TableHeaderCell>
+                            <TableHeaderCell>{t('created')}</TableHeaderCell>
+                            <TableHeaderCell>{t('actions')}</TableHeaderCell>
                           </TableRow>
                         </TableHeader>
                         <TableBody>
@@ -1195,7 +1196,7 @@ export default function SettingsPage() {
                                     variant="outline"
                                     onClick={() => startEditUser(u)}
                                   >
-                                    Edit
+                                    {t('edit')}
                                   </Button>
                                   <Button
                                     size="sm"
@@ -1203,7 +1204,7 @@ export default function SettingsPage() {
                                     onClick={() => handleResetPassword(u.id)}
                                     className="text-orange-600 hover:text-orange-700"
                                   >
-                                    Reset Password
+                                    {t('resetPassword')}
                                   </Button>
                                   {u.id !== user.id && (
                                     <Button
@@ -1211,7 +1212,7 @@ export default function SettingsPage() {
                                       variant="outline"
                                       onClick={() => handleDeleteUser(u.id)}
                                     >
-                                      Delete
+                                      {t('delete')}
                                     </Button>
                                   )}
                                 </div>

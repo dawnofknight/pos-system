@@ -5,6 +5,7 @@ import { usePathname, useRouter } from "next/navigation";
 import { useAuth } from "@/contexts/AuthContext";
 import { useRBAC } from "@/contexts/RBACContext";
 import { useTheme } from "@/contexts/ThemeContext";
+import { useLanguage } from "@/contexts/LanguageContext";
 import AuditLogViewer from "@/components/AuditLogViewer";
 
 export default function DashboardLayout({ children }) {
@@ -17,6 +18,7 @@ export default function DashboardLayout({ children }) {
   });
   const { user, logout } = useAuth();
   const { canAccess } = useRBAC();
+  const { t } = useLanguage();
 
   const router = useRouter();
   const pathname = usePathname();
@@ -52,47 +54,47 @@ export default function DashboardLayout({ children }) {
 
   const allNavigation = [
     {
-      name: "Dashboard",
+      name: t("dashboard"),
       href: "/dashboard",
       icon: "📊",
       resource: "dashboard",
-      description: "Overview & Analytics",
+      description: t("overviewAnalytics"),
     },
     {
-      name: "Items",
+      name: t("items"),
       href: "/dashboard/items",
       icon: "📦",
       resource: "items",
-      description: "Menu Items",
+      description: t("menuItems"),
     },
     {
-      name: "Categories",
+      name: t("categories"),
       href: "/dashboard/categories",
       icon: "🏷️",
       resource: "categories",
-      description: "Product Groups",
+      description: t("productGroups"),
     },
     {
-      name: "Sales",
+      name: t("sales"),
       href: "/dashboard/sales",
       icon: "💰",
       resource: "sales",
-      description: "POS & Orders",
+      description: t("posOrders"),
     },
     {
-      name: "Create Sale",
+      name: t("createSale"),
       href: "/dashboard/sales/create",
       icon: "🛒",
       resource: "sales",
-      description: "New Transaction",
+      description: t("newTransaction"),
     },
     // { name: 'Reports', href: '/dashboard/reports', icon: '📈', resource: 'reports', description: 'Analytics & Reports' },
     {
-      name: "Settings",
+      name: t("settings"),
       href: "/dashboard/settings",
       icon: "⚙️",
       resource: "settings",
-      description: "System Config",
+      description: t("systemConfig"),
     },
   ];
 
@@ -286,7 +288,7 @@ export default function DashboardLayout({ children }) {
                   className="flex items-center space-x-1 text-sm bg-blue-50 hover:bg-blue-100 text-blue-700 px-3 py-1 rounded-full transition-all duration-200"
                 >
                   <span>📋</span>
-                  <span>Audit Logs</span>
+                  <span>{t("auditLogs")}</span>
                 </button>
                 <div className='hidden md:flex items-center space-x-2 text-sm text-gray-500'>
                   <span>🏠</span>
@@ -322,7 +324,7 @@ export default function DashboardLayout({ children }) {
                 onClick={handleLogout}
                 className='bg-gradient-to-r from-orange-500 to-orange-600 text-white px-4 py-2 rounded-xl text-sm font-semibold hover:from-orange-600 hover:to-orange-700 transition-all duration-200 shadow-lg hover:shadow-xl'
               >
-                <span className='hidden md:inline'>Logout</span>
+                <span className='hidden md:inline'>{t("logout")}</span>
                 <span className='md:hidden'>🚪</span>
               </button>
             </div>
@@ -334,12 +336,12 @@ export default function DashboardLayout({ children }) {
             <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50">
               <div className="relative w-full max-w-6xl bg-white rounded-xl shadow-2xl overflow-hidden">
                 <div className="sticky top-0 z-10 flex items-center p-4 border-b border-gray-200 bg-white">
-                  <h2 className="text-xl font-bold text-gray-800 mr-4">Audit Logs</h2>
+                  <h2 className="text-xl font-bold text-gray-800 mr-4">{t("auditLogs")}</h2>
                   <button 
                     onClick={() => setShowAuditLogs(false)}
                     className="bg-red-500 hover:bg-red-600 text-white px-3 py-1 rounded-lg flex items-center transition-all duration-200 shadow-md ml-2"
                   >
-                    <span className="mr-1">Close</span>
+                    <span className="mr-1">{t("close")}</span>
                     <span className="text-xl">✕</span>
                   </button>
                   <div className="flex-grow"></div>

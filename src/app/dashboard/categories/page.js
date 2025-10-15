@@ -3,6 +3,7 @@
 import { useState, useEffect } from 'react'
 import AuthGuard from '@/components/AuthGuard'
 import DashboardLayout from '@/components/DashboardLayout'
+import { useLanguage } from '@/contexts/LanguageContext'
 import { 
   Card, 
   CardHeader, 
@@ -20,6 +21,7 @@ import {
 } from '@/components/ui'
 
 export default function CategoriesPage() {
+  const { t } = useLanguage()
   const [categories, setCategories] = useState([])
   const [loading, setLoading] = useState(true)
   const [showModal, setShowModal] = useState(false)
@@ -124,11 +126,11 @@ export default function CategoriesPage() {
                       <span className="text-white text-xl">📂</span>
                     </div>
                     <h1 className="text-3xl font-bold text-black">
-                      Categories Management
+                      {t("categoriesManagement")}
                     </h1>
                   </div>
                   <p className="text-black ml-14">
-                    Organize and manage your product categories
+                    {t("organizeManageCategories")}
                   </p>
                 </div>
                 <Button 
@@ -137,7 +139,7 @@ export default function CategoriesPage() {
                   icon="➕"
                   className="shadow-lg hover:shadow-xl transition-all duration-300 bg-gradient-to-r from-orange-600 to-orange-700 hover:from-orange-700 hover:to-orange-800"
                 >
-                  Add New Category
+                  {t("addNewCategory")}
                 </Button>
               </div>
             </div>
@@ -151,10 +153,10 @@ export default function CategoriesPage() {
                 </div>
                 <div>
                   <h3 className="text-lg font-semibold text-black">
-                    Product Categories
+                    {t("productCategories")}
                   </h3>
                   <p className="text-sm text-black">
-                    {categories.length} categories total
+                    {categories.length} {t("categoriesTotal")}
                   </p>
                 </div>
               </div>
@@ -163,9 +165,9 @@ export default function CategoriesPage() {
               <Table>
                 <TableHeader>
                   <TableRow>
-                    <TableHeaderCell>Category</TableHeaderCell>
-                    <TableHeaderCell>Items Count</TableHeaderCell>
-                    <TableHeaderCell>Created Date</TableHeaderCell>
+                    <TableHeaderCell>{t("category")}</TableHeaderCell>
+                    <TableHeaderCell>{t("itemsCount")}</TableHeaderCell>
+                    <TableHeaderCell>{t("createdDate")}</TableHeaderCell>
                   </TableRow>
                 </TableHeader>
                 <TableBody>
@@ -187,7 +189,7 @@ export default function CategoriesPage() {
                       </TableCell>
                       <TableCell>
                         <span className="inline-flex items-center px-3 py-1 rounded-xl text-sm font-medium bg-gradient-to-r from-emerald-100 to-green-100 text-emerald-700 border border-emerald-200/50 shadow-sm">
-                          {category._count.items} items
+                          {category._count.items} {t("items")}
                         </span>
                       </TableCell>
                       <TableCell>
@@ -214,19 +216,19 @@ export default function CategoriesPage() {
                   <span className="text-white text-lg">➕</span>
                 </div>
                 <h3 className="text-xl font-semibold bg-gradient-to-r from-purple-600 to-indigo-600 dark:from-purple-400 dark:to-indigo-400 bg-clip-text text-transparent">
-                  Add New Category
+                  {t("addNewCategory")}
                 </h3>
               </div>
             }
           >
             <form onSubmit={handleSubmit} className="space-y-6 p-6">
               <Input
-                label="Category Name"
+                label={t("categoryName")}
                 name="name"
                 value={formData.name}
                 onChange={handleInputChange}
                 required
-                placeholder="Enter category name"
+                placeholder={t("enterCategoryName")}
                 icon="📂"
                 variant="glass"
               />
@@ -238,7 +240,7 @@ export default function CategoriesPage() {
                   icon="✅"
                   className="flex-1 shadow-lg hover:shadow-xl transition-all duration-300 bg-gradient-to-r from-purple-600 to-indigo-600 hover:from-purple-700 hover:to-indigo-700"
                 >
-                  Add Category
+                  {t("addCategory")}
                 </Button>
                 <Button 
                   type="button" 
@@ -250,7 +252,7 @@ export default function CategoriesPage() {
                   icon="❌"
                   className="flex-1 hover:bg-gray-50 dark:hover:bg-gray-800 transition-all duration-200"
                 >
-                  Cancel
+                  {t("cancel")}
                 </Button>
               </div>
             </form>
@@ -270,7 +272,7 @@ export default function CategoriesPage() {
                   <span className="text-white text-lg">📦</span>
                 </div>
                 <h3 className="text-xl font-semibold bg-gradient-to-r from-blue-600 to-indigo-600 dark:from-blue-400 dark:to-indigo-400 bg-clip-text text-transparent">
-                   Items in &quot;{selectedCategory?.name}&quot;
+                   {t("itemsInCategory", { categoryName: selectedCategory?.name })}
                  </h3>
               </div>
             }
@@ -296,7 +298,7 @@ export default function CategoriesPage() {
                           <div>
                              <h4 className="font-semibold text-gray-900">{item.name}</h4>
                              <p className="text-sm text-gray-600">
-                               Stock: {item.stock} | Price: Rp {item.price?.toLocaleString('id-ID') || '0'}
+                               {t("stock")}: {item.stock} | {t("price")}: Rp {item.price?.toLocaleString('id-ID') || '0'}
                              </p>
                            </div>
                          </div>
@@ -311,7 +313,7 @@ export default function CategoriesPage() {
                                  ? 'bg-yellow-100 text-yellow-800 border border-yellow-200'
                                  : 'bg-red-100 text-red-800 border border-red-200'
                            }`}>
-                            {item.stock > 0 ? `${item.stock} in stock` : 'Out of stock'}
+                            {item.stock > 0 ? `${item.stock} ${t("inStock")}` : t("outOfStock")}
                           </div>
                         </div>
                       </div>
@@ -324,10 +326,10 @@ export default function CategoriesPage() {
                      <span className="text-gray-500 text-2xl">📦</span>
                    </div>
                    <h3 className="text-lg font-medium text-gray-900 mb-2">
-                     No items found
+                     {t("noItemsFound")}
                    </h3>
                    <p className="text-gray-600">
-                     This category doesn&apos;t have any items yet.
+                     {t("categoryNoItems")}
                    </p>
                  </div>
               )}

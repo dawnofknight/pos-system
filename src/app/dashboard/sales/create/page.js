@@ -4,15 +4,12 @@ import { useState, useEffect } from 'react'
 import AuthGuard from '@/components/AuthGuard'
 import DashboardLayout from '@/components/DashboardLayout'
 import { useAuth } from '@/contexts/AuthContext'
+import { useLanguage } from '@/contexts/LanguageContext'
 import Link from 'next/link'
 
 import { 
-  Card, 
-  CardHeader, 
-  CardBody, 
   Button, 
   Input, 
-  Select,
   LoadingSpinner 
 } from '@/components/ui'
 import { useRouter } from 'next/navigation'
@@ -20,7 +17,7 @@ import ProductImage from '@/components/ProductImage'
 
 export default function CreateSalePage() {
   const { user } = useAuth()
-
+  const { t } = useLanguage()
   const router = useRouter()
   
   // Existing states
@@ -61,7 +58,7 @@ export default function CreateSalePage() {
   const [tables, setTables] = useState([])
   const [activeSales, setActiveSales] = useState([])
   
-  const DRAFT_STORAGE_KEY = `pos_draft_cart_${user?.id || 'anonymous'}`
+  // const DRAFT_STORAGE_KEY = `pos_draft_cart_${user?.id || 'anonymous'}`
 
   useEffect(() => {
     fetchItems()
@@ -132,7 +129,7 @@ export default function CreateSalePage() {
 
   const addToCart = (item) => {
     if (item.stock <= 0) {
-      alert('This item is out of stock')
+      alert(t('thisItemIsOutOfStock'))
       return
     }
 
@@ -143,7 +140,7 @@ export default function CreateSalePage() {
       const newQuantity = newCart[existingIndex].quantity + 1
       
       if (newQuantity > item.stock) {
-        alert('Not enough stock available')
+        alert(t('notEnoughStockAvailable'))
         return
       }
       
@@ -173,7 +170,7 @@ export default function CreateSalePage() {
 
     const item = items.find(i => i.id === itemId)
     if (newQuantity > item.stock) {
-      alert('Not enough stock available')
+      alert(t('notEnoughStockAvailable'))
       return
     }
 
@@ -243,7 +240,7 @@ export default function CreateSalePage() {
 
   const proceedToMenu = () => {
     if (orderType === 'dine-in' && !selectedTable) {
-      alert('Please select a table for dine-in orders')
+      alert(t('pleaseSelectTableForDineIn'))
       return
     }
     setCurrentStep('menu')
@@ -255,12 +252,12 @@ export default function CreateSalePage() {
 
   const processSale = async () => {
     if (cart.length === 0) {
-      alert('Please add items to cart')
+      alert(t('pleaseAddItemsToCart'))
       return
     }
 
     if (!selectedPaymentMethod) {
-      alert('Please select a payment method')
+      alert(t('pleaseSelectPaymentMethod'))
       return
     }
 
@@ -288,15 +285,15 @@ export default function CreateSalePage() {
       })
 
       if (response.ok) {
-        alert('Sale completed successfully!')
+        alert(t('saleCompletedSuccessfully'))
         setCart([])
         router.push('/dashboard/sales')
       } else {
-        alert('Error processing sale')
+        alert(t('errorProcessingSale'))
       }
     } catch (error) {
       console.error('Error processing sale:', error)
-      alert('Error processing sale')
+      alert(t('errorProcessingSale'))
     } finally {
       setProcessing(false)
     }
@@ -333,8 +330,8 @@ export default function CreateSalePage() {
                     <span className="text-2xl">🍽️</span>
                   </div>
                   <div>
-                    <h1 className="text-2xl font-bold text-gray-900">POS</h1>
-                    <p className="text-sm text-gray-500">Point of Sale System</p>
+                    <h1 className="text-2xl font-bold text-gray-900">{t('pos')}</h1>
+                    <p className="text-sm text-gray-500">{t('pointOfSaleSystem')}</p>
                   </div>
                 </div>
                 
@@ -351,7 +348,7 @@ export default function CreateSalePage() {
                   variant="outline"
                   size="sm"
                 >
-                  ← Back to Sales
+                  ← {t('backToSales')}
                 </Button>
               </div>
             </div>
@@ -363,7 +360,7 @@ export default function CreateSalePage() {
               <div className="max-w-6xl mx-auto">
                 {/* Order Type Selection */}
                 <div className="bg-white rounded-2xl shadow-sm border border-gray-200 p-6 mb-6">
-                  <h2 className="text-xl font-semibold text-gray-900 mb-4">Order Type</h2>
+                  <h2 className="text-xl font-semibold text-gray-900 mb-4">{t('orderType')}</h2>
                   <div className="flex gap-4">
                     <button
                       onClick={() => handleOrderTypeChange('dine-in')}
@@ -375,8 +372,8 @@ export default function CreateSalePage() {
                     >
                       <div className="text-center">
                         <div className="text-4xl mb-2">🍽️</div>
-                        <h3 className="font-semibold text-gray-900">Dine In</h3>
-                        <p className="text-sm text-gray-500">Table service</p>
+                        <h3 className="font-semibold text-gray-900">{t('dineIn')}</h3>
+                        <p className="text-sm text-gray-500">{t('tableService')}</p>
                       </div>
                     </button>
                     
@@ -390,8 +387,8 @@ export default function CreateSalePage() {
                     >
                       <div className="text-center">
                         <div className="text-4xl mb-2">🥡</div>
-                        <h3 className="font-semibold text-gray-900">Take Away</h3>
-                        <p className="text-sm text-gray-500">To go</p>
+                        <h3 className="font-semibold text-gray-900">{t('takeAway')}</h3>
+                        <p className="text-sm text-gray-500">{t('toGo')}</p>
                       </div>
                     </button>
                   </div>
@@ -400,10 +397,10 @@ export default function CreateSalePage() {
                 {orderType === 'dine-in' && (
                   <div className="bg-white rounded-2xl shadow-sm border border-gray-200 p-6 mb-6">
                     <div className="flex items-center justify-between mb-6">
-                      <h2 className="text-xl font-semibold text-gray-900">Table Selection</h2>
+                      <h2 className="text-xl font-semibold text-gray-900">{t('tableSelection')}</h2>
                       <div className="flex items-center gap-4">
                         <div className="flex items-center gap-2">
-                          <span className="text-sm text-gray-600">Guests:</span>
+                          <span className="text-sm text-gray-600">{t('guests')}:</span>
                           <div className="flex items-center bg-gray-100 rounded-lg">
                             <button
                               onClick={() => setGuestCount(Math.max(1, guestCount - 1))}
@@ -424,7 +421,7 @@ export default function CreateSalePage() {
                     </div>
                     
                     <div className="mb-6">
-                      <h3 className="text-lg font-medium text-gray-900 mb-2">Active Table Sessions</h3>
+                      <h3 className="text-lg font-medium text-gray-900 mb-2">{t('activeTableSessions')}</h3>
                       {activeSales.length > 0 ? (
                         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
                           {activeSales.map(sale => (
@@ -435,19 +432,19 @@ export default function CreateSalePage() {
                             >
                               <div className="flex justify-between items-center">
                                 <div>
-                                  <h4 className="font-medium text-gray-900">Table {sale.table?.name || 'Unknown'}</h4>
-                                  <p className="text-sm text-gray-600">Order #{sale.orderNumber}</p>
+                                  <h4 className="font-medium text-gray-900">{t('table')} {sale.table?.name || t('unknown')}</h4>
+                                  <p className="text-sm text-gray-600">{t('order')} #{sale.orderNumber}</p>
                                 </div>
                                 <div className="text-right">
                                   <p className="text-sm font-medium text-gray-900">{settings.currencySymbol} {sale.total.toLocaleString()}</p>
-                                  <p className="text-xs text-gray-500">{sale.items?.length || 0} items</p>
+                                  <p className="text-xs text-gray-500">{sale.items?.length || 0} {t('items')}</p>
                                 </div>
                               </div>
                             </Link>
                           ))}
                         </div>
                       ) : (
-                        <p className="text-gray-500 text-sm">No active table sessions</p>
+                        <p className="text-gray-500 text-sm">{t('noActiveTableSessions')}</p>
                       )}
                     </div>
                     
@@ -492,7 +489,7 @@ export default function CreateSalePage() {
                                 ? 'text-orange-600'
                                 : 'text-gray-700'
                             }`}>
-                              {table.occupied ? 'Occupied' : 'Available'}
+                              {table.occupied ? t('occupied') : t('available')}
                             </p>
                           </div>
                         </div>
@@ -506,19 +503,19 @@ export default function CreateSalePage() {
                   <div className="flex items-center justify-between">
                     <div className="flex items-center gap-6">
                       <div>
-                        <p className="text-sm text-gray-500">Order #</p>
+                        <p className="text-sm text-gray-500">{t('order')} #</p>
                         <p className="text-lg font-semibold text-gray-900">{orderNumber}</p>
                       </div>
                       
                       {orderType === 'dine-in' && selectedTable && (
                         <div>
-                          <p className="text-sm text-gray-500">Table</p>
+                          <p className="text-sm text-gray-500">{t('table')}</p>
                           <p className="text-lg font-semibold text-orange-600">{selectedTable.name}</p>
                         </div>
                       )}
                       
                       <div>
-                        <p className="text-sm text-gray-500">Guests</p>
+                        <p className="text-sm text-gray-500">{t('guests')}</p>
                         <p className="text-lg font-semibold text-gray-900">{guestCount}</p>
                       </div>
                     </div>
@@ -529,7 +526,7 @@ export default function CreateSalePage() {
                       className="bg-orange-500 hover:bg-orange-600"
                       disabled={orderType === 'dine-in' && !selectedTable}
                     >
-                      Select Menu →
+                      {t('selectMenu')} →
                     </Button>
                   </div>
                 </div>
@@ -550,18 +547,18 @@ export default function CreateSalePage() {
                           variant="outline"
                           size="sm"
                         >
-                          ← Back
+                          ← {t('back')}
                         </Button>
-                        <h2 className="text-xl font-semibold text-gray-900">Menu</h2>
+                        <h2 className="text-xl font-semibold text-gray-900">{t('menu')}</h2>
                       </div>
                       
                       <div className="flex items-center gap-4 text-sm">
-                        <span className="text-gray-500">Order #{orderNumber}</span>
+                        <span className="text-gray-500">{t('order')} #{orderNumber}</span>
                         {orderType === 'dine-in' && selectedTable && (
-                          <span className="text-orange-600 font-medium">Table {selectedTable.name}</span>
+                          <span className="text-orange-600 font-medium">{t('table')} {selectedTable.name}</span>
                         )}
                         {orderType === 'take-away' && (
-                          <span className="text-green-600 font-medium">Take Away</span>
+                          <span className="text-green-600 font-medium">{t('takeAway')}</span>
                         )}
                       </div>
                     </div>
@@ -570,7 +567,7 @@ export default function CreateSalePage() {
                     <div className="flex gap-4 mb-4">
                       <div className="flex-1 relative">
                         <Input
-                          placeholder="🔍 Search menu items..."
+                          placeholder={t('searchMenuItems')}
                           value={searchTerm}
                           onChange={(e) => setSearchTerm(e.target.value)}
                           className="pl-10"
@@ -593,7 +590,7 @@ export default function CreateSalePage() {
                         }`}
                         onClick={() => setSelectedCategory('all')}
                       >
-                        All
+                        {t('all')}
                       </div>
                       
                       {categories.map(category => (
@@ -630,7 +627,7 @@ export default function CreateSalePage() {
                               item.stock <= 5 ? 'bg-yellow-100 text-yellow-700' :
                               'bg-green-100 text-green-700'
                             }`}>
-                              {item.stock <= 0 ? 'Out' : item.stock}
+                              {item.stock <= 0 ? t('out') : item.stock}
                             </span>
                           </div>
                           
@@ -656,7 +653,7 @@ export default function CreateSalePage() {
                           {item.stock > 0 && (
                             <div className="absolute inset-0 bg-orange-500/10 rounded-xl opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
                               <div className="bg-orange-500 text-white px-3 py-1.5 rounded-lg text-sm font-medium shadow-lg transform translate-y-2 group-hover:translate-y-0 transition-transform">
-                                + Add to Cart
+                                + {t('addToCart')}
                               </div>
                             </div>
                           )}
@@ -667,7 +664,7 @@ export default function CreateSalePage() {
                     {filteredItems.length === 0 && (
                       <div className="text-center py-12 text-gray-500">
                         <div className="text-4xl mb-4">🔍</div>
-                        <p>No items found matching your criteria</p>
+                        <p>{t('noItemsFound')}</p>
                       </div>
                     )}
                   </div>
@@ -681,9 +678,9 @@ export default function CreateSalePage() {
                   <div className="p-6 border-b border-gray-200">
                     <div className="flex items-center justify-between">
                       <div>
-                        <h3 className="text-lg font-semibold text-gray-900">Order Summary</h3>
+                        <h3 className="text-lg font-semibold text-gray-900">{t('orderSummary')}</h3>
                         <p className="text-sm text-gray-500">
-                          {cart.length} {cart.length === 1 ? 'item' : 'items'}
+                          {cart.length} {cart.length === 1 ? t('item') : t('items')}
                         </p>
                       </div>
                       
@@ -693,7 +690,7 @@ export default function CreateSalePage() {
                           variant="outline"
                           size="sm"
                         >
-                          Clear
+                          {t('clear')}
                         </Button>
                       )}
                     </div>
@@ -704,8 +701,8 @@ export default function CreateSalePage() {
                     {cart.length === 0 ? (
                       <div className="flex flex-col items-center justify-center h-full text-gray-500">
                         <div className="text-4xl mb-4">🛒</div>
-                        <p className="text-center">No items in cart</p>
-                        <p className="text-sm text-center mt-1">Add items from the menu</p>
+                        <p className="text-center">{t('noItemsInCart')}</p>
+                        <p className="text-sm text-center mt-1">{t('addItemsFromMenu')}</p>
                       </div>
                     ) : (
                       <div className="space-y-4">
@@ -714,7 +711,7 @@ export default function CreateSalePage() {
                             <div className="flex items-start justify-between mb-3">
                               <div className="flex-1">
                                 <h4 className="font-medium text-gray-900 text-sm">{item.name}</h4>
-                                <p className="text-xs text-gray-500">{settings.currencySymbol}{item.price.toFixed(2)} each</p>
+                                <p className="text-xs text-gray-500">{settings.currencySymbol}{item.price.toFixed(2)} {t('each')}</p>
                               </div>
                               <button
                                 onClick={() => removeFromCart(item.itemId)}
@@ -761,7 +758,7 @@ export default function CreateSalePage() {
                       {/* Totals */}
                       <div className="space-y-2 mb-4">
                         <div className="flex justify-between text-sm">
-                          <span className="text-gray-600 dark:text-gray-400">Subtotal:</span>
+                          <span className="text-gray-600 dark:text-gray-400">{t('subtotal')}:</span>
                           <span className="font-medium text-gray-900 dark:text-white">{settings.currencySymbol}{calculateTotal().toFixed(2)}</span>
                         </div>
                         {settings.taxEnabled && (
@@ -772,7 +769,7 @@ export default function CreateSalePage() {
                         )}
                         <div className="border-t border-gray-200 pt-2">
                           <div className="flex justify-between">
-                            <span className="text-lg font-bold text-gray-900">Total:</span>
+                            <span className="text-lg font-bold text-gray-900">{t('total')}:</span>
                             <span className="text-xl font-bold text-orange-600">{settings.currencySymbol}{calculateGrandTotal().toFixed(2)}</span>
                           </div>
                         </div>
@@ -783,7 +780,7 @@ export default function CreateSalePage() {
                         <div className="flex items-center justify-between mb-2 cursor-pointer" 
                              onClick={() => setPaymentMethodOpen(!paymentMethodOpen)}>
                           <label className="block text-sm font-medium text-gray-700">
-                            Payment Method
+                            {t('paymentMethod')}
                           </label>
                           <button className="text-gray-500 hover:text-gray-700">
                             {paymentMethodOpen ? (
@@ -807,10 +804,10 @@ export default function CreateSalePage() {
                                   key={method.id}
                                   type="button"
                                   onClick={() => setSelectedPaymentMethod(method.id)}
-                                  className={`flex items-center justify-center p-3 rounded-lg border ${selectedPaymentMethod === method.id ? 'bg-orange-50 border-orange-500' : 'border-gray-300 hover:bg-gray-50'}`}
+                                  className={`flex items-center justify-center p-3 rounded-lg border ${selectedPaymentMethod === method.id ? 'bg-orange-500 border-orange-500' : 'border-gray-300 hover:bg-gray-50'}`}
                                 >
                                   <div className="flex flex-col items-center">
-                                    <span className="text-xl mb-1">{method.name === 'Cash' ? '💵' : method.name === 'Credit Card' ? '💳' : method.name === 'Debit Card' ? '💳' : '📱'}</span>
+                                    <span className="text-xl mb-1">{method.name === t('cash') ? '💵' : method.name === t('creditCard') ? '💳' : method.name === t('debitCard') ? '💳' : '📱'}</span>
                                     <span className="font-medium">{method.name}</span>
                                   </div>
                                 </button>
@@ -830,12 +827,12 @@ export default function CreateSalePage() {
                         {processing ? (
                           <div className="flex items-center justify-center space-x-2">
                             <LoadingSpinner size="sm" />
-                            <span>Processing...</span>
+                            <span>{t('processing')}...</span>
                           </div>
                         ) : (
                           <div className="flex items-center justify-center space-x-2">
                             <span>💰</span>
-                            <span>Complete Order</span>
+                            <span>{t('completeOrder')}</span>
                           </div>
                         )}
                       </Button>

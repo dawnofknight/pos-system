@@ -4,6 +4,7 @@ import { useState, useEffect } from 'react'
 import AuthGuard from '@/components/AuthGuard'
 import DashboardLayout from '@/components/DashboardLayout'
 import { useAuth } from '@/contexts/AuthContext'
+import { useLanguage } from '@/contexts/LanguageContext'
 
 import {
   Card,
@@ -18,6 +19,7 @@ import { formatCurrency } from '@/lib/utils'
 
 export default function ReportsPage() {
   const { user, token } = useAuth()
+  const { t } = useLanguage()
 
   const [loading, setLoading] = useState(true)
   const [reportsData, setReportsData] = useState(null)
@@ -139,10 +141,10 @@ export default function ReportsPage() {
           <div className="flex justify-between items-center">
             <div>
               <h1 className="text-2xl font-bold text-foreground">
-                📊 Sales Reports
+                📊 {t('salesReports')}
               </h1>
               <p className="text-gray-600">
-                View sales analytics and performance metrics
+                {t('viewSalesAnalytics')}
               </p>
             </div>
           </div>
@@ -151,36 +153,36 @@ export default function ReportsPage() {
           <Card>
             <CardHeader>
               <h2 className="text-lg font-semibold text-foreground">
-                Filters
+                {t('filters')}
               </h2>
             </CardHeader>
             <CardBody>
               <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-2">
-                    Period
+                    {t('period')}
                   </label>
                   <Select
                     value={period}
                     onChange={(e) => setPeriod(e.target.value)}
                   >
-                    <option value="today">Today</option>
-                    <option value="week">This Week</option>
-                    <option value="month">This Month</option>
-                    <option value="year">This Year</option>
-                    <option value="custom">Custom Range</option>
+                    <option value="today">{t('today')}</option>
+                    <option value="week">{t('thisWeek')}</option>
+                    <option value="month">{t('thisMonth')}</option>
+                    <option value="year">{t('thisYear')}</option>
+                    <option value="custom">{t('customRange')}</option>
                   </Select>
                 </div>
 
                 <div>
                   <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                    Payment Method
+                    {t('paymentMethod')}
                   </label>
                   <Select
                     value={paymentMethodId}
                     onChange={(e) => setPaymentMethodId(e.target.value)}
                   >
-                    <option value="">All Methods</option>
+                    <option value="">{t('allMethods')}</option>
                     {paymentMethods.map(method => (
                       <option key={method.id} value={method.id}>
                         {method.name}
@@ -193,7 +195,7 @@ export default function ReportsPage() {
                   <>
                     <div>
                       <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                        Start Date
+                        {t('startDate')}
                       </label>
                       <Input
                         type="date"
@@ -203,7 +205,7 @@ export default function ReportsPage() {
                     </div>
                     <div>
                       <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                        End Date
+                        {t('endDate')}
                       </label>
                       <Input
                         type="date"
@@ -231,7 +233,7 @@ export default function ReportsPage() {
                       {reportsData.summary.totalSales}
                     </div>
                     <div className="text-sm text-gray-600">
-                      Total Sales
+                      {t('totalSales')}
                     </div>
                     <div className="text-xs text-gray-500 mt-1">
                       {formatPeriodLabel(reportsData.summary.period)}
@@ -245,7 +247,7 @@ export default function ReportsPage() {
                       {formatCurrency(reportsData.summary.totalRevenue, settings.currencySymbol)}
                     </div>
                     <div className="text-sm text-gray-600 dark:text-gray-400">
-                      Total Revenue
+                      {t('totalRevenue')}
                     </div>
                     <div className="text-xs text-gray-500 dark:text-gray-500 mt-1">
                       {formatPeriodLabel(reportsData.summary.period)}
@@ -259,10 +261,10 @@ export default function ReportsPage() {
                       {formatCurrency(reportsData.summary.averageSale, settings.currencySymbol)}
                     </div>
                     <div className="text-sm text-gray-600 dark:text-gray-400">
-                      Average Sale
+                      {t('averageSale')}
                     </div>
                     <div className="text-xs text-gray-500 dark:text-gray-500 mt-1">
-                      Per transaction
+                      {t('perTransaction')}
                     </div>
                   </CardBody>
                 </Card>
@@ -273,10 +275,10 @@ export default function ReportsPage() {
                       {Object.keys(reportsData.paymentMethods).length}
                     </div>
                     <div className="text-sm text-gray-600 dark:text-gray-400">
-                      Payment Methods
+                      {t('paymentMethods')}
                     </div>
                     <div className="text-xs text-gray-500 dark:text-gray-500 mt-1">
-                      Used in period
+                      {t('usedInPeriod')}
                     </div>
                   </CardBody>
                 </Card>
@@ -286,7 +288,7 @@ export default function ReportsPage() {
               <Card>
                 <CardHeader>
                   <h2 className="text-lg font-semibold text-foreground">
-                    💳 Payment Methods Breakdown
+                    💳 {t('paymentMethodsBreakdown')}
                   </h2>
                 </CardHeader>
                 <CardBody>
@@ -296,7 +298,7 @@ export default function ReportsPage() {
                         <div>
                           <div className="font-medium text-foreground">{method}</div>
                           <div className="text-sm text-gray-600 dark:text-gray-400">
-                            {stats.count} transactions
+                            {stats.count} {t('transactions')}
                           </div>
                         </div>
                         <div className="text-right">
@@ -317,7 +319,7 @@ export default function ReportsPage() {
               <Card>
                 <CardHeader>
                   <h2 className="text-lg font-semibold text-foreground">
-                    🏆 Top Selling Items
+                    🏆 {t('topSellingItems')}
                   </h2>
                 </CardHeader>
                 <CardBody>
@@ -331,7 +333,7 @@ export default function ReportsPage() {
                           <div>
                             <div className="font-medium text-foreground">{item.name}</div>
                             <div className="text-sm text-gray-600 dark:text-gray-400">
-                              {item.quantity} units sold
+                              {item.quantity} {t('unitsSold')}
                             </div>
                           </div>
                         </div>
@@ -350,7 +352,7 @@ export default function ReportsPage() {
               <Card>
                 <CardHeader>
                   <h2 className="text-lg font-semibold text-foreground">
-                    📂 Category Performance
+                    📂 {t('categoryPerformance')}
                   </h2>
                 </CardHeader>
                 <CardBody>
@@ -360,7 +362,7 @@ export default function ReportsPage() {
                         <div>
                           <div className="font-medium text-foreground">{category}</div>
                           <div className="text-sm text-gray-600 dark:text-gray-400">
-                            {stats.quantity} items • {stats.count} transactions
+                            {stats.quantity} {t('items')} • {stats.count} {t('transactions')}
                           </div>
                         </div>
                         <div className="text-right">
@@ -378,7 +380,7 @@ export default function ReportsPage() {
               <Card>
                 <CardHeader>
                   <h2 className="text-lg font-semibold text-foreground">
-                    🕒 Recent Sales
+                    🕒 {t('recentSales')}
                   </h2>
                 </CardHeader>
                 <CardBody>
@@ -387,10 +389,10 @@ export default function ReportsPage() {
                       <div key={sale.id} className="flex justify-between items-center p-3 bg-gray-50 rounded-lg">
                         <div>
                           <div className="font-medium text-foreground">
-                            Sale #{sale.id}
+                            {t('sale')} #{sale.id}
                           </div>
                           <div className="text-sm text-gray-600 dark:text-gray-400">
-                            {sale.user.name} • {sale.paymentMethod?.name || 'Unknown'} • {sale.itemCount} items
+                            {sale.user.name} • {sale.paymentMethod?.name || t('unknown')} • {sale.itemCount} {t('items')}
                           </div>
                           <div className="text-xs text-gray-500">
                             {new Date(sale.createdAt).toLocaleString()}
@@ -412,7 +414,7 @@ export default function ReportsPage() {
               <CardBody className="text-center py-12">
                 <div className="text-gray-500">
                   <div className="text-4xl mb-4">📊</div>
-                  <p>No data available for the selected period</p>
+                  <p>{t('noDataAvailable')}</p>
                 </div>
               </CardBody>
             </Card>

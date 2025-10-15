@@ -4,6 +4,7 @@ import { useState, useEffect } from 'react'
 import AuthGuard from '@/components/AuthGuard'
 import DashboardLayout from '@/components/DashboardLayout'
 import ImageUpload from '@/components/ImageUpload'
+import { useLanguage } from '@/contexts/LanguageContext'
 import { 
   Card, 
   CardHeader, 
@@ -22,6 +23,7 @@ import {
 } from '@/components/ui'
 
 export default function ItemsPage() {
+  const { t } = useLanguage()
   const [items, setItems] = useState([])
   const [categories, setCategories] = useState([])
   const [loading, setLoading] = useState(true)
@@ -413,10 +415,10 @@ export default function ItemsPage() {
                 </div>
                 <div>
                   <h1 className="text-3xl font-bold text-black">
-                    Items Management
+                    {t("itemsManagement")}
                   </h1>
                   <p className="text-black mt-1">
-                    Manage your inventory items and stock levels
+                    {t("manageInventoryItems")}
                   </p>
                 </div>
               </div>
@@ -427,7 +429,7 @@ export default function ItemsPage() {
                   icon="+"
                   className="shadow-lg hover:shadow-xl transition-all duration-300 bg-orange-600 hover:bg-orange-700"
                 >
-                  Add New Item
+                  {t("addNewItem")}
                 </Button>
               )}
             </div>
@@ -444,7 +446,7 @@ export default function ItemsPage() {
               }`}
               onClick={() => setActiveTab('items')}
             >
-              Items Inventory
+              {t("itemsInventory")}
             </button>
             <button
               className={`py-2 px-4 font-medium text-sm ${
@@ -454,7 +456,7 @@ export default function ItemsPage() {
               }`}
               onClick={() => setActiveTab('stock-report')}
             >
-              Stock Report
+              {t("stockReport")}
             </button>
           </div>
 
@@ -467,10 +469,10 @@ export default function ItemsPage() {
                   </div>
                   <div>
                     <h3 className="text-xl font-bold bg-gradient-to-r from-orange-600 to-orange-700 bg-clip-text text-transparent">
-                      {activeTab === 'items' ? 'Inventory Items' : 'Stock Report'}
+                      {activeTab === 'items' ? t("inventoryItems") : t("stockReport")}
                     </h3>
                     <p className="text-sm text-orange-600">
-                      {activeTab === 'items' ? `${items.length} items in stock` : `${filteredSalesData.length} sales records`}
+                      {activeTab === 'items' ? `${items.length} ${t("itemsInStock")}` : `${filteredSalesData.length} ${t("salesRecords")}`}
                     </p>
                   </div>
                 </div>
@@ -478,7 +480,7 @@ export default function ItemsPage() {
                   <div className="flex flex-col sm:flex-row gap-4">
                     <div className="flex flex-col sm:flex-row gap-2 sm:items-center">
                       <label htmlFor="startDate" className="text-sm font-medium">
-                        Start Date:
+                        {t("startDate")}:
                       </label>
                       <input
                         type="date"
@@ -490,7 +492,7 @@ export default function ItemsPage() {
                     </div>
                     <div className="flex flex-col sm:flex-row gap-2 sm:items-center">
                       <label htmlFor="endDate" className="text-sm font-medium">
-                        End Date:
+                        {t("endDate")}:
                       </label>
                       <input
                         type="date"
@@ -505,7 +507,7 @@ export default function ItemsPage() {
                       variant="secondary"
                       className="mt-2 sm:mt-0"
                     >
-                      Search
+                      {t("search")}
                     </Button>
                     <Button
                       onClick={() => {
@@ -516,7 +518,7 @@ export default function ItemsPage() {
                       variant="outline"
                       className="mt-2 sm:mt-0"
                     >
-                      Clear
+                      {t("clear")}
                     </Button>
                   </div>
                 )}
@@ -527,11 +529,11 @@ export default function ItemsPage() {
                 <Table>
                   <TableHeader>
                     <TableRow>
-                      <TableHeaderCell>Item</TableHeaderCell>
-                      <TableHeaderCell>Category</TableHeaderCell>
-                      <TableHeaderCell>Price</TableHeaderCell>
-                      <TableHeaderCell>Stock</TableHeaderCell>
-                      <TableHeaderCell>Actions</TableHeaderCell>
+                      <TableHeaderCell>{t("item")}</TableHeaderCell>
+                      <TableHeaderCell>{t("category")}</TableHeaderCell>
+                      <TableHeaderCell>{t("price")}</TableHeaderCell>
+                      <TableHeaderCell>{t("stock")}</TableHeaderCell>
+                      <TableHeaderCell>{t("actions")}</TableHeaderCell>
                     </TableRow>
                   </TableHeader>
                   <TableBody>
@@ -572,7 +574,7 @@ export default function ItemsPage() {
                               ? 'bg-gradient-to-r from-red-100 to-orange-100 text-red-700 border border-red-200' 
                               : 'bg-gradient-to-r from-green-100 to-emerald-100 text-green-700 border border-green-200'
                           }`}>
-                            {item.stock} units
+                            {item.stock} {t("units")}
                           </span>
                         </TableCell>
                         <TableCell>
@@ -584,7 +586,7 @@ export default function ItemsPage() {
                               icon="✏️"
                               className="hover:bg-primary-50 hover:border-primary-300 transition-all duration-200"
                             >
-                              Edit
+                              {t("edit")}
                             </Button>
                             <Button
                               size="sm"
@@ -593,7 +595,7 @@ export default function ItemsPage() {
                               icon="🗑️"
                               className="hover:shadow-lg transition-all duration-200"
                             >
-                              Delete
+                              {t("delete")}
                             </Button>
                           </div>
                         </TableCell>
@@ -609,7 +611,7 @@ export default function ItemsPage() {
                     <Card variant="glass" className="p-4 bg-gradient-to-br from-blue-50 to-blue-100 border-blue-200">
                       <div className="flex items-center justify-between">
                         <div>
-                          <p className="text-sm font-medium text-blue-600">Total Items</p>
+                          <p className="text-sm font-medium text-blue-600">{t("totalItems")}</p>
                           <p className="text-2xl font-bold text-blue-800">{items.length}</p>
                         </div>
                         <div className="w-12 h-12 bg-blue-500 rounded-xl flex items-center justify-center">
@@ -622,7 +624,7 @@ export default function ItemsPage() {
                     <Card variant="glass" className="p-4 bg-gradient-to-br from-red-50 to-red-100 border-red-200">
                       <div className="flex items-center justify-between">
                         <div>
-                          <p className="text-sm font-medium text-red-600">Low Stock Items</p>
+                          <p className="text-sm font-medium text-red-600">{t("lowStockItems")}</p>
                           <p className="text-2xl font-bold text-red-800">
                             {items.filter(item => item.stock < 10).length}
                           </p>
@@ -637,7 +639,7 @@ export default function ItemsPage() {
                     <Card variant="glass" className="p-4 bg-gradient-to-br from-green-50 to-green-100 border-green-200">
                       <div className="flex items-center justify-between">
                         <div>
-                          <p className="text-sm font-medium text-green-600">Total Stock Value</p>
+                          <p className="text-sm font-medium text-green-600">{t("totalStockValue")}</p>
                           <p className="text-2xl font-bold text-green-800">
                             {settings.currencySymbol}{items.reduce((total, item) => total + (item.price * item.stock), 0).toFixed(2)}
                           </p>
@@ -652,7 +654,7 @@ export default function ItemsPage() {
                     <Card variant="glass" className="p-4 bg-gradient-to-br from-orange-50 to-orange-100 border-orange-200">
                       <div className="flex items-center justify-between">
                         <div>
-                          <p className="text-sm font-medium text-orange-600">Out of Stock</p>
+                          <p className="text-sm font-medium text-orange-600">{t("outOfStock")}</p>
                           <p className="text-2xl font-bold text-orange-800">
                             {items.filter(item => item.stock === 0).length}
                           </p>
@@ -671,7 +673,7 @@ export default function ItemsPage() {
                         <div className="w-8 h-8 bg-yellow-500 rounded-lg flex items-center justify-center">
                           <span className="text-sm">⚠️</span>
                         </div>
-                        <h4 className="text-lg font-semibold text-yellow-800">Low Stock Alert</h4>
+                        <h4 className="text-lg font-semibold text-yellow-800">{t("lowStockAlert")}</h4>
                       </div>
                       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3">
                         {items
@@ -689,7 +691,7 @@ export default function ItemsPage() {
                               </div>
                               <div className="text-right">
                                 <p className={`text-sm font-semibold ${item.stock === 0 ? 'text-red-600' : 'text-orange-600'}`}>
-                                  {item.stock} units
+                                  {item.stock} {t("units")}
                                 </p>
                                 <p className="text-xs text-gray-500">
                                   {settings.currencySymbol}{item.price.toFixed(2)}
@@ -705,13 +707,13 @@ export default function ItemsPage() {
                 <Table>
                   <TableHeader>
                     <TableRow>
-                      <TableHeaderCell>Item Name</TableHeaderCell>
-                      <TableHeaderCell>Category</TableHeaderCell>
-                      <TableHeaderCell>Origin Stock</TableHeaderCell>
-                      <TableHeaderCell>Sold Quantity</TableHeaderCell>
-                      <TableHeaderCell>Remaining Stock</TableHeaderCell>
-                      <TableHeaderCell>Unit Price</TableHeaderCell>
-                      <TableHeaderCell>Total Sales Value</TableHeaderCell>
+                      <TableHeaderCell>{t("itemName")}</TableHeaderCell>
+                      <TableHeaderCell>{t("category")}</TableHeaderCell>
+                      <TableHeaderCell>{t("originStock")}</TableHeaderCell>
+                      <TableHeaderCell>{t("soldQuantity")}</TableHeaderCell>
+                      <TableHeaderCell>{t("remainingStock")}</TableHeaderCell>
+                      <TableHeaderCell>{t("unitPrice")}</TableHeaderCell>
+                      <TableHeaderCell>{t("totalSalesValue")}</TableHeaderCell>
                     </TableRow>
                   </TableHeader>
                   <TableBody>
@@ -744,7 +746,7 @@ export default function ItemsPage() {
                             </TableCell>
                             <TableCell>
                               <div className="text-sm">
-                                {categories.find(cat => cat.id === item.categoryId)?.name || 'Uncategorized'}
+                                {categories.find(cat => cat.id === item.categoryId)?.name || t("uncategorized")}
                               </div>
                             </TableCell>
                             <TableCell>
@@ -786,8 +788,8 @@ export default function ItemsPage() {
                         <TableCell colSpan={7} className="text-center py-8">
                           <div className="text-gray-500">
                             <div className="text-4xl mb-2">📦</div>
-                            <div className="font-medium">No items available</div>
-                            <div className="text-sm">Add some items to see detailed stock information.</div>
+                            <div className="font-medium">{t("noItemsAvailable")}</div>
+                            <div className="text-sm">{t("addItemsToSeeStock")}</div>
                           </div>
                         </TableCell>
                       </TableRow>
@@ -812,14 +814,14 @@ export default function ItemsPage() {
                   <span className="text-lg">{editingItem ? '✏️' : '➕'}</span>
                 </div>
                 <span className="text-xl font-bold bg-gradient-to-r from-primary-600 to-orange-600 bg-clip-text text-transparent">
-                  {editingItem ? 'Edit Item' : 'Add New Item'}
+                  {editingItem ? t("editItem") : t("addNewItem")}
                 </span>
               </div>
             }
           >
             <form onSubmit={handleSubmit} className="space-y-6">
               <Input
-                label="Item Name"
+                label={t("itemName")}
                 name="name"
                 value={formData.name}
                 onChange={handleInputChange}
@@ -827,25 +829,25 @@ export default function ItemsPage() {
                 error={errors.name}
                 icon="🏷️"
                 variant="glass"
-                placeholder="Enter item name"
+                placeholder={t("enterItemName")}
               />
               
               <Input
-                label="Description"
+                label={t("description")}
                 name="description"
                 value={formData.description}
                 onChange={handleInputChange}
-                placeholder="Optional description"
+                placeholder={t("optionalDescription")}
                 icon="📝"
                 variant="glass"
               />
 
               <Input
-                label="Emoji Icon"
+                label={t("emojiIcon")}
                 name="emoji"
                 value={formData.emoji}
                 onChange={handleInputChange}
-                placeholder="📦 (optional emoji for visual identification)"
+                placeholder={t("emojiPlaceholder")}
                 maxLength={4}
                 icon="😊"
                 variant="glass"
@@ -859,7 +861,7 @@ export default function ItemsPage() {
               
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <Input
-                  label={`Price (${settings.currencySymbol})`}
+                  label={`${t("price")} (${settings.currencySymbol})`}
                   name="price"
                   type="number"
                   step="0.01"
@@ -874,7 +876,7 @@ export default function ItemsPage() {
                 />
                 
                 <Input
-                  label="Stock Quantity"
+                  label={t("stockQuantity")}
                   name="stock"
                   type="number"
                   min="0"
@@ -889,12 +891,12 @@ export default function ItemsPage() {
               </div>
               
               <Select
-                label="Category"
+                label={t("category")}
                 name="categoryId"
                 value={formData.categoryId}
                 onChange={handleInputChange}
                 options={[
-                  { value: '', label: 'Select a category' },
+                  { value: '', label: t("selectCategory") },
                   ...categoryOptions
                 ]}
                 required
@@ -911,7 +913,7 @@ export default function ItemsPage() {
                   icon={isSubmitting ? "⏳" : (editingItem ? "✅" : "➕")}
                   className="flex-1 shadow-lg hover:shadow-xl transition-all duration-300"
                 >
-                  {isSubmitting ? 'Saving...' : (editingItem ? 'Update Item' : 'Add Item')}
+                  {isSubmitting ? t("saving") : (editingItem ? t("updateItem") : t("addItem"))}
                 </Button>
                 <Button 
                   type="button" 
@@ -924,7 +926,7 @@ export default function ItemsPage() {
                   icon="❌"
                   className="flex-1 hover:bg-gray-50 transition-all duration-200"
                 >
-                  Cancel
+                  {t("cancel")}
                 </Button>
               </div>
             </form>

@@ -3,6 +3,7 @@
 import { useState, useEffect } from 'react'
 import AuthGuard from '@/components/AuthGuard'
 import DashboardLayout from '@/components/DashboardLayout'
+import { useLanguage } from '@/contexts/LanguageContext'
 import { 
   Card, 
   CardHeader, 
@@ -20,6 +21,7 @@ import Link from 'next/link'
 import ProductImage from '@/components/ProductImage'
 
 export default function SalesPage() {
+  const { t } = useLanguage()
   const [sales, setSales] = useState([])
   const [filteredSales, setFilteredSales] = useState([])
   const [loading, setLoading] = useState(true)
@@ -189,12 +191,12 @@ export default function SalesPage() {
         <div className="space-y-6">
           <div className="flex justify-between items-center">
             <div>
-              <h1 className="text-2xl font-bold text-foreground">Sales History</h1>
-              <p className="text-gray-600">View and manage all sales transactions</p>
+              <h1 className="text-2xl font-bold text-foreground">{t('salesHistory')}</h1>
+              <p className="text-gray-600">{t('viewManageSalesTransactions')}</p>
             </div>
             <Link href="/dashboard/sales/create">
               <Button variant="primary" className="button-hover-effect bg-orange-600 hover:bg-orange-700">
-                + Create New Sale
+                + {t('createNewSale')}
               </Button>
             </Link>
           </div>
@@ -206,7 +208,7 @@ export default function SalesPage() {
                 <div className="text-2xl font-bold text-orange-600 mb-1">
                   {stats.totalSales}
                 </div>
-                <div className="text-sm text-gray-600">Total Sales</div>
+                <div className="text-sm text-gray-600">{t('totalSales')}</div>
               </CardBody>
             </Card>
             <Card className="card-hover">
@@ -214,7 +216,7 @@ export default function SalesPage() {
                 <div className="text-2xl font-bold text-green-600 mb-1">
                   {settings.currencySymbol}{stats.totalRevenue.toFixed(2)}
                 </div>
-                <div className="text-sm text-gray-600">Total Revenue</div>
+                <div className="text-sm text-gray-600">{t('totalRevenue')}</div>
               </CardBody>
             </Card>
             <Card className="card-hover">
@@ -223,10 +225,10 @@ export default function SalesPage() {
                   {stats.periodSales}
                 </div>
                 <div className="text-sm text-gray-600">
-                  {periodFilter === 'all' ? 'All Time Sales' : 
-                   periodFilter === 'week' ? 'This Week Sales' : 
-                   periodFilter === 'month' ? 'This Month Sales' : 
-                   'This Year Sales'}
+                  {periodFilter === 'all' ? t('allTimeSales') : 
+                   periodFilter === 'week' ? t('thisWeekSales') : 
+                   periodFilter === 'month' ? t('thisMonthSales') : 
+                   t('thisYearSales')}
                 </div>
               </CardBody>
             </Card>
@@ -236,10 +238,10 @@ export default function SalesPage() {
                   {settings.currencySymbol}{stats.periodRevenue.toFixed(2)}
                 </div>
                 <div className="text-sm text-gray-600">
-                  {periodFilter === 'all' ? 'All Time Revenue' : 
-                   periodFilter === 'week' ? 'This Week Revenue' : 
-                   periodFilter === 'month' ? 'This Month Revenue' : 
-                   'This Year Revenue'}
+                  {periodFilter === 'all' ? t('allTimeRevenue') : 
+                   periodFilter === 'week' ? t('thisWeekRevenue') : 
+                   periodFilter === 'month' ? t('thisMonthRevenue') : 
+                   t('thisYearRevenue')}
                 </div>
               </CardBody>
             </Card>
@@ -252,7 +254,7 @@ export default function SalesPage() {
                 <div className="flex-1">
                   <input
                     type="text"
-                    placeholder="Search sales by ID, cashier, or item name..."
+                    placeholder={t('searchSalesPlaceholder')}
                     value={searchTerm}
                     onChange={(e) => setSearchTerm(e.target.value)}
                     className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-orange-500"
@@ -270,10 +272,10 @@ export default function SalesPage() {
                     onChange={(e) => setPeriodFilter(e.target.value)}
                     className="px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-orange-500"
                   >
-                    <option value="all">All Time</option>
-                    <option value="week">This Week</option>
-                    <option value="month">This Month</option>
-                    <option value="year">This Year</option>
+                    <option value="all">{t('allTime')}</option>
+                    <option value="week">{t('thisWeek')}</option>
+                    <option value="month">{t('thisMonth')}</option>
+                    <option value="year">{t('thisYear')}</option>
                   </select>
                   <Button
                     variant="outline"
@@ -285,17 +287,17 @@ export default function SalesPage() {
                       setEndDate('')
                     }}
                   >
-                    Clear
+                    {t('clear')}
                   </Button>
                 </div>
               </div>
               
               {/* Date Range Filter */}
               <div className="mt-4 border-t pt-4">
-                <h3 className="text-sm font-medium mb-2">Date Range Filter</h3>
+                <h3 className="text-sm font-medium mb-2">{t('dateRangeFilter')}</h3>
                 <div className="flex flex-col md:flex-row gap-4">
                    <div>
-                     <label className="block text-xs text-gray-500 mb-1">Start Date</label>
+                     <label className="block text-xs text-gray-500 mb-1">{t('startDate')}</label>
                      <input
                        type="date"
                        value={startDate}
@@ -304,7 +306,7 @@ export default function SalesPage() {
                      />
                    </div>
                    <div>
-                     <label className="block text-xs text-gray-500 mb-1">End Date</label>
+                     <label className="block text-xs text-gray-500 mb-1">{t('endDate')}</label>
                      <input
                        type="date"
                        value={endDate}
@@ -317,7 +319,7 @@ export default function SalesPage() {
                        onClick={() => filterSales()}
                        className="px-4 py-2 bg-orange-500 text-white rounded-lg hover:bg-orange-600 transition-colors"
                      >
-                       Search
+                       {t('search')}
                      </button>
                    </div>
                  </div>
@@ -328,9 +330,9 @@ export default function SalesPage() {
           <Card>
             <CardHeader variant="glass" className="card-header-orange">
               <div className="flex justify-between items-center">
-                <h3 className="text-lg font-semibold">Recent Transactions</h3>
+                <h3 className="text-lg font-semibold">{t('recentTransactions')}</h3>
                 <div className="text-sm text-gray-500">
-                  {filteredSales.length} of {sales.length} transactions
+                  {filteredSales.length} {t('of')} {sales.length} {t('transactions')}
                 </div>
               </div>
             </CardHeader>
@@ -341,17 +343,17 @@ export default function SalesPage() {
                     {searchTerm || dateFilter ? '�' : '�🛒'}
                   </div>
                   <h3 className="text-lg font-medium text-foreground mb-2">
-                    {searchTerm || dateFilter ? 'No matching sales found' : 'No sales yet'}
+                    {searchTerm || dateFilter ? t('noMatchingSalesFound') : t('noSalesYet')}
                   </h3>
                   <p className="text-gray-600 mb-6">
                     {searchTerm || dateFilter 
-                      ? 'Try adjusting your search or filter criteria' 
-                      : 'Start making sales to see transactions here'
+                      ? t('tryAdjustingSearchFilter') 
+                      : t('startMakingSales')
                     }
                   </p>
                   {!searchTerm && !dateFilter && (
                     <Link href="/dashboard/sales/create">
-                      <Button variant="primary">Create First Sale</Button>
+                      <Button variant="primary">{t('createFirstSale')}</Button>
                     </Link>
                   )}
                 </div>
@@ -359,11 +361,11 @@ export default function SalesPage() {
                 <Table>
                   <TableHeader>
                     <TableRow>
-                      <TableHeaderCell>Date & Time</TableHeaderCell>
-                      <TableHeaderCell>Items</TableHeaderCell>
-                      <TableHeaderCell>Total Amount</TableHeaderCell>
-                      <TableHeaderCell>Cashier</TableHeaderCell>
-                      <TableHeaderCell>Actions</TableHeaderCell>
+                      <TableHeaderCell>{t('dateTime')}</TableHeaderCell>
+                      <TableHeaderCell>{t('items')}</TableHeaderCell>
+                      <TableHeaderCell>{t('totalAmount')}</TableHeaderCell>
+                      <TableHeaderCell>{t('cashier')}</TableHeaderCell>
+                      <TableHeaderCell>{t('actions')}</TableHeaderCell>
                     </TableRow>
                   </TableHeader>
                   <TableBody>
@@ -397,7 +399,7 @@ export default function SalesPage() {
                             ))}
                             {sale.items.length > 2 && (
                               <div className="text-xs text-gray-500">
-                                +{sale.items.length - 2} more items
+                                +{sale.items.length - 2} {t('moreItems')}
                               </div>
                             )}
                           </div>
@@ -408,7 +410,7 @@ export default function SalesPage() {
                               Rp{sale.total.toFixed(2)}
                             </div>
                             <div className="text-xs text-gray-500">
-                              {sale.items.reduce((sum, item) => sum + item.quantity, 0)} items
+                              {sale.items.reduce((sum, item) => sum + item.quantity, 0)} {t('items')}
                             </div>
                           </div>
                         </TableCell>
@@ -429,7 +431,7 @@ export default function SalesPage() {
                               variant="outline"
                               className="button-hover-effect"
                             >
-                              View Details
+                              {t('viewDetails')}
                             </Button>
                           </Link>
                         </TableCell>

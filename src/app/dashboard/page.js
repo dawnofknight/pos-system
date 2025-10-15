@@ -3,6 +3,7 @@
 import { useState, useEffect } from 'react'
 import AuthGuard from '@/components/AuthGuard'
 import DashboardLayout from '@/components/DashboardLayout'
+import { useLanguage } from '@/contexts/LanguageContext'
 
 import { Card, CardHeader, CardBody } from '@/components/ui'
 import { LoadingSpinner } from '@/components/ui'
@@ -20,6 +21,7 @@ import {
 import ProductImage from '@/components/ProductImage'
 
 export default function Dashboard() {
+  const { t } = useLanguage()
   const [stats, setStats] = useState(null)
   const [loading, setLoading] = useState(true)
 
@@ -67,12 +69,12 @@ export default function Dashboard() {
                 <h1 
                   className="text-3xl font-bold text-gray-900"
                 >
-                  Dashboard
+                  {t('dashboard')}
                 </h1>
                 <p 
                   className="text-lg transition-colors text-gray-600"
                 >
-                  Real-time insights into your business performance
+                  {t('realTimeInsights')}
                 </p>
               </div>
             </div>
@@ -90,7 +92,7 @@ export default function Dashboard() {
                       </div>
                       <div>
                         <dt className="text-sm font-semibold text-orange-600 uppercase tracking-wide">
-                          Total Sales
+                          {t('totalSales')}
                         </dt>
                       </div>
                     </div>
@@ -98,7 +100,7 @@ export default function Dashboard() {
                       Rp{stats?.stats?.totalSales?.amount?.toFixed(2) || '0.00'}
                     </dd>
                     <dd className="text-sm font-medium text-orange-600">
-                      {stats?.stats?.totalSales?.count || 0} transactions
+                      {stats?.stats?.totalSales?.count || 0} {t('transactions')}
                     </dd>
                   </div>
                   <div className="w-16 h-16 rounded-2xl bg-gradient-to-br from-orange-100 to-orange-200 flex items-center justify-center">
@@ -117,16 +119,16 @@ export default function Dashboard() {
                         <span className="text-xl">📈</span>
                       </div>
                       <div>
-                        <dt className="text-sm font-semibold text-primary-600 uppercase tracking-wide">
-                          Today's Sales
+                        <dt className="text-sm font-semibold text-blue-600 uppercase tracking-wide">
+                          {t('todaysSales')}
                         </dt>
                       </div>
                     </div>
-                    <dd className="text-2xl font-bold bg-gradient-to-r from-primary-600 to-orange-600 bg-clip-text text-transparent mb-1">
-                      Rp{stats?.stats?.todaySales?.amount?.toFixed(2) || '0.00'}
+                    <dd className="text-2xl font-bold bg-gradient-to-r from-blue-600 to-blue-700 bg-clip-text text-transparent mb-1">
+                      Rp{stats?.stats?.todaysSales?.amount?.toFixed(2) || '0.00'}
                     </dd>
-                    <dd className="text-sm font-medium text-gray-600">
-                      {stats?.stats?.todaySales?.count || 0} transactions
+                    <dd className="text-sm font-medium text-blue-600">
+                      {stats?.stats?.todaysSales?.count || 0} {t('transactions')}
                     </dd>
                   </div>
                   <div className="w-16 h-16 rounded-2xl bg-gradient-to-br from-primary-100 to-orange-100 flex items-center justify-center">
@@ -145,16 +147,16 @@ export default function Dashboard() {
                         <span className="text-xl">📦</span>
                       </div>
                       <div>
-                        <dt className="text-sm font-semibold text-orange-600 uppercase tracking-wide">
-                          Total Items
+                        <dt className="text-sm font-semibold text-green-600 uppercase tracking-wide">
+                          {t('totalItems')}
                         </dt>
                       </div>
                     </div>
-                    <dd className="text-2xl font-bold bg-gradient-to-r from-orange-600 to-orange-700 bg-clip-text text-transparent mb-1">
+                    <dd className="text-2xl font-bold bg-gradient-to-r from-green-600 to-green-700 bg-clip-text text-transparent mb-1">
                       {stats?.stats?.totalItems || 0}
                     </dd>
-                    <dd className="text-sm font-medium text-orange-600">
-                      In inventory
+                    <dd className="text-sm font-medium text-green-600">
+                      {t('inInventory')}
                     </dd>
                   </div>
                   <div className="w-16 h-16 rounded-2xl bg-gradient-to-br from-orange-100 to-orange-200 flex items-center justify-center">
@@ -173,16 +175,16 @@ export default function Dashboard() {
                         <span className="text-xl">⚠️</span>
                       </div>
                       <div>
-                        <dt className="text-sm font-semibold text-orange-600 dark:text-orange-400 uppercase tracking-wide">
-                          Low Stock
+                        <dt className="text-sm font-semibold text-red-600 uppercase tracking-wide">
+                          {t('lowStock')}
                         </dt>
                       </div>
                     </div>
-                    <dd className="text-2xl font-bold bg-gradient-to-r from-orange-600 to-red-600 bg-clip-text text-transparent mb-1">
+                    <dd className="text-2xl font-bold bg-gradient-to-r from-red-600 to-red-700 bg-clip-text text-transparent mb-1">
                       {stats?.stats?.lowStockItems || 0}
                     </dd>
-                    <dd className="text-sm font-medium text-gray-600 dark:text-gray-400">
-                      Items under 10
+                    <dd className="text-sm font-medium text-red-600">
+                      {t('itemsUnder10')}
                     </dd>
                   </div>
                   <div className="w-16 h-16 rounded-2xl bg-gradient-to-br from-orange-100 to-red-100 flex items-center justify-center">
@@ -204,10 +206,10 @@ export default function Dashboard() {
                   </div>
                   <div>
                     <h3 className="text-xl font-bold text-gray-900">
-                      Recent Sales
+                      {t('recentSales')}
                     </h3>
                     <p className="text-sm text-gray-600">
-                      Latest transactions
+                      {t('latestTransactions')}
                     </p>
                   </div>
                 </div>
@@ -217,9 +219,9 @@ export default function Dashboard() {
                   <Table>
                     <TableHeader>
                       <TableRow>
-                        <TableHeaderCell>Date</TableHeaderCell>
-                        <TableHeaderCell>Amount</TableHeaderCell>
-                        <TableHeaderCell>Cashier</TableHeaderCell>
+                        <TableHeaderCell>{t('date')}</TableHeaderCell>
+                        <TableHeaderCell>{t('amount')}</TableHeaderCell>
+                        <TableHeaderCell>{t('cashier')}</TableHeaderCell>
                       </TableRow>
                     </TableHeader>
                     <TableBody>
@@ -240,10 +242,10 @@ export default function Dashboard() {
                       <span className="text-2xl opacity-50">📊</span>
                     </div>
                     <p className="text-lg font-medium text-gray-600">
-                      No recent sales
+                      {t('noRecentSales')}
                     </p>
                     <p className="text-sm text-gray-500">
-                      Sales will appear here once you start making transactions
+                      {t('salesWillAppearHere')}
                     </p>
                   </div>
                 )}
@@ -259,10 +261,10 @@ export default function Dashboard() {
                   </div>
                   <div>
                     <h3 className="text-xl font-bold text-gray-900">
-                      Top Selling Items
+                      {t('topSellingItems')}
                     </h3>
                     <p className="text-sm text-gray-600">
-                      Best performers
+                      {t('bestPerformers')}
                     </p>
                   </div>
                 </div>
@@ -272,9 +274,9 @@ export default function Dashboard() {
                   <Table>
                     <TableHeader>
                       <TableRow>
-                        <TableHeaderCell>Item</TableHeaderCell>
-                        <TableHeaderCell>Sold</TableHeaderCell>
-                        <TableHeaderCell>Price</TableHeaderCell>
+                        <TableHeaderCell>{t('item')}</TableHeaderCell>
+                        <TableHeaderCell>{t('sold')}</TableHeaderCell>
+                        <TableHeaderCell>{t('price')}</TableHeaderCell>
                       </TableRow>
                     </TableHeader>
                     <TableBody>
@@ -298,10 +300,10 @@ export default function Dashboard() {
                       <span className="text-2xl opacity-50">🏆</span>
                     </div>
                     <p className="text-lg font-medium text-gray-600">
-                      No sales data
+                      {t('noSalesData')}
                     </p>
                     <p className="text-sm text-gray-500">
-                      Top selling items will appear here after sales are made
+                      {t('topSellingItemsWillAppearHere')}
                     </p>
                   </div>
                 )}
