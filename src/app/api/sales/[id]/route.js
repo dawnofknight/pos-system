@@ -1,6 +1,7 @@
 import { NextResponse } from 'next/server'
 import { verifyToken } from '@/lib/auth'
 import { prisma } from '@/lib/prisma'
+import { invalidateCache } from '@/lib/cache'
 
 export async function GET(request, { params }) {
   try {
@@ -58,18 +59,14 @@ export async function GET(request, { params }) {
 // PUT /api/sales/[id] - Update a sale (add items, change status, etc.)
 export async function PUT(request, { params }) {
   try {
-    const session = await getServerSession(authOptions)
-    
-    if (!session) {
-      const token = request.cookies.get('auth-token')?.value
-      if (!token) {
-        return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
-      }
+    const token = request.cookies.get('auth-token')?.value
+    if (!token) {
+      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
+    }
 
-      const decoded = verifyToken(token)
-      if (!decoded) {
-        return NextResponse.json({ error: 'Invalid token' }, { status: 401 })
-      }
+    const decoded = verifyToken(token)
+    if (!decoded) {
+      return NextResponse.json({ error: 'Invalid token' }, { status: 401 })
     }
     
     const { id } = params
@@ -102,7 +99,7 @@ export async function PUT(request, { params }) {
       // If new items are provided, add them to the sale
       if (items && items.length > 0) {
         // Delete existing items if replacing all items
-        if (status === 'completed') {
+        if (status === 'COMPLETED') {
           await prisma.saleItem.deleteMany({
             where: { saleId: parseInt(id) }
           })
@@ -136,7 +133,7 @@ export async function PUT(request, { params }) {
             })
             
             // Update item stock if sale is completed
-            if (status === 'completed') {
+            if (status === 'COMPLETED') {
               await prisma.item.update({
                 where: { id: item.itemId },
                 data: {
@@ -149,9 +146,9 @@ export async function PUT(request, { params }) {
           }
         }
       }
-      
+
       // If sale is completed, update table status to available
-      if (status === 'completed' && existingSale.tableId) {
+      if (status === 'COMPLETED' && existingSale.tableId) {
         await prisma.table.update({
           where: { id: existingSale.tableId },
           data: { status: 'available' }
@@ -160,6 +157,10 @@ export async function PUT(request, { params }) {
       
       return sale
     })
+
+    // Invalidate related caches
+    await invalidateCache.sales()
+    await invalidateCache.dashboard()
     
     return NextResponse.json({
       success: true,
@@ -167,6 +168,96 @@ export async function PUT(request, { params }) {
     })
   } catch (error) {
     console.error('Error updating sale:', error)
+    return NextResponse.json({ error: 'Internal server error' }, { status: 500 })
+  }
+}
+
+// PATCH /api/sales/[id] - Void a sale transaction
+export async function PATCH(request, { params }) {
+  try {
+    const token = request.cookies.get('auth-token')?.value
+    if (!token) {
+      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
+    }
+
+    const decoded = verifyToken(token)
+    if (!decoded) {
+      return NextResponse.json({ error: 'Invalid token' }, { status: 401 })
+    }
+
+    const awaitedParams = await params
+    const saleId = parseInt(awaitedParams.id)
+    const { action } = await request.json()
+
+    if (action !== 'void') {
+      return NextResponse.json({ error: 'Invalid action' }, { status: 400 })
+    }
+
+    // Check if sale exists and is not already cancelled
+    const existingSale = await prisma.sale.findUnique({
+      where: { id: saleId },
+      include: {
+        items: {
+          include: {
+            item: true
+          }
+        }
+      }
+    })
+
+    if (!existingSale) {
+      return NextResponse.json({ error: 'Sale not found' }, { status: 404 })
+    }
+
+    if (existingSale.status === 'CANCELLED') {
+      return NextResponse.json({ error: 'Sale is already cancelled' }, { status: 400 })
+    }
+
+    // Void the sale and restore stock
+    const voidedSale = await prisma.$transaction(async (prisma) => {
+      // Update sale status to cancelled
+      const sale = await prisma.sale.update({
+        where: { id: saleId },
+        data: {
+          status: 'CANCELLED'
+        }
+      })
+
+      // Restore stock for all items in the sale
+      for (const saleItem of existingSale.items) {
+        await prisma.item.update({
+          where: { id: saleItem.itemId },
+          data: {
+            stock: {
+              increment: saleItem.quantity
+            }
+          }
+        })
+      }
+
+      // If sale had a table, make it available
+      if (existingSale.tableId) {
+        await prisma.table.update({
+          where: { id: existingSale.tableId },
+          data: { status: 'available' }
+        })
+      }
+
+      return sale
+    })
+
+    // Invalidate related caches
+    await invalidateCache.sales()
+    await invalidateCache.dashboard()
+    await invalidateCache.items()
+
+    return NextResponse.json({
+      success: true,
+      message: 'Sale voided successfully',
+      sale: voidedSale
+    })
+  } catch (error) {
+    console.error('Error voiding sale:', error)
     return NextResponse.json({ error: 'Internal server error' }, { status: 500 })
   }
 }

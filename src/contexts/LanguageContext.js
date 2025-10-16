@@ -131,6 +131,14 @@ const translations = {
     inStock: "In Stock",
     lowStock: "Low Stock",
     outOfStockStatus: "Out of Stock",
+    status: "Status",
+    completed: "Completed",
+    active: "Active",
+    voided: "Voided",
+    voidTransaction: "Void Transaction",
+    voidTransactionConfirm: "Are you sure you want to void this transaction? This action cannot be undone.",
+    transactionVoidedSuccessfully: "Transaction voided successfully",
+    errorVoidingTransaction: "Error voiding transaction",
 
     // Messages
     noSalesData: "No sales data available",
@@ -429,9 +437,17 @@ const translations = {
     totalSalesValue: "Total Nilai Penjualan",
 
     // Status
-    inStock: "Tersedia",
+    inStock: "Stok Tersedia",
     lowStock: "Stok Rendah",
     outOfStockStatus: "Stok Habis",
+    status: "Status",
+    completed: "Selesai",
+    active: "Aktif",
+    voided: "Dibatalkan",
+    voidTransaction: "Batalkan Transaksi",
+    voidTransactionConfirm: "Apakah Anda yakin ingin membatalkan transaksi ini? Tindakan ini tidak dapat dibatalkan.",
+    transactionVoidedSuccessfully: "Transaksi berhasil dibatalkan",
+    errorVoidingTransaction: "Kesalahan membatalkan transaksi",
 
     // Messages
     noSalesData: "Tidak ada data penjualan",

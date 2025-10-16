@@ -43,6 +43,21 @@ export default function SalesPage() {
     periodRevenue: 0
   })
 
+  const getStatusBadge = (status) => {
+    const statusConfig = {
+      COMPLETED: { color: 'bg-green-100 text-green-800', label: t('completed') },
+      ACTIVE: { color: 'bg-blue-100 text-blue-800', label: t('active') },
+      CANCELLED: { color: 'bg-red-100 text-red-800', label: t('voided') }
+    }
+    
+    const config = statusConfig[status] || statusConfig.COMPLETED
+    return (
+      <span className={`px-2 py-1 rounded-full text-xs font-medium ${config.color}`}>
+        {config.label}
+      </span>
+    )
+  }
+
   useEffect(() => {
     fetchSales()
     fetchSettings()
@@ -403,6 +418,7 @@ export default function SalesPage() {
                       <TableHeaderCell>{t('dateTime')}</TableHeaderCell>
                       <TableHeaderCell>{t('items')}</TableHeaderCell>
                       <TableHeaderCell>{t('totalAmount')}</TableHeaderCell>
+                      <TableHeaderCell>{t('status')}</TableHeaderCell>
                       <TableHeaderCell>{t('cashier')}</TableHeaderCell>
                       <TableHeaderCell>{t('actions')}</TableHeaderCell>
                     </TableRow>
@@ -452,6 +468,9 @@ export default function SalesPage() {
                               {sale.items.reduce((sum, item) => sum + item.quantity, 0)} {t('items')}
                             </div>
                           </div>
+                        </TableCell>
+                        <TableCell>
+                          {getStatusBadge(sale.status)}
                         </TableCell>
                         <TableCell>
                           <div className="flex items-center gap-2">

@@ -20,13 +20,16 @@ import { SkeletonCard, SkeletonTable } from '@/components/ui/Skeleton'
 import Link from 'next/link'
 import ProductImage from '@/components/ProductImage'
 import { generateReceiptHTML, generateSaleCSV } from '@/lib/receipt'
+import { useLanguage } from '@/contexts/LanguageContext'
 
 export default function SaleDetailsPage() {
+  const { t } = useLanguage()
   const params = useParams()
   const router = useRouter()
   const [sale, setSale] = useState(null)
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState(null)
+  const [voiding, setVoiding] = useState(false)
 
   useEffect(() => {
     if (params.id) {
@@ -49,6 +52,52 @@ export default function SaleDetailsPage() {
     } finally {
       setLoading(false)
     }
+  }
+
+  const handleVoidTransaction = async () => {
+    if (!confirm('Are you sure you want to void this transaction? This action cannot be undone and will restore the stock to inventory.')) {
+      return
+    }
+
+    setVoiding(true)
+    try {
+      const response = await fetch(`/api/sales/${params.id}`, {
+        method: 'PATCH',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ action: 'void' }),
+      })
+
+      if (response.ok) {
+        const data = await response.json()
+        setSale(data.sale)
+        alert(t('transactionVoidedSuccessfully'))
+      } else {
+        const errorData = await response.json()
+        alert(t('errorVoidingTransaction'))
+      }
+    } catch (error) {
+      console.error('Error voiding transaction:', error)
+      alert(t('errorVoidingTransaction'))
+    } finally {
+      setVoiding(false)
+    }
+  }
+
+  const getStatusBadge = (status) => {
+    const statusConfig = {
+      COMPLETED: { color: 'bg-green-100 text-green-800', label: t('completed') },
+      ACTIVE: { color: 'bg-blue-100 text-blue-800', label: t('active') },
+      CANCELLED: { color: 'bg-red-100 text-red-800', label: t('voided') }
+    }
+    
+    const config = statusConfig[status] || statusConfig.COMPLETED
+    return (
+      <span className={`px-2 py-1 rounded-full text-xs font-medium ${config.color}`}>
+        {config.label}
+      </span>
+    )
   }
 
   const handleExportSale = () => {
@@ -118,7 +167,7 @@ export default function SaleDetailsPage() {
     )
   }
 
-  const subtotal = sale.items.reduce((sum, item) => sum + (item.price * item.quantity), 0)
+  const subtotal = sale?.items?.reduce((sum, item) => sum + (item.price * item.quantity), 0) || 0
   const tax = sale.total - subtotal
 
   return (
@@ -135,6 +184,7 @@ export default function SaleDetailsPage() {
                   </Button>
                 </Link>
                 <h1 className="text-2xl font-bold text-gray-900">Sale Details</h1>
+                {sale && getStatusBadge(sale.status)}
               </div>
               <p className="text-gray-600">Sale ID: #{sale.id}</p>
             </div>
@@ -145,6 +195,15 @@ export default function SaleDetailsPage() {
               <Button variant="outline" onClick={handlePrintReceipt}>
                 🖨️ Print Receipt
               </Button>
+              {sale?.status === 'COMPLETED' && (
+                <Button 
+                  variant="danger" 
+                  onClick={handleVoidTransaction}
+                  disabled={voiding}
+                >
+                  {voiding ? 'Voiding...' : '❌ Void Transaction'}
+                </Button>
+              )}
               <Button variant="primary" onClick={() => router.push('/dashboard/sales/create')}>
                 Create New Sale
               </Button>
@@ -170,7 +229,7 @@ export default function SaleDetailsPage() {
                       </TableRow>
                     </TableHeader>
                     <TableBody>
-                      {sale.items.map((item) => (
+                      {sale?.items?.map((item) => (
                         <TableRow key={item.id}>
                           <TableCell>
                             <div className="flex items-center gap-3">
@@ -185,15 +244,13 @@ export default function SaleDetailsPage() {
                             <span className="font-medium">Rp{item.price.toFixed(2)}</span>
                           </TableCell>
                           <TableCell>
-                            <span className="bg-primary-100 text-primary-800 px-2 py-1 rounded-full text-sm font-medium">
-                              {item.quantity}
-                            </span>
+                            <span className="font-medium">{item.quantity}</span>
                           </TableCell>
                           <TableCell>
-                            <span className="font-semibold">Rp{(item.price * item.quantity).toFixed(2)}</span>
+                            <span className="font-medium">Rp{(item.price * item.quantity).toFixed(2)}</span>
                           </TableCell>
                         </TableRow>
-                      ))}
+                      )) || []}
                     </TableBody>
                   </Table>
                 </CardBody>
@@ -262,6 +319,10 @@ export default function SaleDetailsPage() {
                       <label className="block text-sm font-medium text-gray-700 mb-1">Sale ID</label>
                       <p className="text-gray-900 font-mono text-sm">#{sale.id}</p>
                     </div>
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700 mb-1">Status</label>
+                      {getStatusBadge(sale.status)}
+                    </div>
                   </div>
                 </CardBody>
               </Card>
@@ -275,13 +336,13 @@ export default function SaleDetailsPage() {
                   <div className="grid grid-cols-2 gap-4">
                     <div className="text-center">
                       <div className="text-2xl font-bold text-primary-600">
-                        {sale.items.length}
+                        {sale?.items?.length || 0}
                       </div>
                       <div className="text-sm text-gray-600">Items</div>
                     </div>
                     <div className="text-center">
                       <div className="text-2xl font-bold text-green-600">
-                        {sale.items.reduce((sum, item) => sum + item.quantity, 0)}
+                        {sale?.items?.reduce((sum, item) => sum + item.quantity, 0) || 0}
                       </div>
                       <div className="text-sm text-gray-600">Quantity</div>
                     </div>
@@ -320,6 +381,16 @@ export default function SaleDetailsPage() {
                     >
                       📋 Copy Details
                     </Button>
+                    {sale.status === 'COMPLETED' && (
+                      <Button 
+                        variant="danger" 
+                        className="w-full"
+                        onClick={handleVoidTransaction}
+                        disabled={voiding}
+                      >
+                        {voiding ? t('loading') : t('voidTransaction')}
+                      </Button>
+                    )}
                     <Link href="/dashboard/sales/create" className="block">
                       <Button variant="primary" className="w-full">
                         + New Sale
