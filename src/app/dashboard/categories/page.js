@@ -16,9 +16,9 @@ import {
   TableHeaderCell, 
   Button, 
   Input, 
-  Modal, 
-  LoadingSpinner 
+  Modal 
 } from '@/components/ui'
+import { SkeletonTable } from '@/components/ui/Skeleton'
 
 export default function CategoriesPage() {
   const { t } = useLanguage()
@@ -103,8 +103,42 @@ export default function CategoriesPage() {
     return (
       <AuthGuard>
         <DashboardLayout>
-          <div className="flex items-center justify-center h-64">
-            <LoadingSpinner size="lg" />
+          <div className="space-y-8">
+            {/* Header Section Skeleton */}
+            <div className="relative overflow-hidden rounded-2xl bg-orange-50 border border-orange-200/50 backdrop-blur-xl">
+              <div className="relative px-8 py-6">
+                <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4">
+                  <div className="space-y-2">
+                    <div className="flex items-center gap-3">
+                      <div className="p-2 rounded-xl bg-gradient-to-br from-orange-500 to-orange-600 shadow-lg">
+                        <span className="text-white text-xl">📂</span>
+                      </div>
+                      <div className="h-8 w-48 bg-gray-200 dark:bg-gray-700 rounded animate-pulse"></div>
+                    </div>
+                    <div className="h-4 w-64 bg-gray-200 dark:bg-gray-700 rounded animate-pulse"></div>
+                  </div>
+                  <div className="h-10 w-32 bg-gray-200 dark:bg-gray-700 rounded animate-pulse"></div>
+                </div>
+              </div>
+            </div>
+
+            {/* Content Skeleton */}
+            <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700">
+              <div className="p-6 border-b border-gray-200 dark:border-gray-700">
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center gap-3">
+                    <div className="w-10 h-10 rounded-xl bg-gray-200 dark:bg-gray-700 animate-pulse"></div>
+                    <div className="space-y-2">
+                      <div className="h-6 w-32 bg-gray-200 dark:bg-gray-700 rounded animate-pulse"></div>
+                      <div className="h-4 w-24 bg-gray-200 dark:bg-gray-700 rounded animate-pulse"></div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+              <div className="p-6">
+                <SkeletonTable rows={6} columns={3} headers={['Category', 'Items Count', 'Actions']} />
+              </div>
+            </div>
           </div>
         </DashboardLayout>
       </AuthGuard>

@@ -13,7 +13,6 @@ import {
   CardBody, 
   Button, 
   Input, 
-  LoadingSpinner,
   Badge,
   Table,
   TableBody,
@@ -23,6 +22,7 @@ import {
   TableRow,
   TableHeaderCell
 } from '@/components/ui'
+import { SkeletonCard, SkeletonTable } from '@/components/ui/Skeleton'
 
 export default function SettingsPage() {
   const { user } = useAuth()
@@ -499,8 +499,30 @@ export default function SettingsPage() {
     return (
       <AuthGuard>
         <DashboardLayout>
-          <div className="flex items-center justify-center h-64">
-            <LoadingSpinner />
+          <div className="space-y-6">
+            {/* Header Skeleton */}
+            <div className="space-y-2">
+              <div className="h-8 bg-gray-200 dark:bg-gray-700 rounded-md w-48 animate-pulse"></div>
+              <div className="h-4 bg-gray-200 dark:bg-gray-700 rounded-md w-64 animate-pulse"></div>
+            </div>
+
+            {/* Tab Navigation Skeleton */}
+            <div className="border-b transition-colors border-gray-200 dark:border-gray-700">
+              <nav className="-mb-px flex space-x-8">
+                {[1, 2, 3, 4].map((i) => (
+                  <div key={i} className="flex items-center gap-2 py-2 px-1">
+                    <div className="h-4 w-4 bg-gray-200 dark:bg-gray-700 rounded animate-pulse"></div>
+                    <div className="h-4 bg-gray-200 dark:bg-gray-700 rounded w-20 animate-pulse"></div>
+                  </div>
+                ))}
+              </nav>
+            </div>
+
+            {/* Content Skeleton */}
+            <div className="space-y-6">
+              <SkeletonCard />
+              <SkeletonCard />
+            </div>
           </div>
         </DashboardLayout>
       </AuthGuard>

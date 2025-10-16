@@ -18,7 +18,7 @@ async function main() {
   const adminPassword = await bcrypt.hash('admin123', 12)
   const admin = await prisma.user.create({
     data: {
-      email: 'admin@pos.com',
+      email: 'admin@7ss.com',
       password: adminPassword,
       name: 'Admin User',
       role: 'ADMIN',
@@ -29,7 +29,7 @@ async function main() {
   const cashierPassword = await bcrypt.hash('cashier123', 12)
   const cashier = await prisma.user.create({
     data: {
-      email: 'cashier@pos.com',
+      email: 'cashier@7ss.com',
       password: cashierPassword,
       name: 'Cashier User',
       role: 'CASHIER',
@@ -155,8 +155,8 @@ async function main() {
   }
 
   console.log('✅ Database seeded successfully!')
-  console.log('👤 Admin user: admin@pos.com / admin123')
-  console.log('👤 Cashier user: cashier@pos.com / cashier123')
+  console.log('👤 Admin user: admin@pos.com / admin7ss123')
+  console.log('👤 Cashier user: cashier@pos.com / cashier7ss123')
 }
 
 main()

@@ -14,9 +14,9 @@ import {
   TableRow, 
   TableCell, 
   TableHeaderCell, 
-  Button, 
-  LoadingSpinner 
+  Button
 } from '@/components/ui'
+import { SkeletonCard, SkeletonTable } from '@/components/ui/Skeleton'
 import Link from 'next/link'
 import ProductImage from '@/components/ProductImage'
 import { generateReceiptHTML, generateSaleCSV } from '@/lib/receipt'
@@ -75,8 +75,26 @@ export default function SaleDetailsPage() {
     return (
       <AuthGuard>
         <DashboardLayout>
-          <div className="flex items-center justify-center h-64">
-            <LoadingSpinner size="lg" />
+          <div className="space-y-6">
+            {/* Header Skeleton */}
+            <div className="flex items-center justify-between">
+              <div className="space-y-2">
+                <div className="h-8 bg-gray-200 dark:bg-gray-700 rounded w-48 animate-pulse"></div>
+                <div className="h-4 bg-gray-200 dark:bg-gray-700 rounded w-32 animate-pulse"></div>
+              </div>
+              <div className="flex space-x-2">
+                <div className="h-10 bg-gray-200 dark:bg-gray-700 rounded w-24 animate-pulse"></div>
+                <div className="h-10 bg-gray-200 dark:bg-gray-700 rounded w-24 animate-pulse"></div>
+              </div>
+            </div>
+
+            {/* Content Skeleton */}
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+              <SkeletonCard />
+              <SkeletonCard />
+            </div>
+            
+            <SkeletonTable rows={5} columns={4} />
           </div>
         </DashboardLayout>
       </AuthGuard>

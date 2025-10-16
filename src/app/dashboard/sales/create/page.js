@@ -9,9 +9,9 @@ import Link from 'next/link'
 
 import { 
   Button, 
-  Input, 
-  LoadingSpinner 
+  Input
 } from '@/components/ui'
+import { SkeletonCard } from '@/components/ui/Skeleton'
 import { useRouter } from 'next/navigation'
 import ProductImage from '@/components/ProductImage'
 
@@ -309,8 +309,44 @@ export default function CreateSalePage() {
     return (
       <AuthGuard>
         <DashboardLayout>
-          <div className="flex items-center justify-center h-64">
-            <LoadingSpinner size="lg" />
+          <div className="h-full bg-gray-50">
+            {/* Header Skeleton */}
+            <div className="bg-white border-b border-gray-200 px-6 py-4">
+              <div className="flex items-center justify-between">
+                <div className="space-y-2">
+                  <div className="h-6 bg-gray-200 rounded w-32 animate-pulse"></div>
+                  <div className="h-4 bg-gray-200 rounded w-48 animate-pulse"></div>
+                </div>
+                <div className="h-10 bg-gray-200 rounded w-24 animate-pulse"></div>
+              </div>
+            </div>
+
+            {/* Content Skeleton */}
+            <div className="flex h-full">
+              {/* Left Panel - Menu Items */}
+              <div className="flex-1 p-6">
+                <div className="space-y-4">
+                  {/* Category Tabs Skeleton */}
+                  <div className="flex space-x-2">
+                    {[1, 2, 3, 4].map((i) => (
+                      <div key={i} className="h-10 bg-gray-200 rounded w-20 animate-pulse"></div>
+                    ))}
+                  </div>
+                  
+                  {/* Items Grid Skeleton */}
+                  <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
+                    {[1, 2, 3, 4, 5, 6, 7, 8].map((i) => (
+                      <SkeletonCard key={i} />
+                    ))}
+                  </div>
+                </div>
+              </div>
+
+              {/* Right Panel - Cart */}
+              <div className="w-96 bg-white border-l border-gray-200 p-6">
+                <SkeletonCard />
+              </div>
+            </div>
           </div>
         </DashboardLayout>
       </AuthGuard>

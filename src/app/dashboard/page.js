@@ -7,6 +7,7 @@ import { useLanguage } from '@/contexts/LanguageContext'
 
 import { Card, CardHeader, CardBody } from '@/components/ui'
 import { LoadingSpinner } from '@/components/ui'
+import { SkeletonDashboardContent } from '@/components/ui/Skeleton'
 import { Badge } from '@/components/ui'
 import { Button } from '@/components/ui'
 import { 
@@ -48,9 +49,7 @@ export default function Dashboard() {
     return (
       <AuthGuard>
         <DashboardLayout>
-          <div className="flex items-center justify-center h-64">
-            <LoadingSpinner size="lg" />
-          </div>
+          <SkeletonDashboardContent />
         </DashboardLayout>
       </AuthGuard>
     )

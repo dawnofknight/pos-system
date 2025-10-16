@@ -12,9 +12,9 @@ import {
   CardBody,
   Button,
   Select,
-  Input,
-  LoadingSpinner
+  Input
 } from '@/components/ui'
+import { SkeletonCard, SkeletonReports } from '@/components/ui/Skeleton'
 import { formatCurrency } from '@/lib/utils'
 
 export default function ReportsPage() {
@@ -125,9 +125,7 @@ export default function ReportsPage() {
     return (
       <AuthGuard>
         <DashboardLayout>
-          <div className="flex items-center justify-center h-64">
-            <LoadingSpinner size="lg" />
-          </div>
+          <SkeletonReports />
         </DashboardLayout>
       </AuthGuard>
     )
@@ -220,8 +218,11 @@ export default function ReportsPage() {
           </Card>
 
           {loading ? (
-            <div className="flex items-center justify-center h-32">
-              <LoadingSpinner size="lg" />
+            <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
+              <SkeletonCard />
+              <SkeletonCard />
+              <SkeletonCard />
+              <SkeletonCard />
             </div>
           ) : reportsData ? (
             <>

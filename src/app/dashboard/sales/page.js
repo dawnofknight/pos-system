@@ -14,9 +14,9 @@ import {
   TableRow, 
   TableCell, 
   TableHeaderCell, 
-  Button, 
-  LoadingSpinner 
+  Button
 } from '@/components/ui'
+import { SkeletonTable, SkeletonCard } from '@/components/ui/Skeleton'
 import Link from 'next/link'
 import ProductImage from '@/components/ProductImage'
 
@@ -177,8 +177,47 @@ export default function SalesPage() {
     return (
       <AuthGuard>
         <DashboardLayout>
-          <div className="flex items-center justify-center h-64">
-            <LoadingSpinner size="lg" />
+          <div className="space-y-6">
+            {/* Header Skeleton */}
+            <div className="flex justify-between items-center">
+              <div>
+                <div className="h-8 w-48 bg-gray-200 dark:bg-gray-700 rounded animate-pulse mb-2"></div>
+                <div className="h-4 w-64 bg-gray-200 dark:bg-gray-700 rounded animate-pulse"></div>
+              </div>
+              <div className="h-10 w-32 bg-gray-200 dark:bg-gray-700 rounded animate-pulse"></div>
+            </div>
+
+            {/* Quick Stats Skeleton */}
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+              <SkeletonCard />
+              <SkeletonCard />
+              <SkeletonCard />
+              <SkeletonCard />
+            </div>
+
+            {/* Search and Filter Skeleton */}
+            <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700 p-6">
+              <div className="flex flex-col md:flex-row gap-4">
+                <div className="flex-1">
+                  <div className="h-10 w-full bg-gray-200 dark:bg-gray-700 rounded animate-pulse"></div>
+                </div>
+                <div className="flex gap-2">
+                  <div className="h-10 w-32 bg-gray-200 dark:bg-gray-700 rounded animate-pulse"></div>
+                  <div className="h-10 w-32 bg-gray-200 dark:bg-gray-700 rounded animate-pulse"></div>
+                  <div className="h-10 w-24 bg-gray-200 dark:bg-gray-700 rounded animate-pulse"></div>
+                </div>
+              </div>
+            </div>
+
+            {/* Sales Table Skeleton */}
+            <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700">
+              <div className="p-6 border-b border-gray-200 dark:border-gray-700">
+                <div className="h-6 w-32 bg-gray-200 dark:bg-gray-700 rounded animate-pulse"></div>
+              </div>
+              <div className="p-6">
+                <SkeletonTable rows={8} columns={6} headers={['Sale ID', 'Date', 'Items', 'Total', 'Payment', 'Actions']} />
+              </div>
+            </div>
           </div>
         </DashboardLayout>
       </AuthGuard>

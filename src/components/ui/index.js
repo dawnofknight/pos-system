@@ -51,6 +51,19 @@ export function Button({
   )
 }
 
+// Export skeleton components
+export { 
+  Skeleton,
+  SkeletonCard,
+  SkeletonTable,
+  SkeletonTableRow,
+  SkeletonListItem,
+  SkeletonDashboardStats,
+  SkeletonDashboardContent,
+  SkeletonItemsGrid,
+  SkeletonReports
+} from './Skeleton'
+
 export function Input({ 
   label, 
   error, 
