@@ -101,7 +101,7 @@ A modern Point of Sale (POS) system built with Next.js, Prisma ORM, and PostgreS
 3. **Set up environment variables**
    Update the `.env` file with your database credentials and JWT secret:
    ```env
-   DATABASE_URL="postgresql://username:password@localhost:5432/pos_system?schema=public"
+   DATABASE_URL="postgresql://username:password@localhost:5432/pos_system?schema=pos_schema"
    JWT_SECRET="your-super-secret-jwt-key-here"
    JWT_EXPIRES_IN="7d"
    NEXTAUTH_SECRET="your-nextauth-secret-here"
