@@ -11,6 +11,7 @@ import { Button, Input, LoadingSpinner } from "@/components/ui";
 import { SkeletonCard } from "@/components/ui/Skeleton";
 import { useRouter } from "next/navigation";
 import ProductImage from "@/components/ProductImage";
+import { generateReceiptHTML } from "@/lib/receipt";
 
 export default function CreateSalePage() {
   const { user } = useAuth();
@@ -41,6 +42,10 @@ export default function CreateSalePage() {
   const [orderNumber, setOrderNumber] = useState("");
   const [guestCount, setGuestCount] = useState(2);
   const [paymentMethodOpen, setPaymentMethodOpen] = useState(true);
+
+  // Success modal states
+  const [showSuccessModal, setShowSuccessModal] = useState(false);
+  const [completedSale, setCompletedSale] = useState(null);
 
   // Generate order number
   useEffect(() => {
@@ -293,9 +298,10 @@ export default function CreateSalePage() {
       });
 
       if (response.ok) {
-        alert(t("saleCompletedSuccessfully"));
+        const result = await response.json();
+        setCompletedSale(result.sale);
         setCart([]);
-        router.push("/dashboard/sales");
+        setShowSuccessModal(true);
       } else {
         alert(t("errorProcessingSale"));
       }
@@ -305,6 +311,25 @@ export default function CreateSalePage() {
     } finally {
       setProcessing(false);
     }
+  };
+
+  const handlePrintReceipt = () => {
+    if (!completedSale) return;
+
+    const receiptHTML = generateReceiptHTML(completedSale, settings);
+    const printWindow = window.open("", "_blank", "width=300,height=600");
+    if (printWindow) {
+      printWindow.document.write(receiptHTML);
+      printWindow.document.close();
+    } else {
+      alert("Please allow popups to print receipts");
+    }
+  };
+
+  const handleCloseModal = () => {
+    setShowSuccessModal(false);
+    setCompletedSale(null);
+    router.push("/dashboard/sales");
   };
 
   const filteredItems = items.filter((item) => {
@@ -1062,6 +1087,80 @@ export default function CreateSalePage() {
             </div>
           )}
         </div>
+
+        {/* Success Modal */}
+        {showSuccessModal && completedSale && (
+          <div className='fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50'>
+            <div className='bg-white rounded-2xl shadow-2xl p-8 max-w-md w-full mx-4 animate-in fade-in zoom-in duration-300'>
+              {/* Success Icon */}
+              <div className='text-center mb-6'>
+                <div className='inline-flex items-center justify-center w-20 h-20 bg-green-100 rounded-full mb-4'>
+                  <span className='text-5xl'>✓</span>
+                </div>
+                <h2 className='text-2xl font-bold text-gray-900 mb-2'>
+                  {t("saleCompletedSuccessfully")}
+                </h2>
+                <p className='text-gray-600'>
+                  {t("receipt")} #{completedSale.id}
+                </p>
+              </div>
+
+              {/* Sale Summary */}
+              <div className='bg-gray-50 rounded-xl p-4 mb-6 space-y-2'>
+                <div className='flex justify-between text-sm'>
+                  <span className='text-gray-600'>{t("items")}:</span>
+                  <span className='font-semibold'>
+                    {completedSale.items?.reduce(
+                      (sum, item) => sum + item.quantity,
+                      0
+                    )}
+                  </span>
+                </div>
+                <div className='flex justify-between text-sm'>
+                  <span className='text-gray-600'>{t("paymentMethod")}:</span>
+                  <span className='font-semibold'>
+                    {completedSale.paymentMethod?.name}
+                  </span>
+                </div>
+                {completedSale.table && (
+                  <div className='flex justify-between text-sm'>
+                    <span className='text-gray-600'>{t("table")}:</span>
+                    <span className='font-semibold'>
+                      {completedSale.table.name}
+                    </span>
+                  </div>
+                )}
+                <div className='flex justify-between text-lg font-bold border-t pt-2 mt-2'>
+                  <span>{t("total")}:</span>
+                  <span className='text-orange-600'>
+                    {settings.currencySymbol}
+                    {completedSale.total.toLocaleString("id-ID")}
+                  </span>
+                </div>
+              </div>
+
+              {/* Action Buttons */}
+              <div className='space-y-3'>
+                <Button
+                  onClick={handlePrintReceipt}
+                  variant='primary'
+                  className='w-full bg-orange-500 hover:bg-orange-600 text-white font-semibold py-3 rounded-xl flex items-center justify-center gap-2'
+                >
+                  <span>🖨️</span>
+                  <span>{t("printReceipt")}</span>
+                </Button>
+
+                <Button
+                  onClick={handleCloseModal}
+                  variant='outline'
+                  className='w-full border-2 border-gray-300 text-gray-700 font-semibold py-3 rounded-xl hover:bg-gray-50'
+                >
+                  {t("backToSales")}
+                </Button>
+              </div>
+            </div>
+          </div>
+        )}
       </DashboardLayout>
     </AuthGuard>
   );

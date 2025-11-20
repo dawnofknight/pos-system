@@ -140,6 +140,9 @@ const translations = {
       "Are you sure you want to void this transaction? This action cannot be undone.",
     transactionVoidedSuccessfully: "Transaction voided successfully",
     errorVoidingTransaction: "Error voiding transaction",
+    receipt: "Receipt",
+    printReceipt: "Print Receipt",
+    total: "Total",
 
     // Messages
     noSalesData: "No sales data available",
@@ -222,6 +225,12 @@ const translations = {
     orderType: "Order Type",
 
     order: "Order",
+    completeOrder: "Complete Order",
+    saleCompletedSuccessfully: "Sale Completed Successfully!",
+    pleaseAddItemsToCart: "Please add items to cart",
+    pleaseSelectPaymentMethod: "Please select a payment method",
+    errorProcessingSale: "Error processing sale",
+    processing: "Processing",
 
     // Settings page
     systemSettings: "System Settings",
@@ -491,6 +500,9 @@ const translations = {
       "Apakah Anda yakin ingin membatalkan transaksi ini? Tindakan ini tidak dapat dibatalkan.",
     transactionVoidedSuccessfully: "Transaksi berhasil dibatalkan",
     errorVoidingTransaction: "Kesalahan membatalkan transaksi",
+    receipt: "Kwitansi",
+    printReceipt: "Cetak Kwitansi",
+    total: "Total",
 
     // Messages
     noSalesData: "Tidak ada data penjualan",
@@ -545,6 +557,12 @@ const translations = {
     tableService: "Layanan meja",
     toGo: "Untuk dibawa",
     order: "Pesanan",
+    completeOrder: "Selesaikan Pesanan",
+    saleCompletedSuccessfully: "Penjualan Berhasil Diselesaikan!",
+    pleaseAddItemsToCart: "Silakan tambahkan item ke keranjang",
+    pleaseSelectPaymentMethod: "Silakan pilih metode pembayaran",
+    errorProcessingSale: "Kesalahan memproses penjualan",
+    processing: "Memproses",
 
     // Sales create page - Table selection
     tableSelection: "Pilih Meja",
