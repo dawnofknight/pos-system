@@ -5,7 +5,6 @@ generator client {
 datasource db {
   provider = "postgresql"
   url      = env("DATABASE_URL")
-  schemas  = ["pos_schema"]
 }
 
 model User {
@@ -19,7 +18,6 @@ model User {
   sales     Sale[]
 
   @@map("users")
-  @@schema("pos_schema")
 }
 
 model Category {
@@ -30,7 +28,6 @@ model Category {
   items     Item[]
 
   @@map("categories")
-  @@schema("pos_schema")
 }
 
 model Item {
@@ -49,7 +46,6 @@ model Item {
   saleItems   SaleItem[]
 
   @@map("items")
-  @@schema("pos_schema")
 }
 
 model Sale {
@@ -67,7 +63,6 @@ model Sale {
   table           Table?        @relation(fields: [tableId], references: [id])
 
   @@map("sales")
-  @@schema("pos_schema")
 }
 
 model SaleItem {
@@ -80,22 +75,17 @@ model SaleItem {
   sale     Sale  @relation(fields: [saleId], references: [id])
 
   @@map("sale_items")
-  @@schema("pos_schema")
 }
 
 enum UserRole {
   ADMIN
   CASHIER
-
-  @@schema("pos_schema")
 }
 
 enum SaleStatus {
   ACTIVE
   COMPLETED
   CANCELLED
-
-  @@schema("pos_schema")
 }
 
 model Settings {
@@ -112,7 +102,6 @@ model Settings {
   updatedAt        DateTime @updatedAt
 
   @@map("settings")
-  @@schema("pos_schema")
 }
 
 model PaymentMethod {
@@ -124,7 +113,6 @@ model PaymentMethod {
   sales     Sale[]
 
   @@map("payment_methods")
-  @@schema("pos_schema")
 }
 
 model Table {
@@ -137,7 +125,6 @@ model Table {
   sales     Sale[]
 
   @@map("tables")
-  @@schema("pos_schema")
 }
 
 model RolePermission {
@@ -153,5 +140,4 @@ model RolePermission {
 
   @@unique([role, resource])
   @@map("role_permissions")
-  @@schema("pos_schema")
 }
