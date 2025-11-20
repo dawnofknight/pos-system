@@ -52,11 +52,12 @@ async function main() {
 
   // Create categories
   const categories = [
-    { name: "Beverages" },
-    { name: "Snacks" },
-    { name: "Electronics" },
-    { name: "Clothing" },
-    { name: "Books" },
+    { name: "Classic Coffee" },
+    { name: "Signature" },
+    { name: "Extras" },
+    { name: "Snack" },
+    { name: "Main Course" },
+    { name: "Pasta" },
   ];
 
   const createdCategories = [];
@@ -67,84 +68,282 @@ async function main() {
     createdCategories.push(createdCategory);
   }
 
-  // Create items
+  // Create items based on cafe/restaurant menu
   const items = [
+    // Classic Coffee
     {
-      name: "Coca Cola",
-      description: "Refreshing soft drink",
-      price: 2.5,
-      stock: 50,
-      categoryId: createdCategories[0].id, // Beverages
-    },
-    {
-      name: "Pepsi",
-      description: "Cola soft drink",
-      price: 2.3,
-      stock: 45,
-      categoryId: createdCategories[0].id, // Beverages
-    },
-    {
-      name: "Water Bottle",
-      description: "Pure drinking water",
-      price: 1.0,
+      name: "Magic Latte",
+      description: "Double Ristretto with Fresh Milk",
+      price: 20000,
       stock: 100,
-      categoryId: createdCategories[0].id, // Beverages
+      emoji: "☕",
+      categoryId: createdCategories[0].id,
     },
     {
-      name: "Potato Chips",
-      description: "Crispy potato chips",
-      price: 3.0,
+      name: "Coffee Latte",
+      description: "Double Espresso with Fresh Milk",
+      price: 19000,
+      stock: 100,
+      emoji: "☕",
+      categoryId: createdCategories[0].id,
+    },
+    {
+      name: "Americano",
+      description: "Strong Coffee Shot",
+      price: 18000,
+      stock: 100,
+      emoji: "☕",
+      categoryId: createdCategories[0].id,
+    },
+
+    // Signature Drinks
+    {
+      name: "Butter Cookie'es",
+      description: "Butterscotch Seasalt with Shortbread Cookies",
+      price: 23000,
+      stock: 50,
+      emoji: "🍪",
+      categoryId: createdCategories[1].id,
+    },
+    {
+      name: "Salted Pecan",
+      description: "Nutty with Caramel Sauce",
+      price: 23000,
+      stock: 50,
+      emoji: "🥜",
+      categoryId: createdCategories[1].id,
+    },
+    {
+      name: "Berries Cake",
+      description: "Berries Jam with Espresso",
+      price: 22000,
+      stock: 50,
+      emoji: "🍓",
+      categoryId: createdCategories[1].id,
+    },
+    {
+      name: "Neroforte",
+      description: "Special Palm Sugar",
+      price: 20000,
+      stock: 50,
+      emoji: "🥤",
+      categoryId: createdCategories[1].id,
+    },
+    {
+      name: "Summer Thrill",
+      description: "Raspberry Aromatic",
+      price: 20000,
+      stock: 50,
+      emoji: "🫐",
+      categoryId: createdCategories[1].id,
+    },
+    {
+      name: "Sweetie Rose",
+      description: "Fresh Watermelon with Tea",
+      price: 20000,
+      stock: 50,
+      emoji: "🍉",
+      categoryId: createdCategories[1].id,
+    },
+    {
+      name: "Golden Peach",
+      description: "Shiny Sour Peach",
+      price: 20000,
+      stock: 50,
+      emoji: "🍑",
+      categoryId: createdCategories[1].id,
+    },
+    {
+      name: "Wildflower",
+      description: "Black Tea Osmanthus",
+      price: 20000,
+      stock: 50,
+      emoji: "🌸",
+      categoryId: createdCategories[1].id,
+    },
+    {
+      name: "Apple Prince",
+      description: "Fruit of Ngalam",
+      price: 18000,
+      stock: 50,
+      emoji: "🍎",
+      categoryId: createdCategories[1].id,
+    },
+    {
+      name: "Hazelnude",
+      description: "Butterscotch with Chocohazel",
+      price: 22000,
+      stock: 50,
+      emoji: "🌰",
+      categoryId: createdCategories[1].id,
+    },
+    {
+      name: "Chio Smiles",
+      description: "Pistachio with Cream Cheese",
+      price: 23000,
+      stock: 50,
+      emoji: "🥜",
+      categoryId: createdCategories[1].id,
+    },
+    {
+      name: "Aoi Matcha",
+      description: "Umami, Sweet, Bitter, Creamy",
+      price: 20000,
+      stock: 50,
+      emoji: "🍵",
+      categoryId: createdCategories[1].id,
+    },
+
+    // Extras
+    {
+      name: "Extra Shot",
+      description: "Additional espresso shot",
+      price: 5000,
+      stock: 200,
+      emoji: "➕",
+      categoryId: createdCategories[2].id,
+    },
+    {
+      name: "Biscoff Biscuit",
+      description: "Crunchy biscuit",
+      price: 3000,
+      stock: 100,
+      emoji: "🍪",
+      categoryId: createdCategories[2].id,
+    },
+
+    // Snack
+    {
+      name: "Burger x French Fries",
+      description: "Burger with crispy fries",
+      price: 30000,
       stock: 30,
-      categoryId: createdCategories[1].id, // Snacks
+      emoji: "🍔",
+      categoryId: createdCategories[3].id,
     },
     {
-      name: "Chocolate Bar",
-      description: "Milk chocolate bar",
-      price: 2.0,
+      name: "Golden Platter",
+      description: "Nugget, Onion Ring, Sausage, Crinkles",
+      price: 30000,
       stock: 25,
-      categoryId: createdCategories[1].id, // Snacks
+      emoji: "🍽️",
+      categoryId: createdCategories[3].id,
     },
     {
-      name: "Cookies",
-      description: "Chocolate chip cookies",
-      price: 4.5,
-      stock: 20,
-      categoryId: createdCategories[1].id, // Snacks
+      name: "Nachoz Bolognese",
+      description: "Nachoz with Bolognese Sauce",
+      price: 28000,
+      stock: 30,
+      emoji: "🌮",
+      categoryId: createdCategories[3].id,
     },
     {
-      name: "Wireless Earbuds",
-      description: "Bluetooth earbuds",
-      price: 99.99,
-      stock: 15,
-      categoryId: createdCategories[2].id, // Electronics
+      name: "Onion Ring",
+      description: "Crispy fried onion rings",
+      price: 22000,
+      stock: 35,
+      emoji: "🧅",
+      categoryId: createdCategories[3].id,
     },
     {
-      name: "Phone Charger",
-      description: "USB-C phone charger",
-      price: 19.99,
-      stock: 8,
-      categoryId: createdCategories[2].id, // Electronics
+      name: "Nana Bloating",
+      description: "Banana Crunchy with Salted Caramel Topping",
+      price: 20000,
+      stock: 30,
+      emoji: "🍌",
+      categoryId: createdCategories[3].id,
     },
     {
-      name: "T-Shirt",
-      description: "Cotton t-shirt",
-      price: 25.0,
+      name: "French Fries",
+      description: "Crispy golden fries",
+      price: 18000,
       stock: 40,
-      categoryId: createdCategories[3].id, // Clothing
+      emoji: "🍟",
+      categoryId: createdCategories[3].id,
+    },
+
+    // Main Course
+    {
+      name: "Beef Teriyaki",
+      description: "Slice Beef with Teriyaki Sauce",
+      price: 28000,
+      stock: 20,
+      emoji: "🥩",
+      categoryId: createdCategories[4].id,
     },
     {
-      name: "Jeans",
-      description: "Denim jeans",
-      price: 65.0,
-      stock: 5,
-      categoryId: createdCategories[3].id, // Clothing
+      name: "Beef Blackpepper",
+      description: "Slice Beef with Blackpepper Sauce",
+      price: 28000,
+      stock: 20,
+      emoji: "🥩",
+      categoryId: createdCategories[4].id,
     },
     {
-      name: "Programming Book",
-      description: "JavaScript programming guide",
-      price: 45.0,
-      stock: 12,
-      categoryId: createdCategories[4].id, // Books
+      name: "Karage Salted Egg",
+      description: "Chicken Karage with Salted Egg Sauce",
+      price: 27000,
+      stock: 25,
+      emoji: "🍗",
+      categoryId: createdCategories[4].id,
+    },
+    {
+      name: "Karage Butter Sauce",
+      description: "Chicken Karage with Butter Sauce",
+      price: 27000,
+      stock: 25,
+      emoji: "🍗",
+      categoryId: createdCategories[4].id,
+    },
+    {
+      name: "Ayam Chili Padi",
+      description: "Spicy Chicken with Stir-fried Chilies",
+      price: 26000,
+      stock: 25,
+      emoji: "🌶️",
+      categoryId: createdCategories[4].id,
+    },
+    {
+      name: "Karage Blackpepper",
+      description: "Fried Chicken with Blackpepper",
+      price: 27000,
+      stock: 25,
+      emoji: "🍗",
+      categoryId: createdCategories[4].id,
+    },
+    {
+      name: "Tamago Gochujang",
+      description: "Boiled Egg with Gochujang Sauce",
+      price: 22000,
+      stock: 30,
+      emoji: "🥚",
+      categoryId: createdCategories[4].id,
+    },
+    {
+      name: "Oyster Sauce Egg",
+      description: "Boiled Egg with Oyster Sauce",
+      price: 22000,
+      stock: 30,
+      emoji: "🥚",
+      categoryId: createdCategories[4].id,
+    },
+
+    // Pasta
+    {
+      name: "Aglio e Olio",
+      description: "Spicy, Salty Spaghetti",
+      price: 26000,
+      stock: 20,
+      emoji: "🍝",
+      categoryId: createdCategories[5].id,
+    },
+    {
+      name: "Carbonara Fettuccine",
+      description: "Creamy, Cheesy Pasta",
+      price: 26000,
+      stock: 20,
+      emoji: "🍝",
+      categoryId: createdCategories[5].id,
     },
   ];
 

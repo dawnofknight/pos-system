@@ -4,6 +4,7 @@ import { AuthProvider } from "@/contexts/AuthContext";
 import { RBACProvider } from "@/contexts/RBACContext";
 import { ThemeProvider } from "@/contexts/ThemeContext";
 import { LanguageProvider } from "@/contexts/LanguageContext";
+import Script from "next/script";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -25,16 +26,21 @@ export const metadata = {
 
 export default function RootLayout({ children }) {
   return (
-    <html lang="en" suppressHydrationWarning>
+    <html
+      lang='en'
+      suppressHydrationWarning
+    >
       <body
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}
       >
+        <Script
+          src='/api-interceptor.js'
+          strategy='beforeInteractive'
+        />
         <ThemeProvider>
           <LanguageProvider>
             <AuthProvider>
-              <RBACProvider>
-                {children}
-              </RBACProvider>
+              <RBACProvider>{children}</RBACProvider>
             </AuthProvider>
           </LanguageProvider>
         </ThemeProvider>
