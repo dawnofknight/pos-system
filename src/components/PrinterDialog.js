@@ -1,26 +1,11 @@
 "use client";
 
 import { useEffect, useState, useCallback } from "react";
-import {
-  Dialog,
-  DialogContent,
-  DialogHeader,
-  DialogTitle,
-  DialogFooter,
-} from "@/components/ui/dialog";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
-import { toast } from "sonner";
+import { Modal } from "@/components/ui";
+import { Button, Input } from "@/components/ui";
 import { nativeDiscoverBluetooth } from "@/lib/printer";
-import { isDesktop } from "@/lib/platform"; // Import platform detection
+import { isDesktop } from "@/lib/platform";
+import toast from "react-hot-toast";
 import PropTypes from "prop-types";
 
 const PrinterDialog = ({ isOpen, onClose, onPrint, onSelectPrinter }) => {
@@ -166,30 +151,30 @@ const PrinterDialog = ({ isOpen, onClose, onPrint, onSelectPrinter }) => {
           {isScanning ? "Scanning..." : "Scan for Bluetooth Printers"}
         </Button>
         {bluetoothDevices.length > 0 && (
-          <Select
-            onValueChange={(value) => {
-              const device = bluetoothDevices.find((d) => d.id === value);
-              setSelectedBluetoothDevice(device);
-              onSelectPrinter({ type: "bluetooth", device });
-            }}
-            defaultValue={
-              selectedBluetoothDevice ? selectedBluetoothDevice.id : ""
-            }
-          >
-            <SelectTrigger>
-              <SelectValue placeholder='Select a Bluetooth device' />
-            </SelectTrigger>
-            <SelectContent>
+          <div>
+            <label className='block text-sm font-medium text-gray-700 mb-2'>
+              Select Bluetooth Device
+            </label>
+            <select
+              value={selectedBluetoothDevice ? selectedBluetoothDevice.id : ""}
+              onChange={(e) => {
+                const device = bluetoothDevices.find((d) => d.id === e.target.value);
+                setSelectedBluetoothDevice(device);
+                onSelectPrinter({ type: "bluetooth", device });
+              }}
+              className='w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500'
+            >
+              <option value="">Select a Bluetooth device</option>
               {bluetoothDevices.map((device) => (
-                <SelectItem
+                <option
                   key={device.id}
                   value={device.id}
                 >
                   {device.name || `ID: ${device.id}`}
-                </SelectItem>
+                </option>
               ))}
-            </SelectContent>
-          </Select>
+            </select>
+          </div>
         )}
       </div>
     );
@@ -214,43 +199,39 @@ const PrinterDialog = ({ isOpen, onClose, onPrint, onSelectPrinter }) => {
   if (!isOpen) return null;
 
   return (
-    <Dialog
-      open={isOpen}
-      onOpenChange={onClose}
+    <Modal
+      isOpen={isOpen}
+      onClose={onClose}
+      title="Select Printer"
     >
-      <DialogContent>
-        <DialogHeader>
-          <DialogTitle>Select Printer</DialogTitle>
-        </DialogHeader>
-        <div className='space-y-4 py-4'>
-          <Select
-            onValueChange={setPrinterType}
-            defaultValue={printerType}
+      <div className='space-y-4'>
+        <div>
+          <label className='block text-sm font-medium text-gray-700 mb-2'>
+            Printer Type
+          </label>
+          <select
+            value={printerType}
+            onChange={(e) => setPrinterType(e.target.value)}
+            className='w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500'
           >
-            <SelectTrigger>
-              <SelectValue placeholder='Select printer type' />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem value='system'>System Print</SelectItem>
-              <SelectItem value='bluetooth'>
-                Bluetooth Printer
-              </SelectItem>
-              <SelectItem value='network'>Network/IP Printer</SelectItem>
-            </SelectContent>
-          </Select>
-
-          {error && <p className='text-sm text-red-500'>{error}</p>}
-
-          {printerType === "system" && (
-            <p className='text-sm text-gray-500'>
-              Uses the device’s native print dialog. Recommended for most
-              printers.
-            </p>
-          )}
-          {printerType === "bluetooth" && renderBluetoothSelector()}
-          {printerType === "network" && renderNetworkSelector()}
+            <option value='system'>System Print</option>
+            <option value='bluetooth'>Bluetooth Printer</option>
+            <option value='network'>Network/IP Printer</option>
+          </select>
         </div>
-        <DialogFooter>
+
+        {error && <p className='text-sm text-red-500'>{error}</p>}
+
+        {printerType === "system" && (
+          <p className='text-sm text-gray-500'>
+            Uses the device's native print dialog. Recommended for most
+            printers.
+          </p>
+        )}
+        {printerType === "bluetooth" && renderBluetoothSelector()}
+        {printerType === "network" && renderNetworkSelector()}
+        
+        <div className='flex justify-end gap-2 mt-6'>
           <Button
             variant='outline'
             onClick={onClose}
@@ -258,9 +239,9 @@ const PrinterDialog = ({ isOpen, onClose, onPrint, onSelectPrinter }) => {
             Cancel
           </Button>
           <Button onClick={handlePrint}>Print</Button>
-        </DialogFooter>
-      </DialogContent>
-    </Dialog>
+        </div>
+      </div>
+    </Modal>
   );
 };
 
