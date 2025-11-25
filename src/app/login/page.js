@@ -1,10 +1,26 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, Suspense } from "react";
 import { useAuth } from "@/contexts/AuthContext";
 import { Button, Input, Card, CardBody } from "@/components/ui";
 import Link from "next/link";
 import { useSearchParams } from "next/navigation";
+
+// Separate component for search params to enable Suspense wrapping
+function SessionExpiredMessage() {
+  const searchParams = useSearchParams();
+  const sessionExpired = searchParams.get("session") === "expired";
+
+  if (!sessionExpired) return null;
+
+  return (
+    <div className='bg-yellow-100 border border-yellow-400 text-yellow-800 px-4 py-3 rounded mb-4'>
+      <p className='font-medium'>
+        Your session has expired. Please login again.
+      </p>
+    </div>
+  );
+}
 
 export default function Login() {
   const [formData, setFormData] = useState({
@@ -18,8 +34,6 @@ export default function Login() {
     logoPath: "/burger-logo.svg",
   });
   const { login } = useAuth();
-  const searchParams = useSearchParams();
-  const sessionExpired = searchParams.get("session") === "expired";
 
   // Fetch branding for dynamic logo and app name
   useEffect(() => {
@@ -94,13 +108,9 @@ export default function Login() {
               onSubmit={handleSubmit}
               className='space-y-6'
             >
-              {sessionExpired && (
-                <div className='bg-yellow-100 border border-yellow-400 text-yellow-800 px-4 py-3 rounded mb-4'>
-                  <p className='font-medium'>
-                    Your session has expired. Please login again.
-                  </p>
-                </div>
-              )}
+              <Suspense fallback={null}>
+                <SessionExpiredMessage />
+              </Suspense>
 
               {error && (
                 <div className='bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded'>
