@@ -722,7 +722,7 @@ export default function CreateSalePage() {
                     </div>
 
                     {/* Category Tabs */}
-                    <div className='flex overflow-x-auto pb-2 mb-2 scrollbar-hide'>
+                    <div className='flex overflow-x-auto scroll-x-touch pb-2 mb-2 scrollbar-hide'>
                       <div
                         className={`flex-shrink-0 px-4 py-2 mr-2 rounded-full cursor-pointer text-sm font-medium transition-colors ${
                           selectedCategory === "all"
@@ -753,7 +753,7 @@ export default function CreateSalePage() {
                   </div>
 
                   {/* Menu Items Grid */}
-                  <div className='flex-1 p-4 md:p-6 overflow-y-auto'>
+                  <div className='flex-1 p-4 md:p-6 overflow-y-auto scroll-touch'>
                     <div className='grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3 md:gap-4'>
                       {filteredItems.map((item) => (
                         <div
@@ -854,7 +854,7 @@ export default function CreateSalePage() {
                   </div>
 
                   {/* Cart Items */}
-                  <div className='flex-1 overflow-y-auto p-6'>
+                  <div className='flex-1 overflow-y-auto scroll-touch p-6'>
                     {cart.length === 0 ? (
                       <div className='flex flex-col items-center justify-center h-full text-gray-500'>
                         <div className='text-4xl mb-4'>🛒</div>

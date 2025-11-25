@@ -20,6 +20,7 @@ import { SkeletonCard, SkeletonTable } from "@/components/ui/Skeleton";
 import Link from "next/link";
 import ProductImage from "@/components/ProductImage";
 import { generateReceiptHTML, generateSaleCSV } from "@/lib/receipt";
+import PrinterDialog from "@/components/PrinterDialog";
 import { useLanguage } from "@/contexts/LanguageContext";
 
 export default function SaleDetailsPage() {
@@ -31,6 +32,7 @@ export default function SaleDetailsPage() {
   const [error, setError] = useState(null);
   const [voiding, setVoiding] = useState(false);
   const [settings, setSettings] = useState(null);
+  const [showPrinterDialog, setShowPrinterDialog] = useState(false);
 
   useEffect(() => {
     if (params.id) {
@@ -139,13 +141,56 @@ export default function SaleDetailsPage() {
   };
 
   const handlePrintReceipt = () => {
-    const receiptHTML = generateReceiptHTML(sale, settings);
-    const printWindow = window.open("", "_blank", "width=300,height=600");
-    if (printWindow) {
-      printWindow.document.write(receiptHTML);
-      printWindow.document.close();
-    } else {
-      alert("Please allow popups to print receipts");
+    if (!settings) {
+      toast.error('Settings not loaded yet. Please try again in a moment.');
+      return;
+    }
+    setShowPrinterDialog(true);
+  };
+
+  const handlePrinterSelect = async (selection) => {
+    if (!selection) return;
+    
+    if (selection.type === "system") {
+      const receiptHTML = generateReceiptHTML(sale, settings);
+      const printWindow = window.open("", "_blank", "width=320,height=600");
+      if (printWindow) {
+        printWindow.document.write(receiptHTML);
+        printWindow.document.close();
+        // The new window will own the print dialog implicitly
+      } else {
+        alert("Please allow popups to print receipts");
+      }
+      setShowPrinterDialog(false);
+    } else if (selection.type === "bluetooth") {
+      // Import dynamically to avoid build errors
+      const { generateESCPOSReceipt, bytesToBase64 } = await import("@/lib/escpos");
+      const { printViaBluetooth } = await import("@/lib/printer");
+      
+      try {
+        // Generate ESC/POS receipt data
+        const escposData = generateESCPOSReceipt(sale, settings);
+        const base64Data = bytesToBase64(escposData);
+        
+        // Get device address from selection
+        const deviceAddress = selection.device?.address || selection.device?.id;
+        
+        if (!deviceAddress) {
+          alert("Please select a Bluetooth printer first");
+          return;
+        }
+        
+        // Print via Bluetooth
+        await printViaBluetooth(deviceAddress, base64Data);
+        alert("Receipt printed successfully!");
+        setShowPrinterDialog(false);
+      } catch (error) {
+        console.error("Bluetooth print error:", error);
+        alert(`Bluetooth print failed: ${error.message || "Unknown error"}. Please make sure:\n1. Printer is turned on\n2. Printer is paired in Bluetooth settings\n3. Printer is in range`);
+      }
+    } else if (selection.type === "network") {
+      alert("Network printer recorded: " + selection.address + "\nUse System Print or a native plugin to print.");
+      setShowPrinterDialog(false);
     }
   };
 
@@ -263,6 +308,13 @@ export default function SaleDetailsPage() {
           </div>
 
           <div className='grid grid-cols-1 lg:grid-cols-3 gap-6'>
+            {/* Printer Dialog */}
+            <PrinterDialog
+              open={showPrinterDialog}
+              onClose={() => setShowPrinterDialog(false)}
+              onSelect={handlePrinterSelect}
+              onBack={() => router.push('/dashboard')}
+            />
             {/* Sale Information */}
             <div className='lg:col-span-2 space-y-6'>
               {/* Items */}

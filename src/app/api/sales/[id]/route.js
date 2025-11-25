@@ -18,6 +18,10 @@ export async function GET(request, { params }) {
     const awaitedParams = await params
     const saleId = parseInt(awaitedParams.id)
 
+    if (isNaN(saleId)) {
+      return NextResponse.json({ error: 'Invalid sale ID' }, { status: 400 });
+    }
+
     const sale = await prisma.sale.findUnique({
       where: { id: saleId },
       include: {
@@ -25,10 +29,10 @@ export async function GET(request, { params }) {
           include: {
             item: {
               include: {
-                category: true
-              }
-            }
-          }
+                category: true,
+              },
+            },
+          },
         },
         table: true,
         paymentMethod: true,
@@ -36,23 +40,31 @@ export async function GET(request, { params }) {
           select: {
             id: true,
             name: true,
-            email: true
-          }
-        }
-      }
-    })
+            email: true,
+          },
+        },
+      },
+    });
 
     if (!sale) {
-      return NextResponse.json({ error: 'Sale not found' }, { status: 404 })
+      return NextResponse.json({ error: 'Sale not found' }, { status: 404 });
     }
+
+    // Sanitize the sale object to ensure no null relations are sent
+    const sanitizedSale = {
+      ...sale,
+      table: sale.table || null,
+      paymentMethod: sale.paymentMethod || null,
+      user: sale.user || null,
+    };
 
     return NextResponse.json({
       success: true,
-      sale
-    })
+      sale: sanitizedSale,
+    });
   } catch (error) {
-    console.error('Error fetching sale details:', error)
-    return NextResponse.json({ error: 'Internal server error' }, { status: 500 })
+    console.error('Error fetching sale details:', error);
+    return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
   }
 }
 

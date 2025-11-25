@@ -1,10 +1,10 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { usePathname, useRouter } from "next/navigation";
+import { usePathname } from "next/navigation";
+import PropTypes from "prop-types";
 import { useAuth } from "@/contexts/AuthContext";
 import { useRBAC } from "@/contexts/RBACContext";
-import { useTheme } from "@/contexts/ThemeContext";
 import { useLanguage } from "@/contexts/LanguageContext";
 import AuditLogViewer from "@/components/AuditLogViewer";
 import LanguageSwitcher from "@/components/LanguageSwitcher";
@@ -15,43 +15,56 @@ export default function DashboardLayout({ children }) {
   const [showAuditLogs, setShowAuditLogs] = useState(false);
   const [settings, setSettings] = useState({
     appName: "POS System",
-    logoPath: "/burger-logo.svg"
+    logoPath: "/burger-logo.svg",
   });
   const { user, logout } = useAuth();
   const { canAccess } = useRBAC();
   const { t } = useLanguage();
 
-  const router = useRouter();
   const pathname = usePathname();
 
   // Fetch branding settings
   useEffect(() => {
     const fetchBranding = async () => {
       try {
-        const response = await fetch('/api/branding');
+        const response = await fetch("/api/branding");
         if (response.ok) {
           const data = await response.json();
           setSettings({
-            appName: data.appName || 'POS System Restaurant Management',
-            logoPath: data.logoPath || '/burger-logo.svg'
+            appName: data.appName || "POS System Restaurant Management",
+            logoPath: data.logoPath || "/burger-logo.svg",
           });
         }
       } catch (error) {
-        console.error('Error fetching branding:', error);
+        console.error("Error fetching branding:", error);
       }
     };
 
     fetchBranding();
-    
+
     // Add event listener for closing audit logs
     const handleCloseAuditLogs = () => setShowAuditLogs(false);
-    window.addEventListener('closeAuditLogs', handleCloseAuditLogs);
-    
+    window.addEventListener("closeAuditLogs", handleCloseAuditLogs);
+
     // Clean up event listener
     return () => {
-      window.removeEventListener('closeAuditLogs', handleCloseAuditLogs);
+      window.removeEventListener("closeAuditLogs", handleCloseAuditLogs);
     };
   }, []);
+
+  // Lock body scroll when mobile sidebar is open
+  useEffect(() => {
+    if (sidebarOpen) {
+      document.body.style.overflow = 'hidden';
+    } else {
+      document.body.style.overflow = 'unset';
+    }
+    
+    // Cleanup on unmount
+    return () => {
+      document.body.style.overflow = 'unset';
+    };
+  }, [sidebarOpen]);
 
   const allNavigation = [
     {
@@ -118,8 +131,8 @@ export default function DashboardLayout({ children }) {
           className='fixed inset-0 bg-black/50 backdrop-blur-sm'
           onClick={() => setSidebarOpen(false)}
         />
-        <div className='relative flex w-full max-w-xs flex-1 flex-col modern-card border-0 rounded-none'>
-          <div className='absolute top-0 right-0 -mr-12 pt-2'>
+        <div className='fixed inset-y-0 left-0 flex w-full max-w-xs flex-col modern-card border-0 rounded-none overflow-hidden'>
+          <div className='absolute top-0 right-0 -mr-12 pt-2 z-10'>
             <button
               type='button'
               className='ml-1 flex h-10 w-10 items-center justify-center rounded-full bg-white/10 backdrop-blur-sm hover:bg-white/20 transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-primary/50'
@@ -129,9 +142,11 @@ export default function DashboardLayout({ children }) {
               <span className='text-white text-xl'>×</span>
             </button>
           </div>
-          <div className='flex-1 h-0 overflow-y-auto'>
-            {/* Mobile Header */}
-            <div className='flex-shrink-0 px-6 py-6 border-b border-gray-200'>
+          
+          {/* Scrollable content container */}
+          <div className='flex flex-col h-full overflow-hidden'>
+            {/* Mobile Header - Fixed */}
+            <div className='flex-shrink-0 px-6 py-6 border-b border-gray-200 bg-white'>
               <div className='flex items-center space-x-3'>
                 <img
                   src={settings.logoPath}
@@ -147,46 +162,52 @@ export default function DashboardLayout({ children }) {
               </div>
             </div>
 
-            {/* Mobile Navigation */}
-            <nav className='px-4 py-6 space-y-2'>
-              {navigation.map((item) => {
-                const isActive = pathname === item.href;
-                return (
-                  <a
-                    key={item.name}
-                    href={item.href}
-                    className={`group flex items-center px-4 py-3 text-sm font-medium rounded-xl transition-all duration-200 ${
-                      isActive
-                        ? "bg-orange-100 text-orange-900 shadow-lg shadow-orange-100/25"
-                        : "text-gray-900 hover:bg-gray-100"
-                    }`}
-                  >
-                    <span className='mr-4 text-lg'>{item.icon}</span>
-                    <div className='flex-1'>
-                      <div className='font-medium'>{item.name}</div>
-                      <div
-                        className={`text-xs ${
-                          isActive ? "text-black-900" : "text-gray-500"
-                        }`}
-                      >
-                        {item.description}
+            {/* Mobile Navigation - Scrollable */}
+            <div className='flex-1 overflow-y-auto overscroll-contain' style={{ WebkitOverflowScrolling: 'touch' }}>
+              <nav className='px-4 py-6 space-y-2'>
+                {navigation.map((item) => {
+                  const isActive = pathname === item.href;
+                  return (
+                    <a
+                      key={item.name}
+                      href={item.href}
+                      className={`group flex items-center px-4 py-3 text-sm font-medium rounded-xl transition-all duration-200 ${
+                        isActive
+                          ? "bg-orange-100 text-orange-900 shadow-lg shadow-orange-100/25"
+                          : "text-gray-900 hover:bg-gray-100"
+                      }`}
+                    >
+                      <span className='mr-4 text-lg'>{item.icon}</span>
+                      <div className='flex-1'>
+                        <div className='font-medium'>{item.name}</div>
+                        <div
+                          className={`text-xs ${
+                            isActive ? "text-black-900" : "text-gray-500"
+                          }`}
+                        >
+                          {item.description}
+                        </div>
                       </div>
-                    </div>
-                  </a>
-                );
-              })}
-            </nav>
+                    </a>
+                  );
+                })}
+              </nav>
 
-            {/* Mobile Footer */}
-            <div className='px-4 py-4 border-t border-gray-200'></div>
+              {/* Mobile Footer */}
+              <div className='px-4 py-4 border-t border-gray-200'></div>
+            </div>
           </div>
         </div>
       </div>
 
       {/* Desktop sidebar */}
-      <div className={`hidden lg:fixed lg:inset-y-0 lg:flex lg:flex-col ${sidebarCollapsed ? 'lg:w-20' : 'lg:w-72'} transition-all duration-300`}>
+      <div
+        className={`hidden lg:fixed lg:inset-y-0 lg:flex lg:flex-col ${
+          sidebarCollapsed ? "lg:w-20" : "lg:w-72"
+        } transition-all duration-300`}
+      >
         <div className='flex min-h-0 flex-1 flex-col modern-card border-0 rounded-none border-r border-gray-200'>
-          <div className='flex-1 flex flex-col overflow-y-auto'>
+          <div className='flex-1 flex flex-col overflow-y-auto scroll-touch'>
             {/* Desktop Header */}
             <div className='flex-shrink-0 px-6 py-8 border-b border-gray-200 flex justify-between items-center'>
               {!sidebarCollapsed && (
@@ -200,7 +221,9 @@ export default function DashboardLayout({ children }) {
                     <h1 className='text-2xl font-bold text-gradient'>
                       {settings.appName}
                     </h1>
-                    <p className='text-sm text-gray-500'>Restaurant Management</p>
+                    <p className='text-sm text-gray-500'>
+                      Restaurant Management
+                    </p>
                   </div>
                 </div>
               )}
@@ -211,17 +234,39 @@ export default function DashboardLayout({ children }) {
                   className='w-10 h-10 mx-auto'
                 />
               )}
-              <button 
+              <button
                 onClick={() => setSidebarCollapsed(!sidebarCollapsed)}
-                className="text-gray-500 hover:text-gray-700 p-1 rounded-full hover:bg-gray-100"
+                className='text-gray-500 hover:text-gray-700 p-1 rounded-full hover:bg-gray-100'
               >
                 {sidebarCollapsed ? (
-                  <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 5l7 7-7 7M5 5l7 7-7 7" />
+                  <svg
+                    xmlns='http://www.w3.org/2000/svg'
+                    className='h-5 w-5'
+                    fill='none'
+                    viewBox='0 0 24 24'
+                    stroke='currentColor'
+                  >
+                    <path
+                      strokeLinecap='round'
+                      strokeLinejoin='round'
+                      strokeWidth={2}
+                      d='M13 5l7 7-7 7M5 5l7 7-7 7'
+                    />
                   </svg>
                 ) : (
-                  <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11 19l-7-7 7-7m8 14l-7-7 7-7" />
+                  <svg
+                    xmlns='http://www.w3.org/2000/svg'
+                    className='h-5 w-5'
+                    fill='none'
+                    viewBox='0 0 24 24'
+                    stroke='currentColor'
+                  >
+                    <path
+                      strokeLinecap='round'
+                      strokeLinejoin='round'
+                      strokeWidth={2}
+                      d='M11 19l-7-7 7-7m8 14l-7-7 7-7'
+                    />
                   </svg>
                 )}
               </button>
@@ -241,7 +286,13 @@ export default function DashboardLayout({ children }) {
                         : "text-gray-900 hover:bg-gray-100"
                     }`}
                   >
-                    <span className={`text-xl ${sidebarCollapsed ? 'mx-auto' : 'mr-4'}`}>{item.icon}</span>
+                    <span
+                      className={`text-xl ${
+                        sidebarCollapsed ? "mx-auto" : "mr-4"
+                      }`}
+                    >
+                      {item.icon}
+                    </span>
                     {!sidebarCollapsed && (
                       <div className='flex-1'>
                         <div className='font-semibold'>{item.name}</div>
@@ -268,7 +319,11 @@ export default function DashboardLayout({ children }) {
         </div>
       </div>
 
-      <div className={`${sidebarCollapsed ? 'lg:pl-20' : 'lg:pl-72'} transition-all duration-300`}>
+      <div
+        className={`${
+          sidebarCollapsed ? "lg:pl-20" : "lg:pl-72"
+        } transition-all duration-300`}
+      >
         {/* Top navigation */}
         <div className='sticky top-0 z-40 flex h-20 modern-card border-0 rounded-none border-b border-gray-200 backdrop-blur-xl bg-white/80'>
           <button
@@ -284,9 +339,9 @@ export default function DashboardLayout({ children }) {
             {/* Search and breadcrumb area */}
             <div className='flex flex-1 items-center'>
               <div className='flex items-center space-x-4'>
-                <button 
+                <button
                   onClick={() => setShowAuditLogs(!showAuditLogs)}
-                  className="flex items-center space-x-1 text-sm bg-blue-50 hover:bg-blue-100 text-blue-700 px-3 py-1 rounded-full transition-all duration-200"
+                  className='flex items-center space-x-1 text-sm bg-blue-50 hover:bg-blue-100 text-blue-700 px-3 py-1 rounded-full transition-all duration-200'
                 >
                   <span>📋</span>
                   <span>{t("auditLogs")}</span>
@@ -305,7 +360,7 @@ export default function DashboardLayout({ children }) {
             <div className='flex items-center space-x-4'>
               {/* Language Switcher */}
               <LanguageSwitcher />
-              
+
               {/* User info */}
               <div className='hidden md:flex items-center space-x-3'>
                 <div className='text-right'>
@@ -337,20 +392,22 @@ export default function DashboardLayout({ children }) {
 
         <main className='p-6 min-h-screen bg-gray-50'>
           {showAuditLogs && (
-            <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50">
-              <div className="relative w-full max-w-6xl bg-white rounded-xl shadow-2xl overflow-hidden">
-                <div className="sticky top-0 z-10 flex items-center p-4 border-b border-gray-200 bg-white">
-                  <h2 className="text-xl font-bold text-gray-800 mr-4">{t("auditLogs")}</h2>
-                  <button 
+            <div className='fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50'>
+              <div className='relative w-full max-w-6xl bg-white rounded-xl shadow-2xl overflow-hidden'>
+                <div className='sticky top-0 z-10 flex items-center p-4 border-b border-gray-200 bg-white'>
+                  <h2 className='text-xl font-bold text-gray-800 mr-4'>
+                    {t("auditLogs")}
+                  </h2>
+                  <button
                     onClick={() => setShowAuditLogs(false)}
-                    className="bg-red-500 hover:bg-red-600 text-white px-3 py-1 rounded-lg flex items-center transition-all duration-200 shadow-md ml-2"
+                    className='bg-red-500 hover:bg-red-600 text-white px-3 py-1 rounded-lg flex items-center transition-all duration-200 shadow-md ml-2'
                   >
-                    <span className="mr-1">{t("close")}</span>
-                    <span className="text-xl">✕</span>
+                    <span className='mr-1'>{t("close")}</span>
+                    <span className='text-xl'>✕</span>
                   </button>
-                  <div className="flex-grow"></div>
+                  <div className='flex-grow'></div>
                 </div>
-                <div className="max-h-[80vh] overflow-y-auto p-4">
+                <div className='max-h-[80vh] overflow-y-auto scroll-touch p-4'>
                   <AuditLogViewer />
                 </div>
               </div>
@@ -362,3 +419,7 @@ export default function DashboardLayout({ children }) {
     </div>
   );
 }
+
+DashboardLayout.propTypes = {
+  children: PropTypes.node.isRequired,
+};
