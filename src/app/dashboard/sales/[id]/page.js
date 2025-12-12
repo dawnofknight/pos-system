@@ -253,6 +253,39 @@ export default function SaleDetailsPage() {
     alert('Receipt downloaded as receipt-' + sale.id + '.txt\n\nOpen it with Thermer or your thermal printer app to print!');
   };
 
+  const handleDownloadThermalReceipt = () => {
+    if (!settings) {
+      alert('Settings not loaded yet. Please try again in a moment.');
+      return;
+    }
+
+    try {
+      // Generate plain text receipt optimized for thermal printers
+      const receiptText = generatePlainTextReceipt(sale, settings);
+      
+      // Create blob and download
+      const blob = new Blob([receiptText], { type: 'text/plain' });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = `thermal-receipt-${sale.id}.txt`;
+      a.style.display = 'none';
+      document.body.appendChild(a);
+      a.click();
+      
+      // Clean up
+      setTimeout(() => {
+        document.body.removeChild(a);
+        URL.revokeObjectURL(url);
+      }, 100);
+      
+      alert('Thermal receipt downloaded!\n\nFile: thermal-receipt-' + sale.id + '.txt\n\nYou can:\n1. Open with Thermer app\n2. Print via Bluetooth printer\n3. Use with any thermal printer app');
+    } catch (error) {
+      console.error('Download error:', error);
+      alert('Failed to download receipt. Please try again.');
+    }
+  };
+
   if (loading) {
     return (
       <AuthGuard>
@@ -347,6 +380,15 @@ export default function SaleDetailsPage() {
               >
                 <span className='sm:hidden'>📊 Export</span>
                 <span className='hidden sm:inline'>📊 Export CSV</span>
+              </Button>
+              <Button
+                variant='outline'
+                onClick={handleDownloadThermalReceipt}
+                title='Download receipt for thermal printers (Thermer compatible)'
+                className='w-full sm:w-auto justify-center sm:justify-start'
+              >
+                <span className='sm:hidden'>⬇️ Thermal</span>
+                <span className='hidden sm:inline'>⬇️ Download Thermal</span>
               </Button>
               <Button
                 variant='outline'
