@@ -19,7 +19,7 @@ import {
 import { SkeletonCard, SkeletonTable } from "@/components/ui/Skeleton";
 import Link from "next/link";
 import ProductImage from "@/components/ProductImage";
-import { generateReceiptHTML, generateSaleCSV } from "@/lib/receipt";
+import { generateReceiptHTML, generateSaleCSV, generatePlainTextReceipt } from "@/lib/receipt";
 import PrinterDialog from "@/components/PrinterDialog";
 import { useLanguage } from "@/contexts/LanguageContext";
 
@@ -194,6 +194,65 @@ export default function SaleDetailsPage() {
     }
   };
 
+  const handleShareReceipt = async () => {
+    if (!settings) {
+      alert('Settings not loaded yet. Please try again in a moment.');
+      return;
+    }
+
+    // Generate plain text receipt
+    const receiptText = generatePlainTextReceipt(sale, settings);
+
+    // Check if Web Share API is available (requires HTTPS)
+    if (navigator.share) {
+      try {
+        // Try sharing as a file first (best for printer apps like Thermer)
+        const blob = new Blob([receiptText], { type: 'text/plain' });
+        const file = new File([blob], `receipt-${sale.id}.txt`, { type: 'text/plain' });
+        
+        await navigator.share({
+          files: [file],
+          title: `Receipt #${sale.id}`,
+        });
+        return;
+      } catch (fileError) {
+        // If file sharing fails, try text sharing
+        if (fileError.name !== 'AbortError') {
+          try {
+            await navigator.share({
+              title: `Receipt #${sale.id}`,
+              text: receiptText,
+            });
+            return;
+          } catch (textError) {
+            if (textError.name === 'AbortError') return;
+            console.log('Share failed, using fallback');
+          }
+        } else {
+          return; // User cancelled
+        }
+      }
+    }
+
+    // Fallback: Create downloadable file for HTTP or unsupported browsers
+    const blob = new Blob([receiptText], { type: 'text/plain' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = `receipt-${sale.id}.txt`;
+    a.style.display = 'none';
+    document.body.appendChild(a);
+    a.click();
+    
+    // Clean up
+    setTimeout(() => {
+      document.body.removeChild(a);
+      URL.revokeObjectURL(url);
+    }, 100);
+    
+    alert('Receipt downloaded as receipt-' + sale.id + '.txt\n\nOpen it with Thermer or your thermal printer app to print!');
+  };
+
   if (loading) {
     return (
       <AuthGuard>
@@ -282,6 +341,13 @@ export default function SaleDetailsPage() {
                 onClick={handleExportSale}
               >
                 📊 Export CSV
+              </Button>
+              <Button
+                variant='outline'
+                onClick={handleShareReceipt}
+                title='Share receipt to thermal printer apps'
+              >
+                📤 Share Receipt
               </Button>
               <Button
                 variant='outline'

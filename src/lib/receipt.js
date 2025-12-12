@@ -288,3 +288,77 @@ export const generateSaleCSV = (sale) => {
 
   return csvContent;
 };
+
+/**
+ * Generate plain text receipt for sharing (compatible with thermal printer apps)
+ * This format is optimized for 58mm thermal printers
+ */
+export const generatePlainTextReceipt = (sale, settings = {}) => {
+  const appName = settings.appName || "POS SYSTEM";
+  const currencySymbol = settings.currencySymbol || "Rp";
+  const subtotal = sale.items.reduce(
+    (sum, item) => sum + item.price * item.quantity,
+    0
+  );
+  const tax = sale.total - subtotal;
+  
+  // Helper function to pad strings for alignment (32 chars for 58mm)
+  const padLine = (left, right, width = 32) => {
+    const spaces = width - left.length - right.length;
+    return left + ' '.repeat(Math.max(0, spaces)) + right;
+  };
+  
+  const divider = '--------------------------------';
+  const date = new Date(sale.createdAt);
+  
+  let receipt = '';
+  
+  // Header - Center aligned
+  receipt += appName.padStart((32 + appName.length) / 2) + '\n';
+  receipt += 'SALES RECEIPT'.padStart((32 + 13) / 2) + '\n';
+  receipt += divider + '\n';
+  
+  // Receipt Info
+  receipt += `Receipt #: ${sale.id}\n`;
+  receipt += `Date: ${date.toLocaleDateString("id-ID")}\n`;
+  receipt += `Time: ${date.toLocaleTimeString("id-ID", { hour: "2-digit", minute: "2-digit" })}\n`;
+  receipt += `Cashier: ${sale.user.name}\n`;
+  
+  if (sale.paymentMethod) {
+    receipt += `Payment: ${sale.paymentMethod.name}\n`;
+  }
+  
+  if (sale.table) {
+    receipt += `Table: ${sale.table.name}\n`;
+  }
+  
+  receipt += divider + '\n';
+  
+  // Items
+  sale.items.forEach((item) => {
+    receipt += `${item.item.name}\n`;
+    const qtyPrice = `${item.quantity} x ${currencySymbol}${item.price.toLocaleString("id-ID")}`;
+    const total = `${currencySymbol}${(item.price * item.quantity).toLocaleString("id-ID")}`;
+    receipt += padLine(' ' + qtyPrice, total) + '\n';
+  });
+  
+  // Totals
+  receipt += divider + '\n';
+  receipt += padLine('Subtotal:', `${currencySymbol}${subtotal.toLocaleString("id-ID")}`) + '\n';
+  
+  if (tax > 0) {
+    receipt += padLine('Tax:', `${currencySymbol}${tax.toLocaleString("id-ID")}`) + '\n';
+  }
+  
+  receipt += padLine('TOTAL:', `${currencySymbol}${sale.total.toLocaleString("id-ID")}`) + '\n';
+  receipt += divider + '\n';
+  
+  // Footer
+  const itemCount = sale.items.reduce((sum, item) => sum + item.quantity, 0);
+  receipt += `Items: ${itemCount}\n`;
+  receipt += divider + '\n';
+  receipt += 'Thank you for your purchase!\n';
+  receipt += 'Please come again!\n';
+  
+  return receipt;
+};
