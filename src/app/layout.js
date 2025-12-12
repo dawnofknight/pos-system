@@ -19,9 +19,25 @@ const geistMono = Geist_Mono({
 export const metadata = {
   title: "POS System",
   description: "Modern Point of Sale System",
+  manifest: "/manifest.json",
   icons: {
-    icon: "/favicon.ico",
+    icon: [
+      { url: "/burger-logo.svg", type: "image/svg+xml" },
+      { url: "/logo.png", sizes: "192x192", type: "image/png" },
+    ],
+    apple: [
+      { url: "/logo.png", sizes: "180x180", type: "image/png" },
+    ],
   },
+  appleWebApp: {
+    capable: true,
+    statusBarStyle: "default",
+    title: "POS System",
+  },
+  formatDetection: {
+    telephone: false,
+  },
+  themeColor: "#ea580c",
 };
 
 export default function RootLayout({ children }) {
@@ -30,6 +46,14 @@ export default function RootLayout({ children }) {
       lang='en'
       suppressHydrationWarning
     >
+      <head>
+        <link rel="manifest" href="/manifest.json" />
+        <meta name="theme-color" content="#ea580c" />
+        <link rel="icon" type="image/svg+xml" href="/burger-logo.svg" />
+        <link rel="apple-touch-icon" href="/logo.png" />
+        <meta name="apple-mobile-web-app-capable" content="yes" />
+        <meta name="apple-mobile-web-app-status-bar-style" content="default" />
+      </head>
       <body
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}
       >
