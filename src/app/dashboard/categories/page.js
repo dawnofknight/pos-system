@@ -153,22 +153,22 @@ export default function CategoriesPage() {
   return (
     <AuthGuard>
       <DashboardLayout>
-        <div className='space-y-8'>
+        <div className='space-y-4 md:space-y-8'>
           {/* Header Section */}
-          <div className='relative overflow-hidden rounded-2xl bg-orange-50 border border-orange-200/50 backdrop-blur-xl'>
+          <div className='relative overflow-hidden rounded-xl md:rounded-2xl bg-orange-50 border border-orange-200/50 backdrop-blur-xl'>
             {/* <div className="absolute inset-0 bg-orange-50/50" /> */}
-            <div className='relative px-8 py-6'>
-              <div className='flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4'>
+            <div className='relative px-4 md:px-8 py-4 md:py-6'>
+              <div className='flex flex-col gap-3 md:gap-4'>
                 <div className='space-y-2'>
-                  <div className='flex items-center gap-3'>
-                    <div className='p-2 rounded-xl bg-gradient-to-br from-orange-500 to-orange-600 shadow-lg'>
-                      <span className='text-white text-xl'>📂</span>
+                  <div className='flex items-center gap-2 md:gap-3'>
+                    <div className='p-1.5 md:p-2 rounded-lg md:rounded-xl bg-gradient-to-br from-orange-500 to-orange-600 shadow-lg'>
+                      <span className='text-white text-base md:text-xl'>📂</span>
                     </div>
-                    <h1 className='text-3xl font-bold text-black'>
+                    <h1 className='text-xl md:text-3xl font-bold text-black'>
                       {t("categoriesManagement")}
                     </h1>
                   </div>
-                  <p className='text-black ml-14'>
+                  <p className='text-sm md:text-base text-black ml-8 md:ml-14'>
                     {t("organizeManageCategories")}
                   </p>
                 </div>
@@ -176,7 +176,7 @@ export default function CategoriesPage() {
                   onClick={() => setShowModal(true)}
                   variant='primary'
                   icon='➕'
-                  className='shadow-lg hover:shadow-xl transition-all duration-300 bg-gradient-to-r from-orange-600 to-orange-700 hover:from-orange-700 hover:to-orange-800'
+                  className='w-full sm:w-auto shadow-lg hover:shadow-xl transition-all duration-300 bg-gradient-to-r from-orange-600 to-orange-700 hover:from-orange-700 hover:to-orange-800'
                 >
                   {t("addNewCategory")}
                 </Button>

@@ -315,65 +315,83 @@ export default function SaleDetailsPage() {
   return (
     <AuthGuard>
       <DashboardLayout>
-        <div className='space-y-6'>
+        <div className='space-y-4 md:space-y-6'>
           {/* Header */}
-          <div className='flex justify-between items-center'>
-            <div>
-              <div className='flex items-center gap-4 mb-2'>
-                <Link href='/dashboard/sales'>
-                  <Button
-                    variant='outline'
-                    size='sm'
-                  >
-                    ← Back to Sales
-                  </Button>
-                </Link>
-                <h1 className='text-2xl font-bold text-gray-900'>
+          <div className='flex flex-col gap-4'>
+            {/* Back button and title */}
+            <div className='flex flex-col sm:flex-row sm:items-center gap-3'>
+              <Link href='/dashboard/sales'>
+                <Button
+                  variant='outline'
+                  size='sm'
+                  className='w-full sm:w-auto'
+                >
+                  ← Back to Sales
+                </Button>
+              </Link>
+              <div className='flex items-center gap-3 flex-wrap'>
+                <h1 className='text-xl md:text-2xl font-bold text-gray-900'>
                   Sale Details
                 </h1>
                 {sale && getStatusBadge(sale.status)}
               </div>
-              <p className='text-gray-600'>Sale ID: #{sale.id}</p>
             </div>
-            <div className='flex gap-2'>
+            <p className='text-sm md:text-base text-gray-600'>Sale ID: #{sale.id}</p>
+            
+            {/* Action buttons */}
+            <div className='flex flex-col sm:flex-row gap-2 sm:flex-wrap'>
               <Button
                 variant='outline'
                 onClick={handleExportSale}
+                className='w-full sm:w-auto justify-center sm:justify-start'
               >
-                📊 Export CSV
+                <span className='sm:hidden'>📊 Export</span>
+                <span className='hidden sm:inline'>📊 Export CSV</span>
               </Button>
               <Button
                 variant='outline'
                 onClick={handleShareReceipt}
                 title='Share receipt to thermal printer apps'
+                className='w-full sm:w-auto justify-center sm:justify-start'
               >
-                📤 Share Receipt
+                <span className='sm:hidden'>📤 Share</span>
+                <span className='hidden sm:inline'>📤 Share Receipt</span>
               </Button>
               <Button
                 variant='outline'
                 onClick={handlePrintReceipt}
+                className='w-full sm:w-auto justify-center sm:justify-start'
               >
-                🖨️ Print Receipt
+                <span className='sm:hidden'>🖨️ Print</span>
+                <span className='hidden sm:inline'>🖨️ Print Receipt</span>
               </Button>
               {sale?.status === "COMPLETED" && (
                 <Button
                   variant='danger'
                   onClick={handleVoidTransaction}
                   disabled={voiding}
+                  className='w-full sm:w-auto justify-center sm:justify-start'
                 >
-                  {voiding ? "Voiding..." : "❌ Void Transaction"}
+                  {voiding ? "Voiding..." : (
+                    <>
+                      <span className='sm:hidden'>❌ Void</span>
+                      <span className='hidden sm:inline'>❌ Void Transaction</span>
+                    </>
+                  )}
                 </Button>
               )}
               <Button
                 variant='primary'
                 onClick={() => router.push("/dashboard/sales/create")}
+                className='w-full sm:w-auto justify-center sm:justify-start'
               >
-                Create New Sale
+                <span className='sm:hidden'>+ New Sale</span>
+                <span className='hidden sm:inline'>Create New Sale</span>
               </Button>
             </div>
           </div>
 
-          <div className='grid grid-cols-1 lg:grid-cols-3 gap-6'>
+          <div className='grid grid-cols-1 lg:grid-cols-3 gap-4 md:gap-6'>
             {/* Printer Dialog */}
             <PrinterDialog
               open={showPrinterDialog}
@@ -382,51 +400,51 @@ export default function SaleDetailsPage() {
               onBack={() => router.push('/dashboard')}
             />
             {/* Sale Information */}
-            <div className='lg:col-span-2 space-y-6'>
+            <div className='lg:col-span-2 space-y-4 md:space-y-6'>
               {/* Items */}
               <Card>
                 <CardHeader>
-                  <h3 className='text-lg font-semibold'>Items Purchased</h3>
+                  <h3 className='text-base md:text-lg font-semibold'>Items Purchased</h3>
                 </CardHeader>
-                <CardBody>
-                  <Table>
+                <CardBody className='overflow-x-auto'>
+                  <Table className='min-w-full'>
                     <TableHeader>
                       <TableRow>
-                        <TableHeaderCell>Item</TableHeaderCell>
-                        <TableHeaderCell>Price</TableHeaderCell>
-                        <TableHeaderCell>Quantity</TableHeaderCell>
-                        <TableHeaderCell>Total</TableHeaderCell>
+                        <TableHeaderCell className='text-xs md:text-sm'>Item</TableHeaderCell>
+                        <TableHeaderCell className='text-xs md:text-sm'>Price</TableHeaderCell>
+                        <TableHeaderCell className='text-xs md:text-sm'>Qty</TableHeaderCell>
+                        <TableHeaderCell className='text-xs md:text-sm'>Total</TableHeaderCell>
                       </TableRow>
                     </TableHeader>
                     <TableBody>
                       {sale?.items?.map((item) => (
                         <TableRow key={item.id}>
-                          <TableCell>
-                            <div className='flex items-center gap-3'>
+                          <TableCell className='min-w-[150px]'>
+                            <div className='flex items-center gap-2'>
                               <ProductImage
                                 item={item.item}
                                 size='md'
                               />
                               <div>
-                                <div className='font-medium'>
+                                <div className='font-medium text-xs md:text-sm'>
                                   {item.item.name}
                                 </div>
-                                <div className='text-sm text-gray-500'>
+                                <div className='text-xs text-gray-500'>
                                   {item.item.category?.name}
                                 </div>
                               </div>
                             </div>
                           </TableCell>
-                          <TableCell>
-                            <span className='font-medium'>
+                          <TableCell className='whitespace-nowrap'>
+                            <span className='font-medium text-xs md:text-sm'>
                               Rp{item.price.toFixed(2)}
                             </span>
                           </TableCell>
                           <TableCell>
-                            <span className='font-medium'>{item.quantity}</span>
+                            <span className='font-medium text-xs md:text-sm'>{item.quantity}</span>
                           </TableCell>
-                          <TableCell>
-                            <span className='font-medium'>
+                          <TableCell className='whitespace-nowrap'>
+                            <span className='font-medium text-xs md:text-sm'>
                               Rp{(item.price * item.quantity).toFixed(2)}
                             </span>
                           </TableCell>
@@ -440,24 +458,24 @@ export default function SaleDetailsPage() {
               {/* Payment Summary */}
               <Card>
                 <CardHeader>
-                  <h3 className='text-lg font-semibold'>Payment Summary</h3>
+                  <h3 className='text-base md:text-lg font-semibold'>Payment Summary</h3>
                 </CardHeader>
                 <CardBody>
                   <div className='space-y-3'>
                     <div className='flex justify-between'>
-                      <span className='text-gray-600'>Subtotal</span>
-                      <span className='font-medium'>
+                      <span className='text-sm md:text-base text-gray-600'>Subtotal</span>
+                      <span className='font-medium text-sm md:text-base'>
                         Rp{subtotal.toFixed(2)}
                       </span>
                     </div>
                     <div className='flex justify-between'>
-                      <span className='text-gray-600'>Tax (10%)</span>
-                      <span className='font-medium'>Rp{tax.toFixed(2)}</span>
+                      <span className='text-sm md:text-base text-gray-600'>Tax (10%)</span>
+                      <span className='font-medium text-sm md:text-base'>Rp{tax.toFixed(2)}</span>
                     </div>
                     <div className='border-t pt-3'>
                       <div className='flex justify-between items-center'>
-                        <span className='text-lg font-semibold'>Total</span>
-                        <span className='text-2xl font-bold text-green-600'>
+                        <span className='text-base md:text-lg font-semibold'>Total</span>
+                        <span className='text-xl md:text-2xl font-bold text-green-600'>
                           Rp{sale.total.toFixed(2)}
                         </span>
                       </div>
@@ -468,11 +486,11 @@ export default function SaleDetailsPage() {
             </div>
 
             {/* Sale Summary */}
-            <div className='space-y-6'>
+            <div className='space-y-4 md:space-y-6'>
               {/* Transaction Info */}
               <Card>
                 <CardHeader>
-                  <h3 className='text-lg font-semibold'>Transaction Info</h3>
+                  <h3 className='text-base md:text-lg font-semibold'>Transaction Info</h3>
                 </CardHeader>
                 <CardBody>
                   <div className='space-y-4'>
@@ -525,7 +543,7 @@ export default function SaleDetailsPage() {
               {/* Quick Stats */}
               <Card>
                 <CardHeader>
-                  <h3 className='text-lg font-semibold'>Quick Stats</h3>
+                  <h3 className='text-base md:text-lg font-semibold'>Quick Stats</h3>
                 </CardHeader>
                 <CardBody>
                   <div className='grid grid-cols-2 gap-4'>

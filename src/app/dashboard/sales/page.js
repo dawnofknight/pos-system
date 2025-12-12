@@ -242,43 +242,43 @@ export default function SalesPage() {
   return (
     <AuthGuard>
       <DashboardLayout>
-        <div className="space-y-6">
-          <div className="flex justify-between items-center">
+        <div className="space-y-4 md:space-y-6">
+          <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-3">
             <div>
-              <h1 className="text-2xl font-bold text-foreground">{t('salesHistory')}</h1>
-              <p className="text-gray-600">{t('viewManageSalesTransactions')}</p>
+              <h1 className="text-xl md:text-2xl font-bold text-foreground">{t('salesHistory')}</h1>
+              <p className="text-sm text-gray-600">{t('viewManageSalesTransactions')}</p>
             </div>
             <Link href="/dashboard/sales/create">
-              <Button variant="primary" className="button-hover-effect bg-orange-600 hover:bg-orange-700">
+              <Button variant="primary" className="button-hover-effect bg-orange-600 hover:bg-orange-700 w-full sm:w-auto">
                 + {t('createNewSale')}
               </Button>
             </Link>
           </div>
 
           {/* Quick Stats */}
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+          <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 md:gap-4">
             <Card className="card-hover">
-              <CardBody className="text-center">
-                <div className="text-2xl font-bold text-orange-600 mb-1">
+              <CardBody className="text-center p-3 md:p-4">
+                <div className="text-lg md:text-2xl font-bold text-orange-600 mb-1">
                   {stats.totalSales}
                 </div>
-                <div className="text-sm text-gray-600">{t('totalSales')}</div>
+                <div className="text-[10px] md:text-sm text-gray-600">{t('totalSales')}</div>
               </CardBody>
             </Card>
             <Card className="card-hover">
-              <CardBody className="text-center">
-                <div className="text-2xl font-bold text-green-600 mb-1">
-                  {settings.currencySymbol}{stats.totalRevenue.toFixed(2)}
+              <CardBody className="text-center p-3 md:p-4">
+                <div className="text-lg md:text-2xl font-bold text-green-600 mb-1">
+                  {settings.currencySymbol}{stats.totalRevenue.toFixed(0)}
                 </div>
-                <div className="text-sm text-gray-600">{t('totalRevenue')}</div>
+                <div className="text-[10px] md:text-sm text-gray-600">{t('totalRevenue')}</div>
               </CardBody>
             </Card>
             <Card className="card-hover">
-              <CardBody className="text-center">
-                <div className="text-2xl font-bold text-purple-600 mb-1">
+              <CardBody className="text-center p-3 md:p-4">
+                <div className="text-lg md:text-2xl font-bold text-purple-600 mb-1">
                   {stats.periodSales}
                 </div>
-                <div className="text-sm text-gray-600">
+                <div className="text-[10px] md:text-sm text-gray-600 line-clamp-2">
                   {periodFilter === 'all' ? t('allTimeSales') : 
                    periodFilter === 'week' ? t('thisWeekSales') : 
                    periodFilter === 'month' ? t('thisMonthSales') : 
@@ -287,11 +287,11 @@ export default function SalesPage() {
               </CardBody>
             </Card>
             <Card className="card-hover">
-              <CardBody className="text-center">
-                <div className="text-2xl font-bold text-orange-600 mb-1">
-                  {settings.currencySymbol}{stats.periodRevenue.toFixed(2)}
+              <CardBody className="text-center p-3 md:p-4">
+                <div className="text-lg md:text-2xl font-bold text-orange-600 mb-1">
+                  {settings.currencySymbol}{stats.periodRevenue.toFixed(0)}
                 </div>
-                <div className="text-sm text-gray-600">
+                <div className="text-[10px] md:text-sm text-gray-600 line-clamp-2">
                   {periodFilter === 'all' ? t('allTimeRevenue') : 
                    periodFilter === 'week' ? t('thisWeekRevenue') : 
                    periodFilter === 'month' ? t('thisMonthRevenue') : 
@@ -303,28 +303,26 @@ export default function SalesPage() {
 
           {/* Search and Filter */}
           <Card>
-            <CardBody>
-              <div className="flex flex-col md:flex-row gap-4">
-                <div className="flex-1">
-                  <input
-                    type="text"
-                    placeholder={t('searchSalesPlaceholder')}
-                    value={searchTerm}
-                    onChange={(e) => setSearchTerm(e.target.value)}
-                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-orange-500"
-                  />
-                </div>
-                <div className="flex gap-2">
+            <CardBody className="p-4 md:p-6">
+              <div className="flex flex-col gap-3">
+                <input
+                  type="text"
+                  placeholder={t('searchSalesPlaceholder')}
+                  value={searchTerm}
+                  onChange={(e) => setSearchTerm(e.target.value)}
+                  className="w-full px-3 py-2 text-sm border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-orange-500"
+                />
+                <div className="flex flex-col sm:flex-row gap-2">
                   <input
                     type="date"
                     value={dateFilter}
                     onChange={(e) => setDateFilter(e.target.value)}
-                    className="px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-orange-500"
+                    className="flex-1 px-3 py-2 text-sm border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-orange-500"
                   />
                   <select
                     value={periodFilter}
                     onChange={(e) => setPeriodFilter(e.target.value)}
-                    className="px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-orange-500"
+                    className="flex-1 px-3 py-2 text-sm border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-orange-500"
                   >
                     <option value="all">{t('allTime')}</option>
                     <option value="week">{t('thisWeek')}</option>
@@ -333,6 +331,7 @@ export default function SalesPage() {
                   </select>
                   <Button
                     variant="outline"
+                    className="w-full sm:w-auto"
                     onClick={() => {
                       setSearchTerm('')
                       setDateFilter('')
@@ -348,30 +347,30 @@ export default function SalesPage() {
               
               {/* Date Range Filter */}
               <div className="mt-4 border-t pt-4">
-                <h3 className="text-sm font-medium mb-2">{t('dateRangeFilter')}</h3>
-                <div className="flex flex-col md:flex-row gap-4">
-                   <div>
+                <h3 className="text-xs md:text-sm font-medium mb-2">{t('dateRangeFilter')}</h3>
+                <div className="flex flex-col sm:flex-row gap-3">
+                   <div className="flex-1">
                      <label className="block text-xs text-gray-500 mb-1">{t('startDate')}</label>
                      <input
                        type="date"
                        value={startDate}
                        onChange={(e) => setStartDate(e.target.value)}
-                       className="px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-orange-500"
+                       className="w-full px-3 py-2 text-sm border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-orange-500"
                      />
                    </div>
-                   <div>
+                   <div className="flex-1">
                      <label className="block text-xs text-gray-500 mb-1">{t('endDate')}</label>
                      <input
                        type="date"
                        value={endDate}
                        onChange={(e) => setEndDate(e.target.value)}
-                       className="px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-orange-500"
+                       className="w-full px-3 py-2 text-sm border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-orange-500"
                      />
                    </div>
                    <div className="flex items-end">
                      <button
                        onClick={() => filterSales()}
-                       className="px-4 py-2 bg-orange-500 text-white rounded-lg hover:bg-orange-600 transition-colors"
+                       className="w-full sm:w-auto px-4 py-2 text-sm bg-orange-500 text-white rounded-lg hover:bg-orange-600 transition-colors"
                      >
                        {t('search')}
                      </button>

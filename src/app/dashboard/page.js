@@ -58,20 +58,20 @@ export default function Dashboard() {
   return (
     <AuthGuard>
       <DashboardLayout>
-        <div className="space-y-6">
-          <div className="mb-8">
-            <div className="flex items-center gap-4 mb-2">
-              <div className="w-12 h-12 rounded-2xl bg-gradient-to-br from-primary-500 to-orange-600 flex items-center justify-center shadow-lg">
-                <span className="text-2xl">📊</span>
+        <div className="space-y-4 md:space-y-6">
+          <div className="mb-6 md:mb-8">
+            <div className="flex items-center gap-3 md:gap-4 mb-2">
+              <div className="w-10 h-10 md:w-12 md:h-12 rounded-2xl bg-gradient-to-br from-primary-500 to-orange-600 flex items-center justify-center shadow-lg">
+                <span className="text-xl md:text-2xl">📊</span>
               </div>
               <div>
                 <h1 
-                  className="text-3xl font-bold text-gray-900"
+                  className="text-2xl md:text-3xl font-bold text-gray-900"
                 >
                   {t('dashboard')}
                 </h1>
                 <p 
-                  className="text-lg transition-colors text-gray-600"
+                  className="text-sm md:text-lg transition-colors text-gray-600"
                 >
                   {t('realTimeInsights')}
                 </p>
@@ -80,29 +80,29 @@ export default function Dashboard() {
           </div>
 
           {/* Stats Cards */}
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+          <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 md:gap-6 mb-6 md:mb-8">
             <Card variant="glass" hover={true}>
-              <CardBody>
+              <CardBody className="p-3 md:p-4">
                 <div className="flex items-center justify-between">
                   <div className="flex-1">
-                    <div className="flex items-center gap-3 mb-3">
-                      <div className="w-12 h-12 rounded-2xl bg-gradient-to-br from-orange-500 to-orange-600 flex items-center justify-center shadow-lg transition-all duration-300">
-                        <span className="text-xl">💰</span>
+                    <div className="flex items-center gap-2 md:gap-3 mb-2 md:mb-3">
+                      <div className="w-10 h-10 md:w-12 md:h-12 rounded-2xl bg-gradient-to-br from-orange-500 to-orange-600 flex items-center justify-center shadow-lg transition-all duration-300">
+                        <span className="text-base md:text-xl">💰</span>
                       </div>
                       <div>
-                        <dt className="text-sm font-semibold text-orange-600 uppercase tracking-wide">
+                        <dt className="text-[10px] md:text-sm font-semibold text-orange-600 uppercase tracking-wide">
                           {t('totalSales')}
                         </dt>
                       </div>
                     </div>
-                    <dd className="text-2xl font-bold bg-gradient-to-r from-orange-600 to-orange-700 bg-clip-text text-transparent mb-1">
-                      Rp{stats?.stats?.totalSales?.amount?.toFixed(2) || '0.00'}
+                    <dd className="text-lg md:text-2xl font-bold bg-gradient-to-r from-orange-600 to-orange-700 bg-clip-text text-transparent mb-1">
+                      Rp{stats?.stats?.totalSales?.amount?.toFixed(0) || '0'}
                     </dd>
-                    <dd className="text-sm font-medium text-orange-600">
+                    <dd className="text-xs md:text-sm font-medium text-orange-600">
                       {stats?.stats?.totalSales?.count || 0} {t('transactions')}
                     </dd>
                   </div>
-                  <div className="w-16 h-16 rounded-2xl bg-gradient-to-br from-orange-100 to-orange-200 flex items-center justify-center">
+                  <div className="hidden sm:flex w-16 h-16 rounded-2xl bg-gradient-to-br from-orange-100 to-orange-200 items-center justify-center">
                     <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-orange-500 to-orange-600 opacity-20"></div>
                   </div>
                 </div>
@@ -110,27 +110,27 @@ export default function Dashboard() {
             </Card>
 
             <Card variant="glass" hover={true}>
-              <CardBody>
+              <CardBody className="p-3 md:p-4">
                 <div className="flex items-center justify-between">
                   <div className="flex-1">
-                    <div className="flex items-center gap-3 mb-3">
-                      <div className="w-12 h-12 rounded-2xl bg-gradient-to-br from-primary-500 to-orange-600 flex items-center justify-center shadow-lg transition-all duration-300">
-                        <span className="text-xl">📈</span>
+                    <div className="flex items-center gap-2 md:gap-3 mb-2 md:mb-3">
+                      <div className="w-10 h-10 md:w-12 md:h-12 rounded-2xl bg-gradient-to-br from-primary-500 to-orange-600 flex items-center justify-center shadow-lg transition-all duration-300">
+                        <span className="text-base md:text-xl">📈</span>
                       </div>
                       <div>
-                        <dt className="text-sm font-semibold text-blue-600 uppercase tracking-wide">
+                        <dt className="text-[10px] md:text-sm font-semibold text-blue-600 uppercase tracking-wide">
                           {t('todaysSales')}
                         </dt>
                       </div>
                     </div>
-                    <dd className="text-2xl font-bold bg-gradient-to-r from-blue-600 to-blue-700 bg-clip-text text-transparent mb-1">
-                      Rp{stats?.stats?.todaysSales?.amount?.toFixed(2) || '0.00'}
+                    <dd className="text-lg md:text-2xl font-bold bg-gradient-to-r from-blue-600 to-blue-700 bg-clip-text text-transparent mb-1">
+                      Rp{stats?.stats?.todaysSales?.amount?.toFixed(0) || '0'}
                     </dd>
-                    <dd className="text-sm font-medium text-blue-600">
+                    <dd className="text-xs md:text-sm font-medium text-blue-600">
                       {stats?.stats?.todaysSales?.count || 0} {t('transactions')}
                     </dd>
                   </div>
-                  <div className="w-16 h-16 rounded-2xl bg-gradient-to-br from-primary-100 to-orange-100 flex items-center justify-center">
+                  <div className="hidden sm:flex w-16 h-16 rounded-2xl bg-gradient-to-br from-primary-100 to-orange-100 items-center justify-center">
                     <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-primary-500 to-orange-600 opacity-20"></div>
                   </div>
                 </div>
@@ -138,27 +138,27 @@ export default function Dashboard() {
             </Card>
 
             <Card variant="glass" hover={true}>
-              <CardBody>
+              <CardBody className="p-3 md:p-4">
                 <div className="flex items-center justify-between">
                   <div className="flex-1">
-                    <div className="flex items-center gap-3 mb-3">
-                      <div className="w-12 h-12 rounded-2xl bg-gradient-to-br from-orange-500 to-orange-600 flex items-center justify-center shadow-lg transition-all duration-300">
-                        <span className="text-xl">📦</span>
+                    <div className="flex items-center gap-2 md:gap-3 mb-2 md:mb-3">
+                      <div className="w-10 h-10 md:w-12 md:h-12 rounded-2xl bg-gradient-to-br from-orange-500 to-orange-600 flex items-center justify-center shadow-lg transition-all duration-300">
+                        <span className="text-base md:text-xl">📦</span>
                       </div>
                       <div>
-                        <dt className="text-sm font-semibold text-green-600 uppercase tracking-wide">
+                        <dt className="text-[10px] md:text-sm font-semibold text-green-600 uppercase tracking-wide">
                           {t('totalItems')}
                         </dt>
                       </div>
                     </div>
-                    <dd className="text-2xl font-bold bg-gradient-to-r from-green-600 to-green-700 bg-clip-text text-transparent mb-1">
+                    <dd className="text-lg md:text-2xl font-bold bg-gradient-to-r from-green-600 to-green-700 bg-clip-text text-transparent mb-1">
                       {stats?.stats?.totalItems || 0}
                     </dd>
-                    <dd className="text-sm font-medium text-green-600">
+                    <dd className="text-xs md:text-sm font-medium text-green-600">
                       {t('inInventory')}
                     </dd>
                   </div>
-                  <div className="w-16 h-16 rounded-2xl bg-gradient-to-br from-orange-100 to-orange-200 flex items-center justify-center">
+                  <div className="hidden sm:flex w-16 h-16 rounded-2xl bg-gradient-to-br from-orange-100 to-orange-200 items-center justify-center">
                     <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-orange-500 to-orange-600 opacity-20"></div>
                   </div>
                 </div>
@@ -166,27 +166,27 @@ export default function Dashboard() {
             </Card>
 
             <Card variant="glass" hover={true}>
-              <CardBody>
+              <CardBody className="p-3 md:p-4">
                 <div className="flex items-center justify-between">
                   <div className="flex-1">
-                    <div className="flex items-center gap-3 mb-3">
-                      <div className="w-12 h-12 rounded-2xl bg-gradient-to-br from-orange-500 to-red-600 flex items-center justify-center shadow-lg transition-all duration-300">
-                        <span className="text-xl">⚠️</span>
+                    <div className="flex items-center gap-2 md:gap-3 mb-2 md:mb-3">
+                      <div className="w-10 h-10 md:w-12 md:h-12 rounded-2xl bg-gradient-to-br from-orange-500 to-red-600 flex items-center justify-center shadow-lg transition-all duration-300">
+                        <span className="text-base md:text-xl">⚠️</span>
                       </div>
                       <div>
-                        <dt className="text-sm font-semibold text-red-600 uppercase tracking-wide">
+                        <dt className="text-[10px] md:text-sm font-semibold text-red-600 uppercase tracking-wide">
                           {t('lowStock')}
                         </dt>
                       </div>
                     </div>
-                    <dd className="text-2xl font-bold bg-gradient-to-r from-red-600 to-red-700 bg-clip-text text-transparent mb-1">
+                    <dd className="text-lg md:text-2xl font-bold bg-gradient-to-r from-red-600 to-red-700 bg-clip-text text-transparent mb-1">
                       {stats?.stats?.lowStockItems || 0}
                     </dd>
-                    <dd className="text-sm font-medium text-red-600">
+                    <dd className="text-xs md:text-sm font-medium text-red-600">
                       {t('itemsUnder10')}
                     </dd>
                   </div>
-                  <div className="w-16 h-16 rounded-2xl bg-gradient-to-br from-orange-100 to-red-100 flex items-center justify-center">
+                  <div className="hidden sm:flex w-16 h-16 rounded-2xl bg-gradient-to-br from-orange-100 to-red-100 items-center justify-center">
                     <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-orange-500 to-red-600 opacity-20"></div>
                   </div>
                 </div>
@@ -195,7 +195,7 @@ export default function Dashboard() {
           </div>
 
           {/* Recent Sales and Top Items */}
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 md:gap-8">
             {/* Recent Sales */}
             <Card variant="glass" hover={true}>
               <CardHeader variant="glass" className="card-header-orange">
