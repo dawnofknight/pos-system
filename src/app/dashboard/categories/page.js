@@ -114,24 +114,24 @@ export default function CategoriesPage() {
                       <div className='p-2 rounded-xl bg-gradient-to-br from-orange-500 to-orange-600 shadow-lg'>
                         <span className='text-white text-xl'>📂</span>
                       </div>
-                      <div className='h-8 w-48 bg-gray-200 dark:bg-gray-700 rounded animate-pulse'></div>
+                      <div className='h-8 w-48 bg-gray-200 rounded animate-pulse'></div>
                     </div>
-                    <div className='h-4 w-64 bg-gray-200 dark:bg-gray-700 rounded animate-pulse'></div>
+                    <div className='h-4 w-64 bg-gray-200 rounded animate-pulse'></div>
                   </div>
-                  <div className='h-10 w-32 bg-gray-200 dark:bg-gray-700 rounded animate-pulse'></div>
+                  <div className='h-10 w-32 bg-gray-200 rounded animate-pulse'></div>
                 </div>
               </div>
             </div>
 
             {/* Content Skeleton */}
-            <div className='bg-white dark:bg-gray-800 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700'>
-              <div className='p-6 border-b border-gray-200 dark:border-gray-700'>
+            <div className='bg-white rounded-lg shadow-sm border border-gray-200'>
+              <div className='p-6 border-b border-gray-200'>
                 <div className='flex items-center justify-between'>
                   <div className='flex items-center gap-3'>
-                    <div className='w-10 h-10 rounded-xl bg-gray-200 dark:bg-gray-700 animate-pulse'></div>
+                    <div className='w-10 h-10 rounded-xl bg-gray-200 animate-pulse'></div>
                     <div className='space-y-2'>
-                      <div className='h-6 w-32 bg-gray-200 dark:bg-gray-700 rounded animate-pulse'></div>
-                      <div className='h-4 w-24 bg-gray-200 dark:bg-gray-700 rounded animate-pulse'></div>
+                      <div className='h-6 w-32 bg-gray-200 rounded animate-pulse'></div>
+                      <div className='h-4 w-24 bg-gray-200 rounded animate-pulse'></div>
                     </div>
                   </div>
                 </div>
@@ -284,7 +284,7 @@ export default function CategoriesPage() {
                 variant='glass'
               />
 
-              <div className='flex flex-col sm:flex-row gap-3 pt-6 border-t border-gray-200 dark:border-gray-700'>
+              <div className='flex flex-col sm:flex-row gap-3 pt-6 border-t border-gray-200'>
                 <Button
                   type='submit'
                   variant='primary'

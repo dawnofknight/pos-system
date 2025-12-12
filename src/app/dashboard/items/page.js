@@ -404,29 +404,29 @@ export default function ItemsPage() {
                     <span className="text-2xl">📦</span>
                   </div>
                   <div className="space-y-2">
-                    <div className="h-8 w-48 bg-gray-200 dark:bg-gray-700 rounded animate-pulse"></div>
-                    <div className="h-4 w-64 bg-gray-200 dark:bg-gray-700 rounded animate-pulse"></div>
+                    <div className="h-8 w-48 bg-gray-200 rounded animate-pulse"></div>
+                    <div className="h-4 w-64 bg-gray-200 rounded animate-pulse"></div>
                   </div>
                 </div>
-                <div className="h-10 w-32 bg-gray-200 dark:bg-gray-700 rounded animate-pulse"></div>
+                <div className="h-10 w-32 bg-gray-200 rounded animate-pulse"></div>
               </div>
             </div>
 
             {/* Tab Navigation Skeleton */}
             <div className="flex space-x-8 border-b border-gray-200">
-              <div className="h-10 w-32 bg-gray-200 dark:bg-gray-700 rounded animate-pulse"></div>
-              <div className="h-10 w-32 bg-gray-200 dark:bg-gray-700 rounded animate-pulse"></div>
+              <div className="h-10 w-32 bg-gray-200 rounded animate-pulse"></div>
+              <div className="h-10 w-32 bg-gray-200 rounded animate-pulse"></div>
             </div>
 
             {/* Content Skeleton */}
-            <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700">
-              <div className="p-6 border-b border-gray-200 dark:border-gray-700">
+            <div className="bg-white rounded-lg shadow-sm border border-gray-200">
+              <div className="p-6 border-b border-gray-200">
                 <div className="flex items-center justify-between">
                   <div className="flex items-center gap-3">
-                    <div className="w-10 h-10 rounded-xl bg-gray-200 dark:bg-gray-700 animate-pulse"></div>
+                    <div className="w-10 h-10 rounded-xl bg-gray-200 animate-pulse"></div>
                     <div className="space-y-2">
-                      <div className="h-6 w-32 bg-gray-200 dark:bg-gray-700 rounded animate-pulse"></div>
-                      <div className="h-4 w-24 bg-gray-200 dark:bg-gray-700 rounded animate-pulse"></div>
+                      <div className="h-6 w-32 bg-gray-200 rounded animate-pulse"></div>
+                      <div className="h-4 w-24 bg-gray-200 rounded animate-pulse"></div>
                     </div>
                   </div>
                 </div>
